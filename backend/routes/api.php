@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\DriverController;
 use App\Http\Controllers\EventController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -55,8 +56,8 @@ Route::apiResource('/usuarios', UserController::class)->middleware([HandlePrecog
 Route::apiResource('/roles', RoleController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/permisos', PermisoController::class)->middleware([HandlePrecognitiveRequests::class]);
 
-Route::apiResource('/orgs', OrgController::class);
-Route::apiResource('/events', EventController::class);
-Route::apiResource('/categorias', CategoriaController::class);
+Route::apiResource('/orgs', OrgController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::apiResource('/events', EventController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::apiResource('/categorias', CategoriaController::class)->middleware([HandlePrecognitiveRequests::class]);
 
-// 
+Route::apiResource('/drivers', DriverController::class)->middleware([HandlePrecognitiveRequests::class]);
