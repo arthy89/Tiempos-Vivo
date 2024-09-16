@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('tripulacions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('piloto');
-            $table->foreign('piloto')->on('drivers')->onDelete('cascade');
+            $table->foreign('piloto')->references('id')->on('drivers')->onDelete('cascade');
             $table->unsignedBigInteger('navegante');
-            $table->foreign('navegante')->on('drivers')->onDelete('cascade');
+            $table->foreign('navegante')->references('id')->on('drivers')->onDelete('cascade');
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
             $table->string('categoria', length: 100);
             $table->string('auto', length: 100);
-            $table->string('auto_num', length: 100);
+            $table->integer('auto_num');
             $table->string('foto_url', length: 100)->nullable();
             $table->timestamps();
         });

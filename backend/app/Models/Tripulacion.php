@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Tripulacion extends Model
 {
@@ -18,4 +19,16 @@ class Tripulacion extends Model
         'auto_num',
         'foto_url',
     ];
+
+    protected $with = ['piloto', 'navegante'];
+
+    public function piloto(): BelongsTo
+    {
+        return $this->belongsTo(Driver::class, 'piloto');
+    }
+
+    public function navegante(): BelongsTo
+    {
+        return $this->belongsTo(Driver::class, 'navegante');
+    }
 }
