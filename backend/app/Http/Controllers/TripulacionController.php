@@ -29,8 +29,8 @@ class TripulacionController extends Controller
      */
     public function store(StoreTripulacionRequest $request)
     {
-        $evento = Tripulacion::create($request->all(), 201);
-        return response()->json($evento);
+        $tripulacion = Tripulacion::create($request->all(), 201);
+        return response()->json($tripulacion);
     }
 
     /**
