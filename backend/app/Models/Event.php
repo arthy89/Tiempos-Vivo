@@ -25,7 +25,7 @@ class Event extends Model
     ];
 
     // Relaciones principales
-    protected $with = ['org', 'ubigeo', 'categorias'];
+    protected $with = ['org', 'ubigeo', 'categorias', 'etapas'];
     // protected $appends = ['org', 'ubigeo', 'categorias'];
 
     public function org(): BelongsTo
@@ -41,5 +41,10 @@ class Event extends Model
     public function categorias(): HasMany
     {
         return $this->hasMany(Categoria::class);
+    }
+
+    public function etapas(): HasMany
+    {
+        return $this->hasMany(Etapa::class);
     }
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\EtapaController;
 use App\Http\Controllers\EventController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +61,7 @@ Route::apiResource('/permisos', PermisoController::class)->middleware([HandlePre
 Route::apiResource('/orgs', OrgController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/events', EventController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/categorias', CategoriaController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::apiResource('/etapas', EtapaController::class)->middleware([HandlePrecognitiveRequests::class]);
 
 Route::apiResource('/drivers', DriverController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/tripulacions', TripulacionController::class)->middleware([HandlePrecognitiveRequests::class]);
