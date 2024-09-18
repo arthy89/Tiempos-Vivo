@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Especial extends Model
 {
@@ -17,8 +18,15 @@ class Especial extends Model
         'distancia',
     ];
 
-    // public function evento(): BelongsTo
-    // {
-    //     return $this->belongsTo(Event::class);
-    // }
+    // protected $with = ['tiempos'];
+
+    public function etapa(): BelongsTo
+    {
+        return $this->belongsTo(Etapa::class);
+    }
+
+    public function tiempos(): HasMany
+    {
+        return $this->hasMany(Tiempo::class);
+    }
 }

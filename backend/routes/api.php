@@ -13,6 +13,7 @@ use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermisoController;
+use App\Http\Controllers\TiempoController;
 use App\Http\Controllers\TripulacionController;
 use App\Http\Controllers\UbigeoController;
 
@@ -64,6 +65,7 @@ Route::apiResource('/events', EventController::class)->middleware([HandlePrecogn
 Route::apiResource('/categorias', CategoriaController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/etapas', EtapaController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/especials', EspecialController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::apiResource('/tiempos', TiempoController::class)->middleware([HandlePrecognitiveRequests::class]);
 
 Route::apiResource('/drivers', DriverController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/tripulacions', TripulacionController::class)->middleware([HandlePrecognitiveRequests::class]);
