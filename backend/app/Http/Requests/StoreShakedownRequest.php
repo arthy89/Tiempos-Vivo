@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreTiempoRequest extends FormRequest
+class StoreShakedownRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,14 +22,10 @@ class StoreTiempoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'especial_id' => 'nullable|numeric',
-            'shakedown_id' => 'nullable|numeric',
-            'tripulacion_id' => 'required|numeric',
-            'hora_salida' => 'required',
-            'hora_llegada' => 'required',
-            'hora_marcado' => 'nullable',
-            'penalizacion' => 'nullable',
-            'registrador' => 'required',
+            'event_id' => 'required|numeric',
+            'nombre' => 'required',
+            'lugar' => 'nullable',
+            'distancia' => 'nullable',
         ];
     }
 }

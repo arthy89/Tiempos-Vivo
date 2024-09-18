@@ -12,6 +12,7 @@ class Tiempo extends Model
 
     protected $fillable = [
         'especial_id',
+        'shakedown_id',
         'tripulacion_id',
         'hora_salida',
         'hora_llegada',
@@ -25,6 +26,11 @@ class Tiempo extends Model
     public function especial(): BelongsTo
     {
         return $this->belongsTo(Especial::class);
+    }
+
+    public function shakedown(): BelongsTo
+    {
+        return $this->belongsTo(Shakedown::class);
     }
 
     public function tripulacion(): BelongsTo

@@ -52,4 +52,9 @@ class Event extends Model
     {
         return $this->hasMany(Etapa::class);
     }
+
+    public function shakedown(): HasOne
+    {
+        return $this->hasOne(Shakedown::class);
+    }
 }

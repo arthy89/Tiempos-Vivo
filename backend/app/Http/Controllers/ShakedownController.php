@@ -2,38 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Especial;
-use App\Http\Requests\StoreEspecialRequest;
+use App\Models\Shakedown;
+use App\Http\Requests\StoreShakedownRequest;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 
-class EspecialController extends Controller
+class ShakedownController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Especial::all();
+        return Shakedown::all();
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreEspecialRequest $request)
+    public function store(StoreShakedownRequest $request)
     {
-        $especial = Especial::create($request->all(), 201);
-        return response()->json($especial);
+        $shakedown = Shakedown::create($request->all());
+        return response()->json($shakedown);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Especial $especial)
+    public function show(Shakedown $shakedown)
     {
-        if ($especial) {
+        if ($shakedown) {
 
-            $tiempos = $especial->tiempos;
+            $tiempos = $shakedown->tiempos;
 
             foreach ($tiempos as $tiempo)
             {
@@ -62,24 +61,24 @@ class EspecialController extends Controller
 
             return response()->json($tiempos);
         } else {
-            return response()->json(['error' => 'El Especial no existe.'], 404);
+            return response()->json(['error' => 'El Shakedown no existe.'], 404);
         }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreEspecialRequest $request, Especial $especial)
+    public function update(StoreShakedownRequest $request, Shakedown $shakedown)
     {
-        $especial->update($request->all());
-        return response()->json($especial);
+        $shakedown->update($request->all());
+        return response()->json($shakedown);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Especial $especial)
+    public function destroy(Shakedown $shakedown)
     {
-        return response()->json($especial->delete());
+        return response()->json($shakedown->delete());
     }
 }
