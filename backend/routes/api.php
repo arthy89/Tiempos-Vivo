@@ -52,6 +52,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     ]);
 });
 
+Route::apiResource('/ubigeos', UbigeoController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::get('ubigeo', [UbigeoController::class, 'getUbigeo']);
 Route::get('departamentos', [UbigeoController::class, 'getDepartamentos']);
 Route::get('provincias', [UbigeoController::class, 'getProvincias']);

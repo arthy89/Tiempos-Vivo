@@ -18,8 +18,8 @@ class EventController extends Controller
             $request,
             Event::query(),
             [],
-            [],
-            [],
+            ['id', 'name'],
+            ['id', 'name']
             // ['id', 'nombre'],
             // ['id', 'nombre', 'codigo']
         );

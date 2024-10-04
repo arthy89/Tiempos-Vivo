@@ -35,7 +35,7 @@ class Event extends Model
 
     public function ubigeo(): BelongsTo
     {
-        return $this->belongsTo(Ubigeo::class);
+        return $this->belongsTo(Ubigeo::class, 'ubigeo_id', 'codigo');
     }
 
     public function categorias(): HasMany

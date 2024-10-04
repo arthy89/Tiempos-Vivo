@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name', length: 100);
             $table->text('descripcion')->nullable();
-            $table->foreignId('ubigeo_id')->constrained(); // region
+            $table->char('ubigeo_id', 6);
+            $table->foreign('ubigeo_id')->references('codigo')->on('ubigeos');
             $table->longText('foto_url')->nullable();
             $table->timestamps();
         });

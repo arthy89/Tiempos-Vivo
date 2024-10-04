@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Ubigeo extends Model
 {
     use HasFactory;
+
+    protected $primaryKey = 'codigo';
+
     protected $fillable = [
         'codigo',
         'tipo',
@@ -27,7 +30,8 @@ class Ubigeo extends Model
             ->where('cod_dist', '00')
             ->first();
         // Ejemplo de cálculo o valor personalizado
-        return $departamento->nombre;
+        // return $departamento->nombre;
+        return $departamento ? $departamento->nombre : null;
     }
     public function getprovinciaAttribute()
     {
@@ -38,7 +42,8 @@ class Ubigeo extends Model
             ->first();
 
         // Ejemplo de cálculo o valor personalizado
-        return $provincia->nombre;
+        // return $provincia->nombre;
+        return $provincia ? $provincia->nombre : null;
     }
 
     public function orgs(): HasMany

@@ -20,7 +20,7 @@ class Org extends Model
 
     public function ubigeo(): BelongsTo
     {
-        return $this->belongsTo(Ubigeo::class);
+        return $this->belongsTo(Ubigeo::class, 'codigo');
     }
 
     public function events(): HasMany
