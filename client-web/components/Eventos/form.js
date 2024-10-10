@@ -22,9 +22,6 @@ import { formData } from './formData';
 import UbigeoService from '@/services/UbigeoService';
 
 const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
-  // const url = process.env.NEXT_PUBLIC_SERVER_URI;
-  // console.log("URLLLLLLLL", url);
-
   const [selectDep, setDep] = useState(null);
   const [selectProv, setProv] = useState(null);
   const [selectDist, setDist] = useState(null);
@@ -65,14 +62,9 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
     "Autocross",
   ];
 
-  // http://127.0.0.1:8000/
-  // const form = isEdit
-  //   ? useForm('put', 'http://tev.test/api/events/' + id, formData)
-  //   : useForm('post', 'http://tev.test/api/events', formData);
-  
   const form = isEdit
-    ? useForm('put', 'http://127.0.0.1:8000/api/events/' + id, formData)
-    : useForm('post', 'http://127.0.0.1:8000/api/events', formData);
+    ? useForm('put', 'api/events/' + id, formData)
+    : useForm('post', 'api/events', formData);  
 
   useEffect(() => {
     const fetchData = async () => {
