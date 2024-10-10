@@ -12,15 +12,45 @@ import {
 import {CalendarDate, parseDate, getLocalTimeZone, parseAbsoluteToLocal, Time, ZonedDateTime} from "@internationalized/date";
 import {useDateFormatter} from "@react-aria/i18n";
 import {Select, SelectSection, SelectItem} from "@nextui-org/select";
-import NextuiAlert from 'nextui-alert'
+import NextuiAlert from 'nextui-alert';
 import { IoAlertCircle } from "react-icons/io5";
 import { RxCross1 } from "react-icons/rx";
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { useForm } from 'laravel-precognition-react';
 import EventoService from '@/services/EventoService';
 import { formData } from './formData';
+import UbigeoService from '@/services/UbigeoService';
 
 const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
+  const [selectDep, setDep] = useState(null);
+  const [selectProv, setProv] = useState(null);
+  const [selectDist, setDist] = useState(null);
+
+  const { data: departamentos } = UbigeoService.getDepartamentos();
+  const { data: provincias } = UbigeoService.getProvincias({
+    cod_dep: selectDep
+  });
+  const { data: distritos } = UbigeoService.getDistritos({
+    cod_dep: selectDep,
+    cod_prov: selectProv
+  });
+  // console.log('gaaa',departamentos);
+
+  const handleDep = (e) => {
+    setDep(e);
+    form.setData('departamento', e);
+  }
+
+  const handleProv = (e) => {
+    setProv(e);
+    form.setData('provincia', e);
+  }
+
+  const handleDist = (e) => {
+    setDist(e)
+    form.setData('distrito', e);
+  }
+  
   // Estados para la alerta
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -37,10 +67,15 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
     : useForm('post', 'http://tev.test/api/events', formData);
 
   useEffect(() => {
-    console.log('EDIT', isEdit);
-    if (isEdit) {
-      evento(id);
-    }
+    const fetchData = async () => {
+      console.log('EDIT', isEdit);
+      if (isEdit) {
+        await evento(id);
+        console.log("DATOOOOOOS", form.data); // Se ejecuta después de que los datos hayan sido asignados
+      }
+    };
+    
+    fetchData();
   }, []);
 
   const fecha = (fechaString) => {
@@ -69,6 +104,12 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
   };
 
   const onSave = async (event) => {
+    // console.log("formmm", form.data);
+    form.setData(
+      'ubigeo_id', 
+      selectDep + selectProv + selectDist
+    );
+
     event.preventDefault();
     // const res = await UbigeoService.save(form);
     // console.log('save', res);
@@ -201,6 +242,71 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
           <p className="text-default-500 text-sm">
             <b>Hora:</b> {formatTime12Hour(parseTime(form.data.hora))}
           </p>
+
+          {/* Ubigeo */}
+
+          <Select
+            variant='bordered'
+            label='Departamento'
+            labelPlacement='outside'
+            // value={form.data.departamento}
+            // selectedKeys={[form.data.departamento]}
+            // color={!selectDep ? 'danger' : 'success'}
+            color={'success'}
+            onChange={(e) => {handleDep(e.target.value)}}
+            // onBlur={() => form.validate('departamento')}
+            // isInvalid={form.invalid('departamento')}
+            // errorMessage={form.errors.departamento}
+            isRequired
+          >
+            {departamentos?.map((dep) => (
+              <SelectItem key={dep.cod_dep}>
+                {dep.nombre}
+              </SelectItem>
+            ))}
+          </Select>
+
+          <Select
+            variant='bordered'
+            label='Provincia'
+            labelPlacement='outside'
+            value={form.data.provincia}
+            selectedKeys={[form.data.provincia]}
+            color={form.invalid('provincia') ? 'danger' : 'success'}
+            onChange={(e) => {handleProv(e.target.value)}}
+            onBlur={() => form.validate('provincia')}
+            isInvalid={form.invalid('provincia')}
+            errorMessage={form.errors.provincia}
+            isRequired
+            isDisabled={!form.data.departamento}
+          >
+            {provincias?.map((prov) => (
+              <SelectItem key={prov.cod_prov}>
+                {prov.nombre}
+              </SelectItem>
+            ))}
+          </Select>
+
+          <Select
+            variant='bordered'
+            label='Distritos'
+            labelPlacement='outside'
+            value={form.data.distrito}
+            selectedKeys={[form.data.distrito]}
+            color={form.invalid('distrito') ? 'danger' : 'success'}
+            onChange={(e) => {handleDist(e.target.value)}}
+            onBlur={() => form.validate('distrito')}
+            isInvalid={form.invalid('distrito')}
+            errorMessage={form.errors.distrito}
+            isRequired
+            isDisabled={!form.data.provincia}
+          >
+            {distritos?.map((dist) => (
+              <SelectItem key={dist.cod_dist}>
+                {dist.nombre}
+              </SelectItem>
+            ))}
+          </Select>
 
         </ModalBody>
 

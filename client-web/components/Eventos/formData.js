@@ -11,9 +11,14 @@ export const formData = {
   name: '',
   descripcion: '',
   tipo: '',
-  ubigeo_id: 211101,
+  ubigeo_id: '',
   fecha: '',
   hora: '',
   foto_url: '',
   ruta_url: '',
+
+  // ubigeo
+  departamento: '',
+  provincia: '',
+  distrito: '',
 };
