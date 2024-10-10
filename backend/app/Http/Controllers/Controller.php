@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Storage;
 
 class Controller extends BaseController
 {
@@ -68,5 +69,56 @@ class Controller extends BaseController
         }
 
         return $this->getPageSize()?$querySet->paginate($this->getPageSize()):response()->json(['data'=>$querySet->get()]);
+    }
+
+    /**
+     * Función auxiliar para manejar la carga de archivos.
+     *
+     * @param Request $request
+     * @param string $inputName
+     * @param string $directory
+     * @param array $uploadedFiles
+     * @return string|null
+     */
+    public function handleFileUpload($request, $inputName, $directory, &$uploadedFiles)
+    {
+        if ($request->hasFile($inputName)) {
+            $file = $request->file($inputName);
+            $direccion = $file->store('public/' . $directory);
+            $urlarchivo = Storage::url($direccion);
+
+            $uploadedFiles[] = $direccion;
+
+            return $urlarchivo;
+        }
+
+        return null;
+    }
+
+    /**
+     * Función auxiliar para eliminar un archivo antiguo si existe y cargar uno nuevo.
+     *
+     * @param Request $request
+     * @param string $inputName
+     * @param string|null $existingFile
+     * @param string $directory
+     * @param array $uploadedFiles
+     * @return string|null
+     */
+    public function updateFileIfExists($request, $inputName, $existingFile, $directory, &$uploadedFiles)
+    {
+        // Si hay un nuevo archivo en el request
+        if ($request->hasFile($inputName)) {
+            // Si ya existe un archivo almacenado, eliminarlo
+            if ($existingFile) {
+                Storage::delete(str_replace('/storage', 'public', $existingFile)); // Asegurarse de eliminar el archivo correcto
+            }
+
+            // Subir el nuevo archivo
+            return $this->handleFileUpload($request, $inputName, $directory, $uploadedFiles);
+        }
+
+        // Si no hay nuevo archivo, devolver el archivo existente
+        return $existingFile;
     }
 }
