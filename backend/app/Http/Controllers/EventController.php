@@ -30,6 +30,10 @@ class EventController extends Controller
      */
     public function store(StoreEventRequest $request)
     {
+        // todo Ejemplos
+        // $req_tm['manual_url'] = $this->handleFileUpload($request, 'manual_url', 'archivos', $uploadedFiles);
+        // $reservorioR['foto_1'] = $this->updateFileIfExists($request, 'foto_1', $reservoriocv->foto_1, 'fotografias', $uploadedFiles);
+
         $evento = Event::create($request->all(), 201);
         return response()->json($evento);
     }
