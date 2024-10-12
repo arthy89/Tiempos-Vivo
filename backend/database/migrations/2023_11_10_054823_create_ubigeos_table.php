@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('ubigeos', function (Blueprint $table) {
             // $table->id('codigo', 6);
-            $table->char('codigo', 6)->primary()->unique();
+            $table->char('codigo', 6)->primary();
             $table->enum('tipo', ['departamento', 'provincia', 'distrito']);
             $table->char('cod_dep', 2);
             $table->char('cod_prov', 2);

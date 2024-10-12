@@ -121,4 +121,10 @@ class Controller extends BaseController
         // Si no hay nuevo archivo, devolver el archivo existente
         return $existingFile;
     }
+
+    // todo Ejemplos
+    // Actualizar
+    // $reservorioR['foto_1'] = $this->updateFileIfExists($request, 'foto_1', $reservoriocv->foto_1, 'fotografias', $uploadedFiles);
+    // Nuevo
+    // $event_R['foto_url'] = $this->handleFileUpload($request, 'foto_url', 'fotografias', $uploadedFiles);
 }

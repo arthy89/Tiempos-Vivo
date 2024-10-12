@@ -13,7 +13,11 @@ class EventoService {
     // }
 
     static async get(id) {
-      return (await api.get(`/api/events/${id}`)).data;
+      return (await api.get(`api/events/${id}`)).data;
+    }
+
+    static async delete(id) {
+      return await api.delete(`api/events/${id}`);
     }
 }
 

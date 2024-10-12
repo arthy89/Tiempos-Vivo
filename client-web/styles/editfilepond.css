@@ -1,0 +1,13 @@
+/* filepond-custom.css */
+
+.filepond--root .filepond--drop-label {
+  font-size: 16px;
+  padding: 0px;
+  /* color: red; */
+  min-height: 2.75em;
+  cursor: pointer;
+}
+
+
+
+  

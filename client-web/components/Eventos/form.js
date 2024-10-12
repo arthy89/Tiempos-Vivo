@@ -9,6 +9,13 @@ import {
   DatePicker,
   TimeInput,
 } from '@nextui-org/react';
+// FilePond
+import { FilePond, registerPlugin } from 'react-filepond';
+import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
+import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
+import 'filepond/dist/filepond.min.css';
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+import '@/styles/editfilepond.css'; // Si tienes tus propios estilos personalizados.
 import {CalendarDate, parseDate, getLocalTimeZone, parseAbsoluteToLocal, Time, ZonedDateTime} from "@internationalized/date";
 import {useDateFormatter} from "@react-aria/i18n";
 import {Select, SelectSection, SelectItem} from "@nextui-org/select";
@@ -21,7 +28,12 @@ import EventoService from '@/services/EventoService';
 import { formData } from './formData';
 import UbigeoService from '@/services/UbigeoService';
 
+// Register the plugins
+registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
+
 const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
+  const [datos, setDatos] = useState(null);
+
   const [selectDep, setDep] = useState(null);
   const [selectProv, setProv] = useState(null);
   const [selectDist, setDist] = useState(null);
@@ -62,21 +74,48 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
     "Autocross",
   ];
 
+  // Fotos
+  const [file, setFile] = useState(null);
+
+  // ! ENVIAR FORM 
   const form = isEdit
-    ? useForm('put', 'api/events/' + id, formData)
+    ? useForm('post', 'api/events/' + id + '?_method=PUT', formData)
     : useForm('post', 'api/events', formData);  
 
   useEffect(() => {
     const fetchData = async () => {
       console.log('EDIT', isEdit);
       if (isEdit) {
-        await evento(id);
-        console.log("DATOOOOOOS", form.data); // Se ejecuta después de que los datos hayan sido asignados
+        const eventData = await evento(id); 
+        setDatos(eventData); // Este cambio no es inmediato
       }
     };
-    
+  
     fetchData();
-  }, []);
+  }, [isEdit, id]); // Elimina `datos` de las dependencias
+  
+  // UseEffect para monitorear cambios en "datos"
+  useEffect(() => {
+    if (datos) {
+      console.log("DATOOOOOOS", datos); // Se ejecuta cuando "datos" cambie
+    }
+  }, [datos]);
+  
+  useEffect(() => {
+    if (form.data.ubigeo_id && form.data.ubigeo_id.length === 6) {
+      const ubigeoId = form.data.ubigeo_id; 
+      setDep(ubigeoId?.substring(0, 2));
+      setProv(ubigeoId?.substring(2, 4));
+      setDist(ubigeoId?.substring(4, 6));
+    }
+  }, [form.data.ubigeo_id]);
+  
+  // Este useEffect se ejecutará después de que `selectDep`, `selectProv`, y `selectDist` hayan sido actualizados
+  // useEffect(() => {
+  //   if (selectDep && selectProv && selectDist) {
+  //     console.log('Ubigeo extraído:', { selectDep, selectProv, selectDist });
+  //   }
+  // }, [selectDep, selectProv, selectDist]);     
 
   const fecha = (fechaString) => {
     const [year, month, day] = fechaString.split('-').map(Number);
@@ -104,6 +143,13 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
   };
 
   const onSave = async (event) => {
+    // console.log(file[0].file);
+    if (file) {
+      form.setData(
+        'foto_url', file[0].file
+      );
+    }
+
     // console.log("formmm", form.data);
     form.setData(
       'ubigeo_id', 
@@ -203,7 +249,7 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
             label="Fecha (dd/mm/aaaa)"
             labelPlacement='outside'
             variant='bordered'
-            value={fecha(form.data.fecha)}
+            value={fecha(form.data.fecha) || null}
             color={form.invalid('fecha') ? 'danger' : 'success'}
             onChange={(e) => {
               // console.log(e);
@@ -250,13 +296,9 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
             label='Departamento'
             labelPlacement='outside'
             // value={form.data.departamento}
-            // selectedKeys={[form.data.departamento]}
-            // color={!selectDep ? 'danger' : 'success'}
+            selectedKeys={[selectDep]}
             color={'success'}
             onChange={(e) => {handleDep(e.target.value)}}
-            // onBlur={() => form.validate('departamento')}
-            // isInvalid={form.invalid('departamento')}
-            // errorMessage={form.errors.departamento}
             isRequired
           >
             {departamentos?.map((dep) => (
@@ -270,15 +312,12 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
             variant='bordered'
             label='Provincia'
             labelPlacement='outside'
-            value={form.data.provincia}
-            selectedKeys={[form.data.provincia]}
-            color={form.invalid('provincia') ? 'danger' : 'success'}
+            // value={form.data.provincia}
+            selectedKeys={[selectProv]}
+            color={'success'}
             onChange={(e) => {handleProv(e.target.value)}}
-            onBlur={() => form.validate('provincia')}
-            isInvalid={form.invalid('provincia')}
-            errorMessage={form.errors.provincia}
             isRequired
-            isDisabled={!form.data.departamento}
+            isDisabled={!selectDep}
           >
             {provincias?.map((prov) => (
               <SelectItem key={prov.cod_prov}>
@@ -289,17 +328,14 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
 
           <Select
             variant='bordered'
-            label='Distritos'
+            label='Distrito'
             labelPlacement='outside'
-            value={form.data.distrito}
-            selectedKeys={[form.data.distrito]}
-            color={form.invalid('distrito') ? 'danger' : 'success'}
+            // value={form.data.distrito}
+            selectedKeys={[selectDist]}
+            color={'success'}
             onChange={(e) => {handleDist(e.target.value)}}
-            onBlur={() => form.validate('distrito')}
-            isInvalid={form.invalid('distrito')}
-            errorMessage={form.errors.distrito}
             isRequired
-            isDisabled={!form.data.provincia}
+            isDisabled={!selectProv}
           >
             {distritos?.map((dist) => (
               <SelectItem key={dist.cod_dist}>
@@ -307,6 +343,37 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
               </SelectItem>
             ))}
           </Select>
+
+          {/* FilePond */}
+          <div>
+            {/* <p className='text-sm text-success mb-1'>Foto de Portada</p> */}
+            {isEdit ? (
+              <p className='text-sm text-success mb-1'>Cambiar Foto</p>
+            ) : (
+              <p className='text-sm text-success mb-1'>Foto de Portada</p>
+            )}
+            <FilePond
+              files={file}
+              onupdatefiles={setFile}
+              credits={false}
+              labelIdle='Agregar imagen'
+            />
+          </div>
+
+          {/* URL RUTA */}
+          <Input
+            label='Ruta'
+            placeholder='Link de la ruta...'
+            labelPlacement='outside'
+            type='text'
+            variant='bordered'
+            value={form.data.ruta_url}
+            color={'success'}
+            onValueChange={(e) => form.setData('ruta_url', e)}
+            // onBlur={() => form.validate('name')}
+            // isInvalid={form.invalid('name')}
+            // errorMessage={form.errors.name}
+          />
 
         </ModalBody>
 

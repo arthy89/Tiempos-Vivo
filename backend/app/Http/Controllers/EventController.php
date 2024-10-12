@@ -6,6 +6,9 @@ use App\Models\Event;
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
@@ -30,12 +33,32 @@ class EventController extends Controller
      */
     public function store(StoreEventRequest $request)
     {
-        // todo Ejemplos
-        // $req_tm['manual_url'] = $this->handleFileUpload($request, 'manual_url', 'archivos', $uploadedFiles);
-        // $reservorioR['foto_1'] = $this->updateFileIfExists($request, 'foto_1', $reservoriocv->foto_1, 'fotografias', $uploadedFiles);
+        // $user = Auth::all();
+        // return $user;
 
-        $evento = Event::create($request->all(), 201);
-        return response()->json($evento);
+        DB::beginTransaction();
+
+        $uploadedFiles = [];
+
+        try {
+            $event_R = $request->all();
+
+            $event_R['foto_url'] = $this->handleFileUpload($request, 'foto_url', 'fotografias', $uploadedFiles);
+
+            $evento = Event::create($event_R);
+
+            DB::commit();
+
+            return response("Evento creado con éxito", 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            foreach ($uploadedFiles as $file) {
+                Storage::delete($file);
+            }
+
+            return response()->json(['error' => 'Error al crear el nuevo Evento', 'message' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -55,8 +78,29 @@ class EventController extends Controller
      */
     public function update(StoreEventRequest $request, Event $event)
     {
-        $event->update($request->all());
-        return response()->json($event);
+        DB::beginTransaction();
+
+        $uploadedFiles = [];
+
+        try {
+            $event_R = $request->all();
+
+            $event_R['foto_url'] = $this->updateFileIfExists($request, 'foto_url', $event->foto_url, 'fotografias', $uploadedFiles);
+
+            $event->update($event_R);
+
+            DB::commit();
+
+            return response("Evento actualizado con éxito", 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            foreach ($uploadedFiles as $file) {
+                Storage::delete($file);
+            }
+
+            return response()->json(['error' => 'Error al actualizar el nuevo Evento', 'message' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -64,6 +108,20 @@ class EventController extends Controller
      */
     public function destroy(Event $event)
     {
-        return response()->json($event->delete());
+        $filesToDelete = [
+            $event->foto_url,
+        ];
+
+        foreach ($filesToDelete as $file) {
+            if ($file) {
+                // Reemplaza la ruta de "/storage" a "public" para eliminarlo del almacenamiento
+                $path = str_replace('/storage', 'public', $file);
+                Storage::delete($path);
+            }
+        }
+        $event->delete();
+
+        return response("Evento Eliminado correctamente", 201);
+
     }
 }

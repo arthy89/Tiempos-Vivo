@@ -17,14 +17,19 @@ import {
   ModalBody,
   ModalFooter,
   Tooltip,
+  Image,
 } from '@nextui-org/react';
 import { MdAutoFixHigh, MdEdit, MdDeleteForever } from 'react-icons/md';
 import React, { useMemo, useRef, useState } from 'react';
 import EventoService from '@/services/EventoService';
 import { columns } from './columns';
 import Form from './form';
+import Foto from '@/components/Modals/Foto';
+import Eliminar from "@/components/Modals/Eliminar";
 
 function EventoTable() {
+  const url = process.env.NEXT_PUBLIC_SERVER_URI;
+
   const [page, setPage] = useState(1);
   const [rowPerPage, setRowPerPage] = useState(5);
   const [edit, setEdit] = useState(false);
@@ -47,6 +52,18 @@ function EventoTable() {
     // console.log(childData);
     mutate();
     onClose();
+  };
+
+  //* Funcion para abrir el Modal <Foto />
+  const [isFotoModalOpen, setFotoModalOpen] = useState(false); // Modal de foto
+  const [selectFoto, setSelectFoto] = useState(null); // para ver la foto
+  const verFoto = async (e) => {
+    // console.log("gaaaaaaaaaaaaaaaaaaa", e);
+    // verifica que e sea dif de Null
+    if (e) {
+      setSelectFoto(e);
+      setFotoModalOpen(true);
+    }
   };
 
   const loadingState = isLoading || data?.data.legth === 0 ? 'loading' : 'idle';
@@ -127,10 +144,27 @@ function EventoTable() {
     // console.log(res);
   };
 
+  // const eliminar = async (e) => {
+  //   console.log(e);
+  //   await EventoService.delete(e.id);
+  //   mutate();
+  // };
+
+  //* Funcion para abrir el Modal <Eliminar>
+  const [isDel, setDel] = useState(false); // Modal de foto
+  const [selectData, setSelectData] = useState(null);
+
   const eliminar = async (e) => {
-    console.log(e);
-    await EventoService.delete(e.id);
+    // console.log(e);
+    setSelectData(e);
+    setDel(true);
+  };
+
+  //* Funcion para eliminar el Registro (Depende del archivo Servicios)
+  const delFicha = async (id) => {
+    await EventoService.delete(id);
     mutate();
+    setDel(false);
   };
 
   const renderCell = React.useCallback((row, columnKey, index) => {
@@ -155,8 +189,20 @@ function EventoTable() {
             {nombre} - {provincia} - {departamento}
           </p>
         );
-      // case 'descripcion':
-      //   return <p>{cellValue}</p>;
+      case 'foto_url':
+        return (
+          <div>
+            <Button variant="light" onClick={() => verFoto(row.foto_url)}>
+              <Image
+                radius="md"
+                src={row.foto_url != null ? `${url}`+`${row.foto_url}` : '/img/mono.png'}
+                alt="Prev Img"
+                width={70}
+                loading='lazy'
+              />  
+            </Button>
+          </div>
+        );
       // case 'tipo':
       //   return <p>{cellValue}</p>;
       case 'acciones':
@@ -231,6 +277,22 @@ function EventoTable() {
         </TableBody>
       </Table>
       {/* <pre>{JSON.stringify(data?.data)}</pre> */}
+
+      {/* Modal para Ver Foto */}
+      <Foto
+        isOpen={isFotoModalOpen}
+        onOpenChange={setFotoModalOpen}
+        datos={selectFoto}
+      />
+
+      {/* Modal Eliminar */}
+      <Eliminar
+        isOpen={isDel}
+        onOpenChange={setDel}
+        datos={selectData}
+        delFicha={delFicha}
+        onClose={onClose}
+      />
     </>
   )
 }
