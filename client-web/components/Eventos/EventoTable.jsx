@@ -76,7 +76,8 @@ function EventoTable() {
             <Modal
               isOpen={isOpen}
               onOpenChange={onOpenChange}
-              placement='top-center'
+              placement='center'
+              scrollBehavior='outside'
             >
               <ModalContent>
                 {(onClose) => (
