@@ -24,6 +24,12 @@ class StoreEtapaRequest extends FormRequest
         return [
             'event_id' => 'required',
             'nombre' => 'required',
+
+            // Especiales
+            'especiales' => 'array|nullable',
+            'especiales.*.nombre' => 'nullable',
+            'especiales.*.lugar' => 'nullable',
+            'especiales.*.distancia' => 'nullable',
         ];
     }
 }

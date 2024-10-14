@@ -22,13 +22,13 @@ import {
 import { useRouter } from "next/navigation";
 import { MdAutoFixHigh, MdEdit, MdDeleteForever, MdRemoveRedEye  } from 'react-icons/md';
 import React, { useMemo, useRef, useState } from 'react';
-import EventoService from '@/services/EventoService';
+import EtapaService from '@/services/EtapaService';
 import { columns } from './columns';
 import Form from './form';
-import Foto from '@/components/Modals/Foto';
 import Eliminar from "@/components/Modals/Eliminar";
 
-function EventoTable() {
+function EtapaTable({ idEvent }) {
+  // console.log('IDEVENT', idEvent);
   const router = useRouter();
 
   const url = process.env.NEXT_PUBLIC_SERVER_URI;
@@ -38,10 +38,11 @@ function EventoTable() {
   const [edit, setEdit] = useState(false);
   const [id, setId] = useState(0);
 
-  const { data, mutate, isLoading } = EventoService.getData({
+  const { data, mutate, isLoading } = EtapaService.getData({
     page,
     rowsPerPage: rowPerPage,
-    order_by: '-id',
+    // order_by: '-id',
+    event_id: idEvent,
   });
   console.log(data?.last_page);
   console.log(data);
@@ -57,18 +58,6 @@ function EventoTable() {
     onClose();
   };
 
-  //* Funcion para abrir el Modal <Foto />
-  const [isFotoModalOpen, setFotoModalOpen] = useState(false); // Modal de foto
-  const [selectFoto, setSelectFoto] = useState(null); // para ver la foto
-  const verFoto = async (e) => {
-    // console.log("gaaaaaaaaaaaaaaaaaaa", e);
-    // verifica que e sea dif de Null
-    if (e) {
-      setSelectFoto(e);
-      setFotoModalOpen(true);
-    }
-  };
-
   const loadingState = isLoading || data?.data.legth === 0 ? 'loading' : 'idle';
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const refForm = useRef(null);
@@ -77,11 +66,12 @@ function EventoTable() {
     return (
       <div className='flex flex-col gap-4'>
         <div className='flex justify-between gap-3 items-end'>
-          <Input
+          {/* <Input
             isClearable
             className='w-full sm:max-w-[44%]'
             placeholder='Search by name...'
-          />
+          /> */}
+          <span className='text-xl font-bold'>Lista de Etapas</span>
           <div className='flex gap-3'>
             <Button
               onPress={() => {
@@ -108,6 +98,7 @@ function EventoTable() {
                       id={id}
                       onClose={onClose}
                       ref={refForm}
+                      idEvent={idEvent}
                     />
                   </>
                 )}
@@ -117,10 +108,10 @@ function EventoTable() {
         </div>
         <div className='flex justify-between items-center'>
           <span className='text-default-400 text-small'>
-            Total {data?.total} users
+            Total {data?.total}
           </span>
           <label className='flex items-center text-default-400 text-small'>
-            Rows per page:
+            Filas por página
             <select
               className='bg-transparent outline-none text-default-400 text-small'
               onChange={(e) => {
@@ -145,19 +136,6 @@ function EventoTable() {
     setId(e.id);
   };
 
-  const ver = (e) => {
-    // console.log("XZDDDDDDDDDD", e);
-    // router.push(`/admin/eventos/${e.id}`);
-    const slug = `${e.id}-${e.name.replace(/\s+/g, '-').toLowerCase()}`;
-    router.push(`/admin/eventos/${slug}`);
-  };
-
-  // const eliminar = async (e) => {
-  //   console.log(e);
-  //   await EventoService.delete(e.id);
-  //   mutate();
-  // };
-
   //* Funcion para abrir el Modal <Eliminar>
   const [isDel, setDel] = useState(false); // Modal de foto
   const [selectData, setSelectData] = useState(null);
@@ -170,7 +148,7 @@ function EventoTable() {
 
   //* Funcion para eliminar el Registro (Depende del archivo Servicios)
   const delFicha = async (id) => {
-    await EventoService.delete(id);
+    await EtapaService.delete(id);
     mutate();
     setDel(false);
   };
@@ -182,40 +160,28 @@ function EventoTable() {
       case 'id':
         // return <p>{cellValue}</p>;
         return <p>{(index !== undefined && index !== null) ? index + 1 : '-'}</p>;
-      case 'ubigeo':
-        // const depNombre = departamento ? departamento.nombre : '-';
-        // const provNombre = provincia ? provincia.nombre : '-';
-        // return (
-        //   <p>
-        //     {nombre ? `${nombre} - ${provNombre} - ${depNombre}` : '-'}
-        //   </p>
-        // );
-        
-        const { nombre, distrito, provincia, departamento } = row.ubigeo || {};
+
+      case 'especiales':
+        const especiales = row.especiales || [];
         return (
-          <p>
-            {nombre} - {provincia} - {departamento}
-          </p>
+          // <>
+          //   {especiales.length === 0 ? (
+          //     <p>Sin Especiales</p>
+          //   ) : (
+          //     <ul>
+          //       {especiales.map((especial, index) => (
+          //         <li key={especial.id}>
+          //           {especial.nombre} - {especial.lugar} ({especial.distancia} km)
+          //         </li>
+          //       ))}
+          //     </ul>
+          //   )}
+          // </>
+          <p>{ especiales.length === 0 ? 'Sin especiales' : especiales.length }</p>
         );
-      case 'foto_url':
-        return (
-          <div>
-            <Button variant="light" onClick={() => verFoto(row.foto_url)}>
-              <Image
-                radius="md"
-                src={row.foto_url != null ? `${url}`+`${row.foto_url}` : '/img/mono.png'}
-                alt="Prev Img"
-                width={70}
-                loading='lazy'
-              />  
-            </Button>
-          </div>
-        );
-      // case 'tipo':
-      //   return <p>{cellValue}</p>;
       case 'acciones':
         return (
-          <div className='relative flex items-center gap-2'>
+          <div className='flex justify-center gap-2'>
             <Tooltip content='Editar'>
               <span
                 onClick={() => editar(row)}
@@ -224,16 +190,6 @@ function EventoTable() {
                 <MdEdit size='1.4em' />
               </span>
             </Tooltip>
-
-            <Tooltip content='Ver'>
-              <span
-                onClick={() => ver(row)}
-                className='text-lg text-default-400 cursor-pointer active:opacity-50'
-              >
-                <MdRemoveRedEye size='1.4em' />
-              </span>
-            </Tooltip>
-
             <Tooltip color='danger' content='Eliminar'>
               <span
                 onClick={() => eliminar(row)}
@@ -274,7 +230,7 @@ function EventoTable() {
           {(column) => (
             <TableColumn
               key={column.uid}
-              align={column.uid === 'actions' ? 'center' : 'start'}
+              align={column.uid === 'acciones' || column.uid === 'especiales' ? 'center' : 'start'}
             >
               {column.name}
             </TableColumn>
@@ -296,13 +252,6 @@ function EventoTable() {
       </Table>
       {/* <pre>{JSON.stringify(data?.data)}</pre> */}
 
-      {/* Modal para Ver Foto */}
-      <Foto
-        isOpen={isFotoModalOpen}
-        onOpenChange={setFotoModalOpen}
-        datos={selectFoto}
-      />
-
       {/* Modal Eliminar */}
       <Eliminar
         isOpen={isDel}
@@ -315,4 +264,4 @@ function EventoTable() {
   )
 }
 
-export default EventoTable
+export default EtapaTable

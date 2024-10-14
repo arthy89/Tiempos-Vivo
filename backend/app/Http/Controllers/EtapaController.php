@@ -5,15 +5,23 @@ namespace App\Http\Controllers;
 use App\Models\Etapa;
 use App\Http\Requests\StoreEtapaRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class EtapaController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Etapa::all();
+        return $this->generateViewSetList(
+            $request,
+            Etapa::query(),
+            ['event_id'],
+            ['id', 'nombre'],
+            ['id', 'nombre']
+        );
     }
 
     /**
@@ -21,8 +29,23 @@ class EtapaController extends Controller
      */
     public function store(StoreEtapaRequest $request)
     {
-        $etapa = Etapa::create($request->all(), 201);
-        return response()->json($etapa);
+        DB::beginTransaction();
+
+        try {
+            $etapa = Etapa::create($request->all());
+
+            if ($request->especiales) {
+                $etapa->especiales()->createMany($request->especiales);
+            }
+
+            DB::commit();
+
+            return response("Etapa creada con éxito", 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json(['error' => 'Error al crear la Etapa', 'message' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -42,8 +65,24 @@ class EtapaController extends Controller
      */
     public function update(StoreEtapaRequest $request, Etapa $etapa)
     {
-        $etapa->update($request->all());
-        return response()->json($etapa);
+        DB::beginTransaction();
+
+        try {
+            $etapa->update($request->all());
+
+            if ($request->especiales) {
+                $etapa->especiales()->delete();
+                $etapa->especiales()->createMany($request->especiales);
+            }
+
+            DB::commit();
+
+            return response("Etapa actualizada con éxito", 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json(['error' => 'Error al actualizar la Etapa', 'message' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -51,6 +90,7 @@ class EtapaController extends Controller
      */
     public function destroy(Etapa $etapa)
     {
-        return response()->json($etapa->delete());
+        $etapa->delete();
+        return response("Etapa eliminada");
     }
 }
