@@ -4,15 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Categoria;
 use App\Http\Requests\StoreCategoriaRequest;
+use Illuminate\Http\Request;
 
 class CategoriaController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Categoria::all());
+        return $this->generateViewSetList(
+            $request,
+            Categoria::query(),
+            ['event_id'],
+            ['id', 'name'],
+            ['id', 'name']
+        );
     }
 
     /**
