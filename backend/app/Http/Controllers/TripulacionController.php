@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Tripulacion;
 use App\Http\Requests\StoreTripulacionRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class TripulacionController extends Controller
 {
@@ -16,11 +18,9 @@ class TripulacionController extends Controller
         return $this->generateViewSetList(
             $request,
             Tripulacion::query(),
-            [],
-            [],
-            [],
-            // ['id', 'nombre'],
-            // ['id', 'nombre', 'codigo']
+            ['event_id'],
+            ['id', 'piloto', 'navegante'],
+            ['id', 'piloto', 'navegante'],
         );
     }
 
@@ -29,8 +29,29 @@ class TripulacionController extends Controller
      */
     public function store(StoreTripulacionRequest $request)
     {
-        $tripulacion = Tripulacion::create($request->all(), 201);
-        return response()->json($tripulacion);
+        DB::beginTransaction();
+
+        $uploadedFiles = [];
+
+        try {
+            $tri_R = $request->all();
+
+            $tri_R['foto_url'] = $this->handleFileUpload($request, 'foto_url', 'fotografias', $uploadedFiles);
+
+            $tripulacion = Tripulacion::create($tri_R);
+
+            DB::commit();
+
+            return response("Tripulación creada con éxito", 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            foreach ($uploadedFiles as $file) {
+                Storage::delete($file);
+            }
+
+            return response()->json(['error' => 'Error al crear la nueva Tripulación', 'message' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -50,8 +71,29 @@ class TripulacionController extends Controller
      */
     public function update(StoreTripulacionRequest $request, Tripulacion $tripulacion)
     {
-        $tripulacion->update($request->all());
-        return response()->json($tripulacion);
+        DB::beginTransaction();
+
+        $uploadedFiles = [];
+
+        try {
+            $tri_R = $request->all();
+
+            $tri_R['foto_url'] = $this->updateFileIfExists($request, 'foto_url', $tripulacion->foto_url, 'fotografias', $uploadedFiles);
+
+            $tripulacion->update($tri_R);
+
+            DB::commit();
+
+            return response("Tripulación actualizada con éxito", 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            foreach ($uploadedFiles as $file) {
+                Storage::delete($file);
+            }
+
+            return response()->json(['error' => 'Error al actualizar la Tripulación', 'message' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -59,6 +101,19 @@ class TripulacionController extends Controller
      */
     public function destroy(Tripulacion $tripulacion)
     {
-        return response()->json($tripulacion->delete());
+        $filesToDelete = [
+            $tripulacion->foto_url,
+        ];
+
+        foreach ($filesToDelete as $file) {
+            if ($file) {
+                // Reemplaza la ruta de "/storage" a "public" para eliminarlo del almacenamiento
+                $path = str_replace('/storage', 'public', $file);
+                Storage::delete($path);
+            }
+        }
+        $tripulacion->delete();
+
+        return response("Evento Eliminado correctamente", 201);
     }
 }

@@ -18,10 +18,8 @@ class DriverController extends Controller
             $request,
             Driver::query(),
             [],
-            [],
-            [],
-            // ['id', 'nombre'],
-            // ['id', 'nombre', 'codigo']
+            ['nombre', 'apellidos'],
+            ['id', 'nombre']
         );
     }
 

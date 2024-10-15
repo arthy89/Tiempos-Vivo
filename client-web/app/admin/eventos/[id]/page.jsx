@@ -6,6 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import EventoService from '@/services/EventoService';
 import EtapaTable from '@/components/Eventos/Etapas/EtapaTable';
 import CategoriaTable from '@/components/Eventos/Categorias/CategoriaTable';
+import TripulacionTable from '@/components/Eventos/Tripulaciones/TripulacionTable';
 
 function page() {
   const router = useRouter();
@@ -47,8 +48,9 @@ function page() {
             />
           </Tab>
           <Tab key="tripulaciones" title="Tripulaciones">
-            {/*! Cambiar */}
-            {/* <EtapaTable /> */}
+            <TripulacionTable 
+              idEvent={idEvent}
+            />
           </Tab>
         </Tabs>
       </div> 

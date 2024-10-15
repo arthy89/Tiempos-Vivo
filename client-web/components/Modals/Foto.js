@@ -20,7 +20,7 @@ function Foto({ datos, isOpen, onOpenChange }) {
               {datos && (
                 <>
                   <ModalHeader>
-                    Portada
+                    Foto
                   </ModalHeader>
                   <ModalBody>
                     <div className="flex justify-center">
