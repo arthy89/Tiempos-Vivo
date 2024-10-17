@@ -25,20 +25,21 @@ import { useRouter } from "next/navigation";
 import { MdAutoFixHigh, MdEdit, MdDeleteForever, MdRemoveRedEye  } from 'react-icons/md';
 import React, { useMemo, useRef, useState } from 'react';
 import TripulacionService from '@/services/TripulacionService';
-import { columns } from './columns';
+import { columns as allColumns  } from './columns';
 import TripulacionForm from './form';
 import ConductorForm from './Conductor/form';
 import Foto from '@/components/Modals/Foto';
 import Eliminar from "@/components/Modals/Eliminar";
 
-function TripulacionTable({ idEvent }) {
+function TripulacionTable({ idEvent, modo }) {
   // console.log('IDEVENT', idEvent);
+  console.log('MODOOOOOOO', modo);
   const router = useRouter();
 
   const url = process.env.NEXT_PUBLIC_SERVER_URI;
 
   const [page, setPage] = useState(1);
-  const [rowPerPage, setRowPerPage] = useState(5);
+  const [rowPerPage, setRowPerPage] = useState(100);
   const [edit, setEdit] = useState(false);
   const [id, setId] = useState(0);
 
@@ -54,6 +55,14 @@ function TripulacionTable({ idEvent }) {
   const pages = useMemo(() => {
     return data?.last_page;
   }, [data?.total, rowPerPage]);
+
+  // Filtrar las columnas basadas en el valor de `modo`
+  const columns = useMemo(() => {
+    if (modo === 'client') {
+      return allColumns.filter(column => column.uid !== 'acciones'); // Excluye 'acciones'
+    }
+    return allColumns;
+  }, [modo]);
 
   const onSave = () => {
     mutate();
@@ -79,56 +88,58 @@ function TripulacionTable({ idEvent }) {
   const topContent = React.useMemo(() => {
     return (
       <div className='flex flex-col gap-4'>
-        <div className='flex justify-between gap-3 items-end'>
+        <div className='flex items-end justify-between gap-3'>
           <span className='text-xl font-bold'>Lista de Tripulaciones</span>
-          <div className='flex gap-3'>
-            <Button
-              onPress={() => {
-                setEdit(false);
-                onOpen();
-              }}
-              color='primary'
-              endContent={<MdAutoFixHigh size='1.4em' />}
-            >
-              Añadir
-            </Button>
-            <Modal
-              isOpen={isOpen}
-              onOpenChange={onOpenChange}
-              placement='center'
-              scrollBehavior='outside'
-            >
-              <ModalContent>
-                {(onClose) => (
-                  <>
-                    <ModalHeader className='flex flex-col gap-1'>
-                      {edit ? 'Editar Tripulación' : "Agregar Tripulación"}
-                    </ModalHeader>
+            {modo != 'client' && (
+              <div className='flex gap-3'>
+                <Button
+                  onPress={() => {
+                    setEdit(false);
+                    onOpen();
+                  }}
+                  color='primary'
+                  endContent={<MdAutoFixHigh size='1.4em' />}
+                >
+                  Añadir
+                </Button>
+                <Modal
+                  isOpen={isOpen}
+                  onOpenChange={onOpenChange}
+                  placement='center'
+                  scrollBehavior='outside'
+                >
+                  <ModalContent>
+                    {(onClose) => (
+                      <>
+                        <ModalHeader className='flex flex-col gap-1'>
+                          {edit ? 'Editar Tripulación' : "Agregar Tripulación"}
+                        </ModalHeader>
 
-                    <div className="flex justify-center w-full flex-col">
-                      <Tabs aria-label="Options" className='flex justify-center'>
-                        <Tab key="tripulacion" title="Tripulación">
-                          <TripulacionForm
-                            save={onSave}
-                            isEdit={edit}
-                            id={id}
-                            onClose={onClose}
-                            ref={refForm}
-                            idEvent={idEvent}
-                          />
-                        </Tab>
-                        <Tab key="conductor" title="Nuevo Conductor">
-                          <ConductorForm />
-                        </Tab>
-                      </Tabs>
-                    </div>
-                  </>
-                )}
-              </ModalContent>
-            </Modal>
-          </div>
+                        <div className="flex flex-col justify-center w-full">
+                          <Tabs aria-label="Options" className='flex justify-center'>
+                            <Tab key="tripulacion" title="Tripulación">
+                              <TripulacionForm
+                                save={onSave}
+                                isEdit={edit}
+                                id={id}
+                                onClose={onClose}
+                                ref={refForm}
+                                idEvent={idEvent}
+                              />
+                            </Tab>
+                            <Tab key="conductor" title="Nuevo Conductor">
+                              <ConductorForm />
+                            </Tab>
+                          </Tabs>
+                        </div>
+                      </>
+                    )}
+                  </ModalContent>
+                </Modal>
+              </div>
+            )}
         </div>
-        <div className='flex justify-between items-center'>
+        <div className='flex items-center justify-between'>
           <span className='text-default-400 text-small'>
             Total {data?.total}
           </span>
@@ -206,12 +217,13 @@ function TripulacionTable({ idEvent }) {
           </div>
         );
       case 'acciones':
+        if (modo == 'client') return '';
         return (
           <div className='flex justify-center gap-2'>
             <Tooltip content='Editar'>
               <span
                 onClick={() => editar(row)}
-                className='text-lg text-default-400 cursor-pointer active:opacity-50'
+                className='text-lg cursor-pointer text-default-400 active:opacity-50'
               >
                 <MdEdit size='1.4em' />
               </span>
@@ -219,7 +231,7 @@ function TripulacionTable({ idEvent }) {
             <Tooltip color='danger' content='Eliminar'>
               <span
                 onClick={() => eliminar(row)}
-                className='text-lg text-danger cursor-pointer active:opacity-50'
+                className='text-lg cursor-pointer text-danger active:opacity-50'
               >
                 <MdDeleteForever size='1.4em' />
               </span>
@@ -238,7 +250,7 @@ function TripulacionTable({ idEvent }) {
         topContent={topContent}
         bottomContent={
           pages > 0 ? (
-            <div className='flex w-full justify-center'>
+            <div className='flex justify-center w-full'>
               <Pagination
                 isCompact
                 showControls
@@ -256,7 +268,7 @@ function TripulacionTable({ idEvent }) {
           {(column) => (
             <TableColumn
               key={column.uid}
-              align={column.uid === 'acciones' || column.uid === 'especiales' ? 'center' : 'start'}
+              align={column.uid === 'acciones' || column.uid === 'especiales' || column.uid === 'foto_url' ? 'center' : 'start'}
             >
               {column.name}
             </TableColumn>

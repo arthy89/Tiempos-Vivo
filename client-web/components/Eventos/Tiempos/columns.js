@@ -6,7 +6,8 @@ export const columns = [
   { name: 'H. Salida', uid: 'hora_salida' },
   { name: 'H. Llegada', uid: 'hora_llegada' },
   { name: 'Penalización', uid: 'penalizacion' },
-  { name: 'T. Marcado', uid: 'hora_marcado' },
+  { name: 'Tiempo', uid: 'hora_marcado' },
   { name: 'Diferencias', uid: 'diferencias' },
+  { name: 'Foto', uid: 'foto' },
   { name: 'Acciones', uid: 'acciones' },
 ]

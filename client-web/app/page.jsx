@@ -9,34 +9,36 @@ import { title, subtitle } from "@/components/primitives";
 import { GithubIcon } from "@/components/icons";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import EventoService from "@/services/EventoService";
 
 import EventoList from "@/components/Eventos/EventoList";
 import CardSkeleton from "@/components/Eventos/CardSkeleton";
 
 export default function Home() {
-  const [eventos, setEventos] = useState(null);
-  
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const data = await EventoService.getData();
-        // console.log(data);
-        setEventos(data);
-      } catch (error) {
-        console.error("Error al obtener los datos: ", error);
-      }
-    }
+  const router = useRouter();
 
-    fetchData();
-  }, []);
+  const url = process.env.NEXT_PUBLIC_SERVER_URI;
+
+  const [page, setPage] = useState(1);
+  const [rowPerPage, setRowPerPage] = useState(5);
+  const [edit, setEdit] = useState(false);
+  const [id, setId] = useState(0);
+
+  const { data, mutate, isLoading } = EventoService.getData({
+    page,
+    rowsPerPage: rowPerPage,
+    order_by: '-id',
+  });
+  // console.log(data?.last_page);
+  // console.log(data);
 
 
   return (
     <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-      <div className="inline-block max-w-xl text-center justify-center">
-        <span className={title()}>Aplicación&nbsp;</span>
-        <span className={title({ color: "blue" })}>TEV Perú&nbsp;</span>
+      <div className="justify-center inline-block max-w-xl text-center">
+        <span className={title()}>Rally Cronos&nbsp;</span>
+        <span className={title({ color: "blue" })}>Tiempos en Vivo Perú&nbsp;</span>
         <br />
         {/* <span className={title()}>
           websites regardless of your design experience.
@@ -46,17 +48,9 @@ export default function Home() {
         </div> */}
       </div>
 
-      <div className="py-2 justify-center">
-        {eventos ? (
-          // <div>
-          //   {eventos?.data.map((evento) => (
-          //     <div key={evento.id}>
-          //       <p>{evento.name}</p>
-          //     </div>
-          //   ))}
-          // </div>
-
-          <EventoList eventos={eventos} />
+      <div className="justify-center py-2">
+        {data ? (
+          <EventoList eventos={data} />
         ): (
           <div className="flex gap-4">
             <CardSkeleton />

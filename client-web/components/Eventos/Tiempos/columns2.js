@@ -7,4 +7,5 @@ export const columns = [
   { name: 'Penalización', uid: 'penalizacion_acumulada' },
   { name: 'Tiempo', uid: 'tiempo_acumulado' },
   { name: 'Diferencias', uid: 'diferencias' },
+  { name: 'Foto', uid: 'foto' },
 ]

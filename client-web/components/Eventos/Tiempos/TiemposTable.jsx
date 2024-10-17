@@ -30,11 +30,12 @@ import React, { useMemo, useRef, useState, useEffect } from 'react';
 import EspecialService from '@/services/EspecialService';
 import CategoriaService from '@/services/CategoriaService';
 import TIemposService from '@/services/TIemposService';
-import { columns } from './columns';
+import { columns as allColumns } from './columns';
 import Form from './form';
+import Foto from '@/components/Modals/Foto';
 import Eliminar from "@/components/Modals/Eliminar";
 
-function TiemposTable({ idEvent }) {
+function TiemposTable({ idEvent, modo }) {
   // console.log('IDEVENT desde TIEMPOS', idEvent);
   const router = useRouter();
 
@@ -75,6 +76,8 @@ function TiemposTable({ idEvent }) {
     categoria: selCat,
   });
 
+  // console.log('times', data)
+
   const [tiempos, setTiempos] = useState(null);
   useEffect(() => {
     if (data && data.data){
@@ -86,6 +89,15 @@ function TiemposTable({ idEvent }) {
   const pages = useMemo(() => {
     return data?.last_page;
   }, [data?.total, rowPerPage]);
+
+  // Filtrar las columnas basadas en el valor de `modo`
+  const columns = useMemo(() => {
+    if (modo === 'client') {
+      return allColumns.filter(column => !['acciones', 'hora_salida', 'hora_llegada'].includes(column.uid));
+    } else {
+      return allColumns.filter(column => column.uid !== 'foto');
+    }
+  }, [modo]);
 
   const handleSelEsp = (e) => {
     setSelEsp(e.target.value)
@@ -118,6 +130,18 @@ function TiemposTable({ idEvent }) {
     }
   };
 
+  //* Funcion para abrir el Modal <Foto />
+  const [isFotoModalOpen, setFotoModalOpen] = useState(false); // Modal de foto
+  const [selectFoto, setSelectFoto] = useState(null); // para ver la foto
+  const verFoto = async (e) => {
+    // console.log("gaaaaaaaaaaaaaaaaaaa", e);
+    // verifica que e sea dif de Null
+    if (e) {
+      setSelectFoto(e);
+      setFotoModalOpen(true);
+    }
+  };
+
   const onSave = () => {
     mutate();
     onClose();
@@ -132,41 +156,43 @@ function TiemposTable({ idEvent }) {
       <div className='flex flex-col gap-4'>
         <div className='flex items-end justify-between gap-3'>
           <span className='text-xl font-bold'>Tabla de Tiempos</span>
-          <div className='flex gap-3'>
-            <Button
-              onPress={() => {
-                setEdit(false);
-                onOpen();
-              }}
-              color='primary'
-              endContent={<MdAutoFixHigh size='1.4em' />}
-            >
-              Añadir
-            </Button>
-            <Modal
-              isOpen={isOpen}
-              onOpenChange={onOpenChange}
-              placement='center'
-              scrollBehavior='outside'
-            >
-              <ModalContent>
-                {(onClose) => (
-                  <>
-                    <Form
-                      save={onSave}
-                      isEdit={edit}
-                      id={id}
-                      onClose={onClose}
-                      ref={refForm}
-                      idEvent={idEvent}
-                      especial={selEsp}
-                      showToast={showToast}
-                    />
-                  </>
-                )}
-              </ModalContent>
-            </Modal>
-          </div>
+          {modo != 'client' && (
+            <div className='flex gap-3'>
+              <Button
+                onPress={() => {
+                  setEdit(false);
+                  onOpen();
+                }}
+                color='primary'
+                endContent={<MdAutoFixHigh size='1.4em' />}
+              >
+                Añadir
+              </Button>
+              <Modal
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                placement='center'
+                scrollBehavior='outside'
+              >
+                <ModalContent>
+                  {(onClose) => (
+                    <>
+                      <Form
+                        save={onSave}
+                        isEdit={edit}
+                        id={id}
+                        onClose={onClose}
+                        ref={refForm}
+                        idEvent={idEvent}
+                        especial={selEsp}
+                        showToast={showToast}
+                      />
+                    </>
+                  )}
+                </ModalContent>
+              </Modal>
+            </div>
+          )}
         </div>
 
         {/* Filtrar por Especiales */}
@@ -316,6 +342,22 @@ function TiemposTable({ idEvent }) {
           </>
         );
 
+      // * Foto
+      case 'foto':
+        return (
+          <div>
+            <Button variant="light" onClick={() => verFoto(row.tripulacion.foto_url)}>
+              <Image
+                radius="md"
+                src={row.tripulacion.foto_url != null ? `${url}`+`${row.tripulacion.foto_url}` : ''}
+                alt="Prev Img"
+                width={70}
+                loading='lazy'
+              />  
+            </Button>
+          </div>
+        );
+
       //* ACCIONES
       case 'acciones':
         return (
@@ -368,7 +410,7 @@ function TiemposTable({ idEvent }) {
           {(column) => (
             <TableColumn
               key={column.uid}
-              align={column.uid === 'acciones' || column.uid === 'especiales' ? 'center' : 'start'}
+              align={column.uid === 'acciones' || column.uid === 'especiales' || column.uid === 'foto' ? 'center' : 'start'}
             >
               {column.name}
             </TableColumn>
@@ -392,6 +434,13 @@ function TiemposTable({ idEvent }) {
       {/* <pre>{JSON.stringify(data?.data)}</pre> */}
 
       <Toaster />
+
+      {/* Modal para Ver Foto */}
+      <Foto
+        isOpen={isFotoModalOpen}
+        onOpenChange={setFotoModalOpen}
+        datos={selectFoto}
+      />
 
       {/* Modal Eliminar */}
       <Eliminar

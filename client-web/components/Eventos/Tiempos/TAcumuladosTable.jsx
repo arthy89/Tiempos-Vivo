@@ -27,11 +27,14 @@ import { useRouter } from "next/navigation";
 import React, { useMemo, useRef, useState, useEffect } from 'react';
 import CategoriaService from '@/services/CategoriaService';
 import EventoService from '@/services/EventoService';
-import { columns } from './columns2'
+import { columns as allColumns } from './columns2'
+import Foto from '@/components/Modals/Foto';
 
-function TAcumuladosTable({ idEvent, categorias }) {
+function TAcumuladosTable({ idEvent, categorias, modo }) {
   // console.log('IDEVENT desde TIEMPOS', idEvent);
   // console.log('CATS DESDE', categorias);
+  const url = process.env.NEXT_PUBLIC_SERVER_URI;
+  
   const [selCat, setSelCat] = useState('todas');
 
   const [page, setPage] = useState(1);
@@ -50,23 +53,51 @@ function TAcumuladosTable({ idEvent, categorias }) {
     }
   }, [tiempos, data]);
 
-  console.log('tiempo', tiempos);
+  // console.log('tiempo', tiempos);
   
   const pages = useMemo(() => {
     return data?.last_page;
   }, [data?.total, rowPerPage]);
+
+  // Filtrar las columnas basadas en el valor de `modo`
+  const columns = useMemo(() => {
+    if (modo !== 'client') {
+      return allColumns.filter(column => column.uid !== 'foto');
+    }
+    return allColumns;
+  }, [modo]);
+
+  //* Funcion para abrir el Modal <Foto />
+  const [isFotoModalOpen, setFotoModalOpen] = useState(false); // Modal de foto
+  const [selectFoto, setSelectFoto] = useState(null); // para ver la foto
+  const verFoto = async (e) => {
+    // console.log("gaaaaaaaaaaaaaaaaaaa", e);
+    // verifica que e sea dif de Null
+    if (e) {
+      setSelectFoto(e);
+      setFotoModalOpen(true);
+    }
+  };
 
   const handleSelCategoria = (e) => {
     setSelCat(e.target.value)
   }
 
   const calculateTimeDifference = (startTime, endTime) => {
-    const diff = new Date(`1970-01-01T${endTime}`) - new Date(`1970-01-01T${startTime}`);
-    const hours = Math.floor(diff / (1000 * 60 * 60));  // Calculate hours
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / 60000);  // Calculate minutes
-    const seconds = ((diff % 60000) / 1000).toFixed(0);  // Calculate seconds
-
-    // Return format: HH:MM:SS or MM:SS when no hours involved
+    const start = new Date(`1970-01-01T${startTime}`);
+    const end = new Date(`1970-01-01T${endTime}`);
+  
+    // Si el tiempo final es menor que el inicial, significa que el cálculo es incorrecto
+    if (end < start) {
+      return `-`; // Ajuste para evitar valores negativos
+    }
+  
+    const diff = end - start;
+    const hours = Math.floor(diff / (1000 * 60 * 60));  // Calcular horas
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / 60000);  // Calcular minutos
+    const seconds = ((diff % 60000) / 1000).toFixed(0);  // Calcular segundos
+  
+    // Formatear el tiempo en formato HH:MM:SS o MM:SS
     return `+ ${hours > 0 ? hours + ':' : ''}${minutes < 10 && hours > 0 ? '0' + minutes : minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
@@ -163,6 +194,22 @@ function TAcumuladosTable({ idEvent, categorias }) {
             {diffWithPrev && <div className="text-purple-500">{diffWithPrev}</div>}
           </>
         );
+        
+      // * Foto
+      case 'foto':
+        return (
+          <div>
+            <Button variant="light" onClick={() => verFoto(row.tripulacion.foto_url)}>
+              <Image
+                radius="md"
+                src={row.tripulacion.foto_url != null ? `${url}`+`${row.tripulacion.foto_url}` : ''}
+                alt="Prev Img"
+                width={70}
+                loading='lazy'
+              />  
+            </Button>
+          </div>
+        );
       default:
         return cellValue;
     }
@@ -193,7 +240,7 @@ function TAcumuladosTable({ idEvent, categorias }) {
           {(column) => (
             <TableColumn
               key={column.uid}
-              align={column.uid === 'acciones' || column.uid === 'num_especiales' ? 'center' : 'start'}
+              align={column.uid === 'acciones' || column.uid === 'num_especiales' || column.uid === 'foto' ? 'center' : 'start'}
             >
               {column.name}
             </TableColumn>
@@ -215,6 +262,13 @@ function TAcumuladosTable({ idEvent, categorias }) {
         </TableBody>
       </Table>
       {/* <pre>{JSON.stringify(data?.data)}</pre> */}
+
+      {/* Modal para Ver Foto */}
+      <Foto
+        isOpen={isFotoModalOpen}
+        onOpenChange={setFotoModalOpen}
+        datos={selectFoto}
+      />
     </>
   )
 }
