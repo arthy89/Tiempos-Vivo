@@ -73,11 +73,6 @@ class EspecialController extends Controller
             [],  // Sin filtros adicionales en esta parte
             []   // Sin ordenamientos adicionales
         );
-
-        // $esp = $especial->load(['tiempos']);
-        // $esp_ord = $esp->tiempos->sortBy('hora_marcado');
-        // $tiempos = $esp_ord->values();
-        // return $tiempos;
     }
 
     public function show_tiempos(Request $request)

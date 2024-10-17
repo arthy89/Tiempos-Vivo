@@ -12,6 +12,12 @@ class EventoService {
     //     return (await api.get("/api/events", params)).data;
     // }
 
+    static getTimes(params = {}) {
+      return useSWR(['api/events_lite', params], async ([url, params]) => {
+        return (await api.get(url, { params })).data;
+      });
+    }
+
     static async get(id) {
       return (await api.get(`api/events/${id}`)).data;
     }

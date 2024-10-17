@@ -65,7 +65,7 @@ function TiemposTable({ idEvent }) {
 
   useEffect(() => {
     setSelEsp(especiales?.data[0].id);
-    // console.log('ESSSSSSSSSSS', selEsp);
+    // console.log('ESSSSSSSSSSS', selEsp);f
   }, [especiales]);
 
   const { data, mutate, isLoading } = EspecialService.get({

@@ -8,12 +8,14 @@ import EtapaTable from '@/components/Eventos/Etapas/EtapaTable';
 import CategoriaTable from '@/components/Eventos/Categorias/CategoriaTable';
 import TripulacionTable from '@/components/Eventos/Tripulaciones/TripulacionTable';
 import TiemposTable from '@/components/Eventos/Tiempos/TiemposTable'
+import TAcumuladosTable from "@/components/Eventos/Tiempos/TAcumuladosTable";
 
 function page() {
   const router = useRouter();
   const params = useParams();
 
   const [evento, setEvento] = useState(null);
+  const [categorias, setCategorias] = useState([]);
   // const { slug } = router.query;
 
   // Extraer el ID
@@ -29,8 +31,9 @@ function page() {
     }
     
     fetchData();
-  }, []);
 
+  }, []);
+  
   return (
     <>
       <div className="pb-2">
@@ -56,6 +59,12 @@ function page() {
           <Tab key="tiempos" title="Tiempos">
             <TiemposTable 
               idEvent={idEvent}
+            />
+          </Tab>
+          <Tab key="acumulado" title="Tiempo Acumulado">
+            <TAcumuladosTable 
+              idEvent={idEvent}
+              categorias={evento?.categorias}
             />
           </Tab>
         </Tabs>

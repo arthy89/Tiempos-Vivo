@@ -64,6 +64,7 @@ Route::apiResource('/permisos', PermisoController::class)->middleware([HandlePre
 
 Route::apiResource('/orgs', OrgController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/events', EventController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::get('/events_lite', [EventController::class, 'index_lite'])->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/categorias', CategoriaController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/etapas', EtapaController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/especials', EspecialController::class)->middleware([HandlePrecognitiveRequests::class]);
