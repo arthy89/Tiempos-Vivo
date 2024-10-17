@@ -76,7 +76,7 @@ function TiemposTable({ idEvent, modo }) {
     categoria: selCat,
   });
 
-  console.log('times', data)
+  // console.log('times', data)
 
   const [tiempos, setTiempos] = useState(null);
   useEffect(() => {
