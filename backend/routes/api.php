@@ -67,6 +67,7 @@ Route::apiResource('/events', EventController::class)->middleware([HandlePrecogn
 Route::apiResource('/categorias', CategoriaController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/etapas', EtapaController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/especials', EspecialController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::get('/especial_tiempos', [EspecialController::class, 'show_tiempos'])->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/tiempos', TiempoController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/shakedowns', ShakedownController::class)->middleware([HandlePrecognitiveRequests::class]);
 

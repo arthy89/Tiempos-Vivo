@@ -71,6 +71,62 @@ class Controller extends BaseController
         return $this->getPageSize()?$querySet->paginate($this->getPageSize()):response()->json(['data'=>$querySet->get()]);
     }
 
+    public function newGenerateViewSetList(Request $request, Builder $querySet, array $filterBy, array $searchBy, array $orderBy)
+    {
+        function newAddOrSkipBaseTable(string $colName, string $tableBaseName)
+        {
+            if (strpos($colName, '.') === false) {
+                return $tableBaseName . '.' . $colName;
+            }
+            return $colName;
+        }
+
+        $tableBaseName = $querySet->getModel()->getTable();
+
+        // Filtro por campos básicos
+        if ($request->hasAny($filterBy)) {
+            foreach ($filterBy as $filter) {
+                if ($request->filled($filter)) {
+                    $querySet->where(newAddOrSkipBaseTable($filter, $tableBaseName), $request->input($filter));
+                }
+            }
+        }
+
+        // Búsqueda
+        if ($request->filled('search')) {
+            $querySet->where(function ($q) use ($searchBy, $request) {
+                foreach ($searchBy as $searchByCol) {
+                    // Si es un campo relacionado, utiliza whereHas
+                    if (strpos($searchByCol, '.') !== false) {
+                        $relation = explode('.', $searchByCol);
+                        $q->orWhereHas($relation[0], function ($query) use ($relation, $request) {
+                            $query->where($relation[1], 'like', '%' . $request->input('search') . '%');
+                        });
+                    } else {
+                        $q->orwhere($searchByCol, 'like', '%' . $request->input('search') . '%');
+                    }
+                }
+                return $q;
+            });
+        }
+
+        // Ordenamiento
+        if ($request->filled('order_by')) {
+            $searchOrderList = explode(',', $request->input('order_by'));
+            foreach ($searchOrderList as $searchOrderParam) {
+                $searchOrderParamWithoutSign = preg_replace('/-/', '', $searchOrderParam, 1);
+                $orderDirection = substr($searchOrderParam, 0, 1) === '-' ? 'desc' : 'asc';
+
+                if (in_array($searchOrderParamWithoutSign, $orderBy, true)) {
+                    $querySet->orderBy(newAddOrSkipBaseTable($searchOrderParamWithoutSign, $tableBaseName), $orderDirection);
+                }
+            }
+        }
+
+        return $this->getPageSize() ? $querySet->paginate($this->getPageSize()) : response()->json(['data' => $querySet->get()]);
+    }
+
+
     /**
      * Función auxiliar para manejar la carga de archivos.
      *

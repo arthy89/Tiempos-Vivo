@@ -15,11 +15,19 @@ class TripulacionController extends Controller
      */
     public function index(Request $request)
     {
-        return $this->generateViewSetList(
+        // Funcion que acepta tambien columnas anidadas
+        return $this->newGenerateViewSetList(
             $request,
             Tripulacion::query(),
             ['event_id'],
-            ['id', 'piloto', 'navegante'],
+            [
+            // 'id',
+            'piloto.nombre',
+            'piloto.apellidos',
+            'navegante.nombre',
+            'navegante.apellidos',
+            'auto_num'
+            ],
             ['id', 'piloto', 'navegante'],
         );
     }

@@ -25,11 +25,11 @@ class StoreTiempoRequest extends FormRequest
             'especial_id' => 'nullable|numeric',
             'shakedown_id' => 'nullable|numeric',
             'tripulacion_id' => 'required|numeric',
-            'hora_salida' => 'required',
-            'hora_llegada' => 'required',
+            'hora_salida' => 'nullable',
+            'hora_llegada' => 'nullable',
             'hora_marcado' => 'nullable',
             'penalizacion' => 'nullable',
-            'registrador' => 'required',
+            'registrador' => 'nullable',
         ];
     }
 }

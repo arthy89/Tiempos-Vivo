@@ -20,7 +20,7 @@ return new class extends Migration
             $table->time('hora_llegada')->nullable();
             $table->time('hora_marcado')->nullable(); // Para subir el tiempo directamente
             $table->time('penalizacion')->nullable();
-            $table->text('registrador');
+            $table->text('registrador')->nullable();
             $table->timestamps();
         });
     }

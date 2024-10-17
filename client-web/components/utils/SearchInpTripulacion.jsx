@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Input } from '@nextui-org/react';
 
-const SearchInput = ({ label, formKey, form, placeholder, initialValue  }) => {
+const SearchInpTripulacion = ({ label, formKey, form, placeholder, initialValue, idEvent  }) => {
   const url = process.env.NEXT_PUBLIC_SERVER_URI;
 
   const [search, setSearch] = useState(initialValue || '');
@@ -9,20 +9,26 @@ const SearchInput = ({ label, formKey, form, placeholder, initialValue  }) => {
   const [loading, setLoading] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
 
+  // useEffect(() => {
+  //   if (initialValue) {
+  //     setSearch(initialValue); // Establece el valor inicial
+  //   } else if (search.length > 0 && !form.data[formKey]) {
+  //     fetchItems(search); // Realiza la búsqueda cuando no hay un valor inicial
+  //   } else {
+  //     setItems([]); // Limpia los resultados si no hay búsqueda activa
+  //   }
+  // }, [search, initialValue]);
+
   useEffect(() => {
     if (initialValue) {
-      setSearch(initialValue); // Establece el valor inicial
-    } else if (search.length > 0 && !form.data[formKey]) {
-      fetchItems(search); // Realiza la búsqueda cuando no hay un valor inicial
-    } else {
-      setItems([]); // Limpia los resultados si no hay búsqueda activa
+      setSearch(initialValue);
     }
-  }, [search, initialValue]);
+  }, [initialValue]);
 
   const fetchItems = async (searchText) => {
     setLoading(true);
     try {
-      const response = await fetch(`${url}api/drivers?search=${searchText}`);
+      const response = await fetch(`${url}api/tripulacions?event_id=${idEvent}&search=${searchText}`);
       const data = await response.json();
       setItems(data?.data || []);
     } catch (error) {
@@ -34,13 +40,14 @@ const SearchInput = ({ label, formKey, form, placeholder, initialValue  }) => {
 
   const handleInputChange = (e) => {
     setSearch(e.target.value);
-    form.setData(formKey, null); // Limpiar el valor del formulario
+    form.setData(formKey, null);
+    fetchItems(e.target.value);
     setShowOptions(true);
   };
 
   const handleSelectItem = (item) => {
-    setSearch(`${item.nombre} ${item.apellidos}`); // Mostrar el nombre en el input
-    form.setData(formKey, item.id); // Asignar solo el ID al campo del formulario
+    setSearch(`${item.auto_num} - ${item.categoria} - ${item.piloto.nombre} - ${item.navegante.nombre}`);
+    form.setData(formKey, item.id);
     setShowOptions(false);
   };
 
@@ -69,7 +76,9 @@ const SearchInput = ({ label, formKey, form, placeholder, initialValue  }) => {
               className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-700 cursor-pointer text-sm"
               onClick={() => handleSelectItem(item)}
             >
-              {item.nombre} {item.apellidos}
+              <p>{item.auto_num} - {item.categoria}</p>
+              <p>{item.piloto.nombre} {item.piloto.apellidos}</p>
+              <p>{item.navegante.nombre} {item.navegante.apellidos}</p>
             </li>
           ))}
         </ul>
@@ -78,4 +87,4 @@ const SearchInput = ({ label, formKey, form, placeholder, initialValue  }) => {
   );
 };
 
-export default SearchInput;
+export default SearchInpTripulacion;

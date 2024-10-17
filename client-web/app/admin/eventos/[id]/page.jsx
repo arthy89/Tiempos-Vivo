@@ -7,6 +7,7 @@ import EventoService from '@/services/EventoService';
 import EtapaTable from '@/components/Eventos/Etapas/EtapaTable';
 import CategoriaTable from '@/components/Eventos/Categorias/CategoriaTable';
 import TripulacionTable from '@/components/Eventos/Tripulaciones/TripulacionTable';
+import TiemposTable from '@/components/Eventos/Tiempos/TiemposTable'
 
 function page() {
   const router = useRouter();
@@ -35,8 +36,8 @@ function page() {
       <div className="pb-2">
         <span className={title({ color: "blue" })}>{evento?.name}</span>
       </div>
-      <div className="flex w-full flex-col">
-        <Tabs aria-label="Options">
+      <div className="flex flex-col w-full">
+        <Tabs aria-label="Options" color='success'>
           <Tab key="etapas" title="Etapas">
             <EtapaTable 
               idEvent={idEvent}
@@ -49,6 +50,11 @@ function page() {
           </Tab>
           <Tab key="tripulaciones" title="Tripulaciones">
             <TripulacionTable 
+              idEvent={idEvent}
+            />
+          </Tab>
+          <Tab key="tiempos" title="Tiempos">
+            <TiemposTable 
               idEvent={idEvent}
             />
           </Tab>

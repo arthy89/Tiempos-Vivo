@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Especial;
 use App\Http\Requests\StoreEspecialRequest;
+use App\Models\Event;
+use App\Models\Tiempo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -12,9 +14,26 @@ class EspecialController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Especial::all();
+        // params = 'event_id'
+        $evento = Event::with('etapas.especiales')
+            ->findOrFail($request->event_id);
+
+        // Obtener los IDs de los especiales
+        $especialIds = $evento->etapas->flatMap->especiales->pluck('id');
+
+        // Crear una consulta con esos IDs
+        $query = Especial::whereIn('id', $especialIds);
+        // return $query;
+
+        return $this->generateViewSetList(
+            $request,
+            $query,
+            [],
+            [],
+            ['nombre']
+        );
     }
 
     /**
@@ -29,41 +48,63 @@ class EspecialController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Especial $especial)
+    public function show(Especial $especial, Request $request)
     {
-        if ($especial) {
+        $categoria = $request->input('categoria');
 
-            $tiempos = $especial->tiempos;
+        // Consulta base con la relación 'tiempos' ordenada
+        $query = Especial::where('id', $especial->id)
+            ->with(['tiempos' => function($query) use ($categoria) {
+                $query->orderBy('hora_marcado', 'asc');
 
-            foreach ($tiempos as $tiempo)
-            {
-                // Generar el tiempo con Carbon
-                $hora_salida = Carbon::createFromFormat('H:i:s', $tiempo->hora_salida);
-                $hora_llegada = Carbon::createFromFormat('H:i:s', $tiempo->hora_llegada);
-
-                // Calcular el tiempo resultado
-                $tiempo_resultado = $hora_llegada->diff($hora_salida);
-
-                // Agregar penalizacion si es existente
-                if ($tiempo->penalizacion) {
-                    $penalizacion = Carbon::createFromFormat('H:i:s', $tiempo->penalizacion);
-                    $penalizacion_intervalo = $penalizacion->diffAsCarbonInterval(Carbon::createFromFormat('H:i:s', '00:00:00'));
-
-                    $tiempo_resultado->add($penalizacion_intervalo);
+                // Aplica el filtro de categoría si se proporciona
+                if ($categoria) {
+                    $query->whereHas('tripulacion', function($q) use ($categoria) {
+                        $q->where('categoria', $categoria);
+                    });
                 }
+            }]);
 
-                // Asignar valor 'tiempo_resultado' con el tiempo resultante en el array para la respesta API
-                $tiempo['tiempo_resultado'] = $tiempo_resultado->format('%H:%I:%S');
-            }
+        // Genera la vista o lista con la función personalizada
+        return $this->generateViewSetList(
+            $request,
+            $query,
+            [],
+            [],  // Sin filtros adicionales en esta parte
+            []   // Sin ordenamientos adicionales
+        );
 
-            // Ordenar los tiempos de manera ascendente segun el 'tiempo_resultado'
-            $tiempos_ordenados = $tiempos->sortBy('tiempo_resultado');
-            $tiempos = $tiempos_ordenados->values();
+        // $esp = $especial->load(['tiempos']);
+        // $esp_ord = $esp->tiempos->sortBy('hora_marcado');
+        // $tiempos = $esp_ord->values();
+        // return $tiempos;
+    }
 
-            return response()->json($tiempos);
-        } else {
-            return response()->json(['error' => 'El Especial no existe.'], 404);
+    public function show_tiempos(Request $request)
+    {
+        $categoria = $request->input('categoria');
+        $especial = $request->input('especial');
+
+        // Modifica la consulta para trabajar sobre el modelo Tiempo
+        $query = Tiempo::where('especial_id', $especial)
+            ->with(['tripulacion.piloto', 'tripulacion.navegante'])
+            ->orderBy('hora_marcado', 'asc');
+
+        // Aplica el filtro de categoría si se proporciona
+        if ($categoria && $categoria != 'todas') {
+            $query->whereHas('tripulacion', function($q) use ($categoria) {
+                $q->where('categoria', $categoria);
+            });
         }
+
+        // Genera la vista o lista con la función personalizada
+        return $this->generateViewSetList(
+            $request,
+            $query,
+            [],
+            [],  // Sin filtros adicionales en esta parte
+            []   // Sin ordenamientos adicionales
+        );
     }
 
     /**
