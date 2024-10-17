@@ -29,6 +29,7 @@ import { MdAutoFixHigh, MdEdit, MdDeleteForever, MdRemoveRedEye  } from 'react-i
 import React, { useMemo, useRef, useState, useEffect } from 'react';
 import EspecialService from '@/services/EspecialService';
 import CategoriaService from '@/services/CategoriaService';
+import TIemposService from '@/services/TIemposService';
 import { columns } from './columns';
 import Form from './form';
 import Eliminar from "@/components/Modals/Eliminar";
@@ -249,7 +250,7 @@ function TiemposTable({ idEvent }) {
 
   //* Funcion para eliminar el Registro (Depende del archivo Servicios)
   const delFicha = async (id) => {
-    await EspecialService.delete(id);
+    await TIemposService.delete(id);
     mutate();
     setDel(false);
   };
