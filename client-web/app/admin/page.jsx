@@ -1,9 +1,34 @@
-import React from 'react'
+"use client";
+
+import { useDispatch } from 'react-redux';
+import { logout } from '@/slices/authSlice';
+import { useRouter } from 'next/navigation';
+import { Button } from "@nextui-org/react";
+import React from 'react';
 
 function page() {
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  // const usuario
+
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push('/login');
+  };
+
   return (
-    <div>admin page</div>
-  )
+    <div>
+      <h1>Admin Page</h1>
+      <Button 
+        onClick={handleLogout}
+        color="danger"
+        variant="flat"
+      >
+        Cerrar Sesión
+      </Button>
+    </div>
+  );
 }
 
-export default page
+export default page;

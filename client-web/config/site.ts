@@ -5,17 +5,17 @@ export const siteConfig = {
   description: "Make beautiful websites regardless of your design experience.",
   navItems: [
     {
-      label: "Home",
+      label: "Inicio",
       href: "/",
     },
-    {
-      label: "Admin",
-      href: "/admin",
-    },
-    {
-      label: "Eventos Admin",
-      href: "/admin/eventos",
-    },
+    // {
+    //   label: "Admin",
+    //   href: "/admin",
+    // },
+    // {
+    //   label: "Eventos Admin",
+    //   href: "/admin/eventos",
+    // },
     // {
     //   label: "Pricing",
     //   href: "/pricing",

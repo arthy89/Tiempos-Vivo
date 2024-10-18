@@ -22,11 +22,11 @@ import {
 import { useRouter, useParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import EventoTable from '@/components/Eventos/EventoTable';
+import { LogoutButton } from '@/components/logout';
 
 function page() {
   return (
     <div>
-      {/* <EventoForm /> */}
       <EventoTable />
     </div>
   )

@@ -18,7 +18,7 @@ function page() {
   return (
     <TripulacionTable
       idEvent={idEvent}
-      modo=''
+      modo='client'
     />
   )
 }
