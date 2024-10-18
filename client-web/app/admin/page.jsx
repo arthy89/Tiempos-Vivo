@@ -21,6 +21,13 @@ function page() {
     <div>
       <h1>Admin Page</h1>
       <Button 
+        onClick={() => router.push('admin/eventos')}
+        color="primary"
+      >
+        Ir a Eventos
+      </Button>
+
+      <Button 
         onClick={handleLogout}
         color="danger"
         variant="flat"

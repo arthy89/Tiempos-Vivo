@@ -75,7 +75,7 @@ function EventoShow() {
             </Button>
             <Button
               color="danger"
-              variant="ghost"
+              variant="shadow"
               startContent={<IoTimeSharp />}
               className="font-bold"
               onPress={() => ClickTiempos(evento)}
