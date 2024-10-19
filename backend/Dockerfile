@@ -1,7 +1,7 @@
 FROM php:8.2-fpm-alpine
-RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+# RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-COPY ./php/php.ini /usr/local/etc/php/
+# COPY ./php/php.ini /usr/local/etc/php/
 
 LABEL MAINTAINER="SATYADEEP G" \
     "GitHub Link"="https://github.com/satyadeep" \
