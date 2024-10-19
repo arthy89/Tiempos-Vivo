@@ -18,10 +18,17 @@ const Form = forwardRef(({ save, isEdit, id, onClose, idEvent }, ref) => {
   const [alertMessage, setAlertMessage] = useState("");
 
   // ! ENVIAR FORM
-  const form = isEdit
-    ? useForm("post", "api/drivers/" + id + "?_method=PUT", formData)
-    : useForm("post", "api/drivers", formData);
-
+  // const form = isEdit
+  //   ? useForm("post", "api/drivers/" + id + "?_method=PUT", formData)
+  //   : useForm("post", "api/drivers", formData);
+    
+  const endpoint = isEdit
+    ? `api/drivers/${id}?_method=PUT`
+    : "api/drivers";
+    
+  // Ahora `useForm` se llama incondicionalmente con el endpoint calculado
+  const form = useForm("post", endpoint, formData);
+  
   useEffect(() => {
     const fetchData = async () => {
       console.log("EDIT", isEdit);
@@ -119,5 +126,5 @@ const Form = forwardRef(({ save, isEdit, id, onClose, idEvent }, ref) => {
     </>
   );
 });
-
+Form.displayName = "ConductorForm";
 export default Form;

@@ -26,9 +26,16 @@ const Form = forwardRef(({ save, isEdit, id, onClose, idEvent }, ref) => {
   const [alertMessage, setAlertMessage] = useState("");
 
   // ! ENVIAR FORM
-  const form = isEdit
-    ? useForm("post", "api/etapas/" + id + "?_method=PUT", formData)
-    : useForm("post", "api/etapas", formData);
+  // const form = isEdit
+  //   ? useForm("post", "api/etapas/" + id + "?_method=PUT", formData)
+  //   : useForm("post", "api/etapas", formData);
+
+  const endpoint = isEdit
+    ? `api/etapas/${id}?_method=PUT`
+    : "api/etapas";
+    
+  // Ahora `useForm` se llama incondicionalmente con el endpoint calculado
+  const form = useForm("post", endpoint, formData);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -136,5 +143,5 @@ const Form = forwardRef(({ save, isEdit, id, onClose, idEvent }, ref) => {
     </>
   );
 });
-
+Form.displayName = "EtapasForm";
 export default Form;

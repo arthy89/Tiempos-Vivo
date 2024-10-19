@@ -10,34 +10,43 @@ import { fetchUserData } from "@/slices/authSlice";
 import { secureStorage } from "@/utils/SecureStorage";
 
 const PrivateRoute = ({ children }) => {
-  const token = Cookies.get("token");
-  const usuario = secureStorage.getItem("user");
+  const [loading, setLoading] = useState(true); // loading inicia en true
   const router = useRouter();
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true); // loading inicia en true
+  const [token, setToken] = useState(null);
+  const [usuario, setUsuario] = useState(null);
 
   useEffect(() => {
-    // Solo proceder si existe un token
-    if (!token && !usuario) {
-      // Si no hay token, redirige al login
-      router.push("/login");
-      setLoading(false); // Detenemos la carga si no hay token
-    } else {
-      // Si hay token, intenta fetch de datos del usuario
-      dispatch(fetchUserData())
-        .unwrap()
-        .then((userData) => {
-          console.log("User Data: ", userData);
-          setLoading(false); // Detenemos la carga una vez que tenemos los datos del usuario
-        })
-        .catch((error) => {
-          console.log("Error fetching user data: ", error);
-          Cookies.remove("token"); // Removemos el token si falla el fetch
-          router.push("/login"); // Redirigimos a login si hay algún error
-          setLoading(false); // Nos aseguramos de parar la carga
-        });
+    if (typeof window !== 'undefined') {
+      // Solo acceder a secureStorage y Cookies en el cliente
+      const tokenFromCookies = Cookies.get("token");
+      const userFromStorage = secureStorage.getItem("user");
+
+      setToken(tokenFromCookies);
+      setUsuario(userFromStorage);
+
+      // Solo proceder si existe un token o un usuario
+      if (!tokenFromCookies && !userFromStorage) {
+        // Si no hay token ni usuario, redirige al login
+        router.push("/login");
+        setLoading(false); // Detenemos la carga si no hay token
+      } else {
+        // Si hay token, intenta fetch de datos del usuario
+        dispatch(fetchUserData())
+          .unwrap()
+          .then((userData) => {
+            console.log("User Data: ", userData);
+            setLoading(false); // Detenemos la carga una vez que tenemos los datos del usuario
+          })
+          .catch((error) => {
+            console.log("Error fetching user data: ", error);
+            Cookies.remove("token"); // Removemos el token si falla el fetch
+            router.push("/login"); // Redirigimos a login si hay algún error
+            setLoading(false); // Nos aseguramos de parar la carga
+          });
+      }
     }
-  }, [token, router, dispatch]);
+  }, [router, dispatch]);
 
   // console.log('usuario ss', usuario);
 

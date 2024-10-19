@@ -112,7 +112,14 @@ function EspecialesTable({ form }) {
                   <Tooltip color="danger" content="Eliminar">
                     <span
                       onClick={() => quitar(index)}
-                      className="text-lg text-danger cursor-pointer active:opacity-50"
+                      role="button"
+                      tabIndex={0}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          quitar(index); // Ejecuta la acción al presionar 'Enter' o 'Espacio'
+                        }
+                      }}
+                      className="text-lg cursor-pointer text-danger active:opacity-50"
                     >
                       <MdDeleteForever size="1.4em" />
                     </span>

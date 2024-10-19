@@ -6,7 +6,7 @@ const SearchInput = ({ label, formKey, form, placeholder, initialValue }) => {
 
   const [search, setSearch] = useState(initialValue || "");
   const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ const SearchInput = ({ label, formKey, form, placeholder, initialValue }) => {
   }, [search, initialValue]);
 
   const fetchItems = async (searchText) => {
-    setLoading(true);
+    // setLoading(true);
     try {
       const response = await fetch(`${url}api/drivers?search=${searchText}`);
       const data = await response.json();
@@ -28,7 +28,7 @@ const SearchInput = ({ label, formKey, form, placeholder, initialValue }) => {
     } catch (error) {
       console.error("Error fetching items:", error);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
@@ -66,10 +66,13 @@ const SearchInput = ({ label, formKey, form, placeholder, initialValue }) => {
           {items.map((item) => (
             <li
               key={item.id}
-              className="p-2 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700"
-              onClick={() => handleSelectItem(item)}
             >
-              {item.nombre} {item.apellidos}
+              <button
+                className="w-full p-2 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700"
+                onClick={() => handleSelectItem(item)}
+              >
+                {item.nombre} {item.apellidos}
+              </button>
             </li>
           ))}
         </ul>

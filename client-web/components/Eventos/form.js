@@ -63,8 +63,8 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
   };
 
   // Estados para la alerta
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
+  // const [alertVisible, setAlertVisible] = useState(false);
+  // const [alertMessage, setAlertMessage] = useState("");
 
   // ? Opciones para Selects
   const option_tipos = ["Rally", "Circuito", "Autocross"];
@@ -73,9 +73,16 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
   const [file, setFile] = useState(null);
 
   // ! ENVIAR FORM
-  const form = isEdit
-    ? useForm("post", "api/events/" + id + "?_method=PUT", formData)
-    : useForm("post", "api/events", formData);
+  // const form = isEdit
+  //   ? useForm("post", "api/events/" + id + "?_method=PUT", formData)
+  //   : useForm("post", "api/events", formData);
+
+  const endpoint = isEdit
+    ? `api/events/${id}?_method=PUT`
+    : "api/events";
+    
+  // Ahora `useForm` se llama incondicionalmente con el endpoint calculado
+  const form = useForm("post", endpoint, formData);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -255,7 +262,7 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
             isRequired
           />
 
-          <p className="text-default-500 text-sm">
+          <p className="text-sm text-default-500">
             <b>Fecha:</b>{" "}
             {fecha(form.data.fecha)
               ? formatter.format(
@@ -283,7 +290,7 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
             isRequired
           />
 
-          <p className="text-default-500 text-sm">
+          <p className="text-sm text-default-500">
             <b>Hora:</b> {formatTime12Hour(parseTime(form.data.hora))}
           </p>
 
@@ -344,11 +351,11 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
 
           {/* FilePond */}
           <div>
-            {/* <p className='text-sm text-success mb-1'>Foto de Portada</p> */}
+            {/* <p className='mb-1 text-sm text-success'>Foto de Portada</p> */}
             {isEdit ? (
-              <p className="text-sm text-success mb-1">Cambiar Foto</p>
+              <p className="mb-1 text-sm text-success">Cambiar Foto</p>
             ) : (
-              <p className="text-sm text-success mb-1">Foto de Portada</p>
+              <p className="mb-1 text-sm text-success">Foto de Portada</p>
             )}
             <FilePond
               files={file}
@@ -402,5 +409,5 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
     </>
   );
 });
-
+Form.displayName = "TripulacionForm";
 export default Form;

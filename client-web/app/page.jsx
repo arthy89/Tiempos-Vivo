@@ -1,33 +1,31 @@
 "use client";
-import { Link } from "@nextui-org/link";
-import { Snippet } from "@nextui-org/snippet";
-import { Code } from "@nextui-org/code";
-import { button as buttonStyles } from "@nextui-org/theme";
+// import { Link } from "@nextui-org/link";
+// import { Snippet } from "@nextui-org/snippet";
+// import { Code } from "@nextui-org/code";
+// import { button as buttonStyles } from "@nextui-org/theme";
 
 import { Image } from "@nextui-org/image";
 
-import { siteConfig } from "@/config/site";
+// import { siteConfig } from "@/config/site";
 import { title, subtitle } from "@/components/primitives";
-import { GithubIcon } from "@/components/icons";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react"; // Asegúrate de importar los hooks
+// import { useRouter } from "next/navigation"; // Importar hooks de navegación
 import EventoService from "@/services/EventoService";
 
 import EventoList from "@/components/Eventos/EventoList";
 import CardSkeleton from "@/components/Eventos/CardSkeleton";
 
 export default function Home() {
-  const router = useRouter();
+  // const router = useRouter();
 
-  const url = process.env.NEXT_PUBLIC_SERVER_URI;
+  // const url = process.env.NEXT_PUBLIC_SERVER_URI;
 
   const [page, setPage] = useState(1);
   const [rowPerPage, setRowPerPage] = useState(5);
-  const [edit, setEdit] = useState(false);
-  const [id, setId] = useState(0);
+  // const [edit, setEdit] = useState(false);
+  // const [id, setId] = useState(0);
 
-  const { data, mutate, isLoading } = EventoService.getData({
+  const { data, isLoading } = EventoService.getData({
     page,
     rowsPerPage: rowPerPage,
     order_by: "-id",

@@ -27,13 +27,20 @@ const Form = forwardRef(
     const [datos, setDatos] = useState(null);
 
     // Estados para la alerta
-    const [alertVisible, setAlertVisible] = useState(false);
-    const [alertMessage, setAlertMessage] = useState("");
+    // const [alertVisible, setAlertVisible] = useState(false);
+    // const [alertMessage, setAlertMessage] = useState("");
 
     // ! ENVIAR FORM
-    const form = isEdit
-      ? useForm("post", "api/tiempos/" + id + "?_method=PUT", formData)
-      : useForm("post", "api/tiempos", formData);
+    // const form = isEdit
+    //   ? useForm("post", "api/tiempos/" + id + "?_method=PUT", formData)
+    //   : useForm("post", "api/tiempos", formData);
+
+    const endpoint = isEdit
+      ? `api/tiempos/${id}?_method=PUT`
+      : "api/tiempos";
+      
+    // Ahora `useForm` se llama incondicionalmente con el endpoint calculado
+    const form = useForm("post", endpoint, formData);
 
     useEffect(() => {
       const fetchData = async () => {
@@ -221,5 +228,5 @@ const Form = forwardRef(
     );
   },
 );
-
+Form.displayName = "TiempoForm";
 export default Form;

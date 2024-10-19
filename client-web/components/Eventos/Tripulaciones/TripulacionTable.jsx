@@ -235,6 +235,13 @@ function TripulacionTable({ idEvent, modo }) {
             <Tooltip content="Editar">
               <span
                 onClick={() => editar(row)}
+                role="button" // Añadimos rol de botón para accesibilidad
+                tabIndex={0} // Permitimos la navegación con teclado
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    editar(row); // Ejecuta la acción al presionar 'Enter' o 'Espacio'
+                  }
+                }}
                 className="text-lg cursor-pointer text-default-400 active:opacity-50"
               >
                 <MdEdit size="1.4em" />
@@ -243,6 +250,13 @@ function TripulacionTable({ idEvent, modo }) {
             <Tooltip color="danger" content="Eliminar">
               <span
                 onClick={() => eliminar(row)}
+                role="button" // Añadir el rol de botón
+                tabIndex={0}  // Permitir la navegación por teclado
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    eliminar(row); // Ejecuta la acción al presionar 'Enter' o 'Espacio'
+                  }
+                }}
                 className="text-lg cursor-pointer text-danger active:opacity-50"
               >
                 <MdDeleteForever size="1.4em" />

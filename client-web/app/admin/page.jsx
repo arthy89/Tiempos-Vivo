@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@nextui-org/react";
 import React from "react";
 
-function page() {
+function Page() {
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -31,4 +31,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;

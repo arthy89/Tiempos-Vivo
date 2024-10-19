@@ -82,20 +82,21 @@ const SearchInpTripulacion = ({
       {showOptions && items.length > 0 && (
         <ul className="absolute z-30 w-full mt-1 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg dark:bg-zinc-900 dark:border-zinc-800 max-h-40">
           {items.map((item) => (
-            <li
-              key={item.id}
-              className="p-2 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700"
-              onClick={() => handleSelectItem(item)}
-            >
-              <p>
-                {item.auto_num} - {item.categoria}
-              </p>
-              <p>
-                {item.piloto.nombre} {item.piloto.apellidos}
-              </p>
-              <p>
-                {item.navegante.nombre} {item.navegante.apellidos}
-              </p>
+            <li key={item.id}>
+              <button
+                className="w-full p-2 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700"
+                onClick={() => handleSelectItem(item)}
+              >
+                <p>
+                  {item.auto_num} - {item.categoria}
+                </p>
+                <p>
+                  {item.piloto.nombre} {item.piloto.apellidos}
+                </p>
+                <p>
+                  {item.navegante.nombre} {item.navegante.apellidos}
+                </p>
+              </button>
             </li>
           ))}
         </ul>

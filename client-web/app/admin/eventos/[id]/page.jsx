@@ -10,7 +10,7 @@ import TripulacionTable from "@/components/Eventos/Tripulaciones/TripulacionTabl
 import TiemposTable from "@/components/Eventos/Tiempos/TiemposTable";
 import TAcumuladosTable from "@/components/Eventos/Tiempos/TAcumuladosTable";
 
-function page() {
+function Page() {
   const router = useRouter();
   const params = useParams();
 
@@ -64,4 +64,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;

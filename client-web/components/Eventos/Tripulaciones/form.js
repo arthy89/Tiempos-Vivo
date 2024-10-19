@@ -21,45 +21,39 @@ import CategoriaService from "@/services/CategoriaService";
 const Form = forwardRef(
   ({ save, isEdit, id, onClose, idEvent, onSelectConductor }, ref) => {
     const [datos, setDatos] = useState(null);
+
+    const endpoint = isEdit
+      ? `api/tripulacions/${id}?_method=PUT`
+      : "api/tripulacions";
+      
+    // Ahora `useForm` se llama incondicionalmente con el endpoint calculado
+    const form = useForm("post", endpoint, formData);
+
     const {
       data: categorias,
-      mutate: catMutate,
-      isLoading: catLoading,
     } = CategoriaService.getData({
       page: 1,
       rowsPerPage: 30,
-      // order_by: '-id',
       event_id: idEvent,
     });
 
     console.log(categorias?.last_page);
     console.log(categorias);
 
-    // Estados para la alerta
-    const [alertVisible, setAlertVisible] = useState(false);
-    const [alertMessage, setAlertMessage] = useState("");
-
-    // ! ENVIAR FORM
-    const form = isEdit
-      ? useForm("post", "api/tripulacions/" + id + "?_method=PUT", formData)
-      : useForm("post", "api/tripulacions", formData);
-
     useEffect(() => {
       const fetchData = async () => {
         console.log("EDIT", isEdit);
         if (isEdit) {
           const eventData = await tripulacion(id);
-
-          setDatos(eventData); // Este cambio no es inmediato
+          setDatos(eventData);
         }
       };
 
       fetchData();
-    }, [isEdit, id]); // Elimina `datos` de las dependencias
+    }, [isEdit, id]);
 
     const tripulacion = async (id) => {
       const res = await TripulacionService.get(id);
-
       form.setData(res);
     };
 
@@ -242,10 +236,10 @@ const Form = forwardRef(
                 : "Foto del Vehiculo (Opcional)"}
             </p>
 
-            <div className="py-2 px-4">
+            <div className="px-4 py-2">
               <div
                 {...getRootProps()}
-                className="border-2 border-green-300 hover:border-green-500 hover:bg-zinc-50 dark:border-green-500 dark:hover:border-green-700 dark:hover:bg-zinc-800 py-2 px-4 rounded-lg cursor-pointer"
+                className="px-4 py-2 border-2 border-green-300 rounded-lg cursor-pointer hover:border-green-500 hover:bg-zinc-50 dark:border-green-500 dark:hover:border-green-700 dark:hover:bg-zinc-800"
               >
                 <input {...getInputProps()} />
                 {isDragActive ? (
@@ -258,11 +252,11 @@ const Form = forwardRef(
               </div>
 
               {preview && (
-                <div className="mt-4 flex justify-center">
+                <div className="flex justify-center mt-4">
                   <img
                     src={preview}
                     alt="Vista previa"
-                    className="w-50 object-cover rounded-md"
+                    className="object-cover rounded-md w-50"
                   />
                 </div>
               )}
@@ -282,5 +276,5 @@ const Form = forwardRef(
     );
   },
 );
-
+Form.displayName = "TripulacionForm";
 export default Form;

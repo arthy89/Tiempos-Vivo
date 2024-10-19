@@ -81,7 +81,7 @@ function EventoTable() {
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
-        <div className="flex justify-between gap-3 items-end">
+        <div className="flex items-end justify-between gap-3">
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
@@ -120,7 +120,7 @@ function EventoTable() {
             </Modal>
           </div>
         </div>
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <span className="text-default-400 text-small">
             Total {data?.total} users
           </span>
@@ -228,7 +228,14 @@ function EventoTable() {
             <Tooltip content="Editar">
               <span
                 onClick={() => editar(row)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                role="button" // Añadimos rol de botón para accesibilidad
+                tabIndex={0} // Permitimos la navegación con teclado
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    editar(row); // Ejecuta la acción al presionar 'Enter' o 'Espacio'
+                  }
+                }}
+                className="text-lg cursor-pointer text-default-400 active:opacity-50"
               >
                 <MdEdit size="1.4em" />
               </span>
@@ -237,7 +244,14 @@ function EventoTable() {
             <Tooltip content="Ver">
               <span
                 onClick={() => ver(row)}
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                role="button"
+                tabIndex={0}  // Permitir la navegación por teclado
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    ver(row); // Ejecuta la acción al presionar 'Enter' o 'Espacio'
+                  }
+                }}
+                className="text-lg cursor-pointer text-default-400 active:opacity-50"
               >
                 <MdRemoveRedEye size="1.4em" />
               </span>
@@ -246,7 +260,14 @@ function EventoTable() {
             <Tooltip color="danger" content="Eliminar">
               <span
                 onClick={() => eliminar(row)}
-                className="text-lg text-danger cursor-pointer active:opacity-50"
+                role="button" // Añadir el rol de botón
+                tabIndex={0}  // Permitir la navegación por teclado
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    eliminar(row); // Ejecuta la acción al presionar 'Enter' o 'Espacio'
+                  }
+                }}
+                className="text-lg cursor-pointer text-danger active:opacity-50"
               >
                 <MdDeleteForever size="1.4em" />
               </span>
@@ -265,7 +286,7 @@ function EventoTable() {
         topContent={topContent}
         bottomContent={
           pages > 0 ? (
-            <div className="flex w-full justify-center">
+            <div className="flex justify-center w-full">
               <Pagination
                 isCompact
                 showControls

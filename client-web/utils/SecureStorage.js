@@ -1,8 +1,10 @@
-import { EncryptStorage } from "encrypt-storage";
+let secureStorage = null;
 
-export const secureStorage = new EncryptStorage(
-  process.env.NEXT_PUBLIC_SECURE_KEY,
-  {
-    storageType: "localStorage", // Puedes cambiar a 'sessionStorage' o cualquier otro método.
-  },
-);
+if (typeof window !== "undefined") {
+  const { EncryptStorage } = require("encrypt-storage");
+  secureStorage = new EncryptStorage("your-secret-key", {
+    storageType: "sessionStorage", // o localStorage
+  });
+}
+
+export { secureStorage };
