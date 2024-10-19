@@ -3,6 +3,8 @@ FROM node:18-alpine
 # Establecer directorio de trabajo
 WORKDIR /app
 
+RUN npm install -g nextui-cli
+
 # Copiar los archivos de package.json y package-lock.json
 COPY package*.json ./
 
