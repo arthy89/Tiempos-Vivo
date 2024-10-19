@@ -48,30 +48,27 @@ RUN apk update && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && php -r "unlink('composer-setup.php');"
 
 # Instalar extensiones de PHP necesarias
-RUN docker-php-ext-install pdo pdo_mysql gd zip
+# RUN docker-php-ext-install pdo pdo_mysql gd zip
 
 # Instalar Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Configurar el directorio de trabajo
 WORKDIR /var/www/html
-
-# Copiar archivos de la aplicación
-COPY . .
-
 # Configuración de permisos
 RUN chown -R www-data:www-data /var/www && \
     chmod -R 755 /var/www
 
-# Instalar dependencias de Composer
-RUN composer install --no-dev --optimize-autoloader
+# Copia primero los archivos composer.json y composer.lock
+COPY composer.json composer.lock ./
+
+# Copiar archivos de la aplicación
+COPY . .
 
 # Copiar el archivo de ejemplo .env y generar APP_KEY
+RUN composer install --no-dev --optimize-autoloader
 RUN cp .env.example .env
-RUN php artisan key:generate
 RUN php artisan passport:key
-
-# Crear enlaces simbólicos
 RUN php artisan storage:link
 
 # Exponer el puerto 9000 para PHP-FPM
