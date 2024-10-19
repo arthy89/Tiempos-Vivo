@@ -2,7 +2,7 @@ export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
   name: "Rally Cronos Perú",
-  description: "Make beautiful websites regardless of your design experience.",
+  description: "Tiempos en Vivo de competencias de Rally del Perú.",
   navItems: [
     {
       label: "Inicio",

@@ -11,6 +11,7 @@ import { Button } from "@nextui-org/button";
 import { Kbd } from "@nextui-org/kbd";
 import { Link } from "@nextui-org/link";
 import { Input } from "@nextui-org/input";
+import { Image } from "@nextui-org/image";
 import { link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
@@ -53,7 +54,14 @@ export const Navbar = () => {
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex items-center justify-start gap-1" href="/">
-            <Logo />
+            {/* <Logo /> */}
+            <Image
+              width={50}
+              isBlurred
+              radius="full"
+              alt="NextUI hero Image"
+              src="/img/llanta1.png"
+            />
             <p className="font-bold text-inherit">Rally Cronos Perú</p>
           </NextLink>
         </NavbarBrand>

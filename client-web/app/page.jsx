@@ -4,6 +4,8 @@ import { Snippet } from "@nextui-org/snippet";
 import { Code } from "@nextui-org/code";
 import { button as buttonStyles } from "@nextui-org/theme";
 
+import { Image } from "@nextui-org/image";
+
 import { siteConfig } from "@/config/site";
 import { title, subtitle } from "@/components/primitives";
 import { GithubIcon } from "@/components/icons";
@@ -37,8 +39,23 @@ export default function Home() {
   return (
     <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
       <div className="justify-center inline-block max-w-xl text-center">
-        <span className={title()}>Rally Cronos&nbsp;</span>
-        <span className={title({ color: "blue" })}>Tiempos en Vivo Perú&nbsp;</span>
+        <div className="items-center justify-center gap-4 sm:flex">
+          <div className="flex justify-center">
+            <Image
+              className="w-24 sm:w-40 md:w-60 lg:w-80"
+              isBlurred
+              radius="full"
+              alt="NextUI hero Image"
+              src="/img/llanta1.png"
+            />
+          </div>
+
+          <div>
+            <span className={title()}>Rally Cronos&nbsp;</span>
+            <span className={title({ color: "blue" })}>Tiempos en Vivo Perú&nbsp;</span>
+          </div>
+        </div>
+        
         <br />
         {/* <span className={title()}>
           websites regardless of your design experience.
