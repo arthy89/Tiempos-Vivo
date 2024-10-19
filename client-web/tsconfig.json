@@ -30,8 +30,8 @@
     ".next/types/**/*.ts",
     "app/providers.tsx",
     "components/navbar/navbar.tsx",
-    "**/*.js", 
-    "**/*.jsx",
+    "**/*.js",
+    "**/*.jsx"
   ],
   "exclude": ["node_modules"]
 }

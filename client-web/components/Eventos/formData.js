@@ -8,17 +8,17 @@ export const formData = {
   // nombre: '',
 
   org_id: 1,
-  name: '',
-  descripcion: '',
-  tipo: '',
-  ubigeo_id: '',
-  fecha: '',
-  hora: '',
-  foto_url: '',
-  ruta_url: '',
+  name: "",
+  descripcion: "",
+  tipo: "",
+  ubigeo_id: "",
+  fecha: "",
+  hora: "",
+  foto_url: "",
+  ruta_url: "",
 
   // ubigeo
-  departamento: '',
-  provincia: '',
-  distrito: '',
+  departamento: "",
+  provincia: "",
+  distrito: "",
 };

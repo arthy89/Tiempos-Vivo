@@ -16,11 +16,14 @@ function Eliminar({ datos, isOpen, onOpenChange, delFicha }) {
             <>
               {datos && (
                 <>
-                  <ModalHeader>Eliminar {datos.name || datos.nombre}</ModalHeader>
+                  <ModalHeader>
+                    Eliminar {datos.name || datos.nombre}
+                  </ModalHeader>
 
                   <ModalBody>
                     <p>
-                      ¿Seguro de eliminar <strong>{datos.name || datos.nombre}</strong>?
+                      ¿Seguro de eliminar{" "}
+                      <strong>{datos.name || datos.nombre}</strong>?
                     </p>
                   </ModalBody>
 

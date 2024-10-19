@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Input } from '@nextui-org/react';
+import { useState, useEffect } from "react";
+import { Input } from "@nextui-org/react";
 
-const SearchInput = ({ label, formKey, form, placeholder, initialValue  }) => {
+const SearchInput = ({ label, formKey, form, placeholder, initialValue }) => {
   const url = process.env.NEXT_PUBLIC_SERVER_URI;
 
-  const [search, setSearch] = useState(initialValue || '');
+  const [search, setSearch] = useState(initialValue || "");
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -26,7 +26,7 @@ const SearchInput = ({ label, formKey, form, placeholder, initialValue  }) => {
       const data = await response.json();
       setItems(data?.data || []);
     } catch (error) {
-      console.error('Error fetching items:', error);
+      console.error("Error fetching items:", error);
     } finally {
       setLoading(false);
     }
@@ -51,7 +51,7 @@ const SearchInput = ({ label, formKey, form, placeholder, initialValue  }) => {
         labelPlacement="outside"
         isRequired
         variant="bordered"
-        color={form.invalid(formKey) ? 'danger' : 'success'}
+        color={form.invalid(formKey) ? "danger" : "success"}
         type="text"
         placeholder={placeholder}
         value={search}
@@ -62,11 +62,11 @@ const SearchInput = ({ label, formKey, form, placeholder, initialValue  }) => {
         errorMessage={form.errors[formKey]}
       />
       {showOptions && items.length > 0 && (
-        <ul className="absolute bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md mt-1 w-full max-h-40 overflow-y-auto z-30 shadow-lg">
+        <ul className="absolute z-30 w-full mt-1 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg dark:bg-zinc-900 dark:border-zinc-800 max-h-40">
           {items.map((item) => (
             <li
               key={item.id}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-700 cursor-pointer text-sm"
+              className="p-2 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700"
               onClick={() => handleSelectItem(item)}
             >
               {item.nombre} {item.apellidos}

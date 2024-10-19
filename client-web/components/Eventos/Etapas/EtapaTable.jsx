@@ -18,13 +18,18 @@ import {
   ModalFooter,
   Tooltip,
   Image,
-} from '@nextui-org/react';
+} from "@nextui-org/react";
 import { useRouter } from "next/navigation";
-import { MdAutoFixHigh, MdEdit, MdDeleteForever, MdRemoveRedEye  } from 'react-icons/md';
-import React, { useMemo, useRef, useState } from 'react';
-import EtapaService from '@/services/EtapaService';
-import { columns } from './columns';
-import Form from './form';
+import {
+  MdAutoFixHigh,
+  MdEdit,
+  MdDeleteForever,
+  MdRemoveRedEye,
+} from "react-icons/md";
+import React, { useMemo, useRef, useState } from "react";
+import EtapaService from "@/services/EtapaService";
+import { columns } from "./columns";
+import Form from "./form";
 import Eliminar from "@/components/Modals/Eliminar";
 
 function EtapaTable({ idEvent }) {
@@ -58,36 +63,36 @@ function EtapaTable({ idEvent }) {
     onClose();
   };
 
-  const loadingState = isLoading || data?.data.legth === 0 ? 'loading' : 'idle';
+  const loadingState = isLoading || data?.data.legth === 0 ? "loading" : "idle";
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const refForm = useRef(null);
 
   const topContent = React.useMemo(() => {
     return (
-      <div className='flex flex-col gap-4'>
-        <div className='flex justify-between gap-3 items-end'>
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between gap-3 items-end">
           {/* <Input
             isClearable
             className='w-full sm:max-w-[44%]'
             placeholder='Search by name...'
           /> */}
-          <span className='text-xl font-bold'>Lista de Etapas</span>
-          <div className='flex gap-3'>
+          <span className="text-xl font-bold">Lista de Etapas</span>
+          <div className="flex gap-3">
             <Button
               onPress={() => {
                 setEdit(false);
                 onOpen();
               }}
-              color='primary'
-              endContent={<MdAutoFixHigh size='1.4em' />}
+              color="primary"
+              endContent={<MdAutoFixHigh size="1.4em" />}
             >
               Añadir
             </Button>
             <Modal
               isOpen={isOpen}
               onOpenChange={onOpenChange}
-              placement='center'
-              scrollBehavior='outside'
+              placement="center"
+              scrollBehavior="outside"
             >
               <ModalContent>
                 {(onClose) => (
@@ -106,22 +111,22 @@ function EtapaTable({ idEvent }) {
             </Modal>
           </div>
         </div>
-        <div className='flex justify-between items-center'>
-          <span className='text-default-400 text-small'>
+        <div className="flex justify-between items-center">
+          <span className="text-default-400 text-small">
             Total {data?.total}
           </span>
-          <label className='flex items-center text-default-400 text-small'>
+          <label className="flex items-center text-default-400 text-small">
             Filas por página
             <select
-              className='bg-transparent outline-none text-default-400 text-small'
+              className="bg-transparent outline-none text-default-400 text-small"
               onChange={(e) => {
                 setRowPerPage(e.target.value);
               }}
             >
-              <option value='5'>5</option>
-              <option value='10'>10</option>
-              <option value='15'>15</option>
-              <option value='20'>20</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
             </select>
           </label>
         </div>
@@ -157,11 +162,11 @@ function EtapaTable({ idEvent }) {
     const cellValue = row[columnKey];
 
     switch (columnKey) {
-      case 'id':
+      case "id":
         // return <p>{cellValue}</p>;
-        return <p>{(index !== undefined && index !== null) ? index + 1 : '-'}</p>;
+        return <p>{index !== undefined && index !== null ? index + 1 : "-"}</p>;
 
-      case 'especiales':
+      case "especiales":
         const especiales = row.especiales || [];
         return (
           // <>
@@ -177,25 +182,27 @@ function EtapaTable({ idEvent }) {
           //     </ul>
           //   )}
           // </>
-          <p>{ especiales.length === 0 ? 'Sin especiales' : especiales.length }</p>
+          <p>
+            {especiales.length === 0 ? "Sin especiales" : especiales.length}
+          </p>
         );
-      case 'acciones':
+      case "acciones":
         return (
-          <div className='flex justify-center gap-2'>
-            <Tooltip content='Editar'>
+          <div className="flex justify-center gap-2">
+            <Tooltip content="Editar">
               <span
                 onClick={() => editar(row)}
-                className='text-lg text-default-400 cursor-pointer active:opacity-50'
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
               >
-                <MdEdit size='1.4em' />
+                <MdEdit size="1.4em" />
               </span>
             </Tooltip>
-            <Tooltip color='danger' content='Eliminar'>
+            <Tooltip color="danger" content="Eliminar">
               <span
                 onClick={() => eliminar(row)}
-                className='text-lg text-danger cursor-pointer active:opacity-50'
+                className="text-lg text-danger cursor-pointer active:opacity-50"
               >
-                <MdDeleteForever size='1.4em' />
+                <MdDeleteForever size="1.4em" />
               </span>
             </Tooltip>
           </div>
@@ -208,16 +215,16 @@ function EtapaTable({ idEvent }) {
   return (
     <>
       <Table
-        aria-label='Example static collection table'
+        aria-label="Example static collection table"
         topContent={topContent}
         bottomContent={
           pages > 0 ? (
-            <div className='flex w-full justify-center'>
+            <div className="flex w-full justify-center">
               <Pagination
                 isCompact
                 showControls
                 showShadow
-                color='primary'
+                color="primary"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -230,7 +237,11 @@ function EtapaTable({ idEvent }) {
           {(column) => (
             <TableColumn
               key={column.uid}
-              align={column.uid === 'acciones' || column.uid === 'especiales' ? 'center' : 'start'}
+              align={
+                column.uid === "acciones" || column.uid === "especiales"
+                  ? "center"
+                  : "start"
+              }
             >
               {column.name}
             </TableColumn>
@@ -261,7 +272,7 @@ function EtapaTable({ idEvent }) {
         onClose={onClose}
       />
     </>
-  )
+  );
 }
 
-export default EtapaTable
+export default EtapaTable;

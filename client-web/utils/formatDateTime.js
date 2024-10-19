@@ -7,6 +7,7 @@ export const formatDate = (dateString) => {
     month: "short",
     year: "numeric",
   });
+
   return formattedDate;
 };
 
@@ -15,6 +16,7 @@ export const formatTime = (timeString) => {
 
   const [hours, minutes] = timeString.split(":");
   const hora = new Date();
+
   hora.setHours(hours, minutes);
 
   const formattedTime = hora.toLocaleTimeString("en-US", {

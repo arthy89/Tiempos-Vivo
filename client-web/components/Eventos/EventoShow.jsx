@@ -5,8 +5,8 @@ import { Image, Button, Chip } from "@nextui-org/react";
 import { title } from "@/components/primitives";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { formatDate, formatTime } from '@/utils/formatDateTime'
-import EventoService from '@/services/EventoService';
+import { formatDate, formatTime } from "@/utils/formatDateTime";
+import EventoService from "@/services/EventoService";
 
 function EventoShow() {
   const url = process.env.NEXT_PUBLIC_SERVER_URI;
@@ -16,7 +16,7 @@ function EventoShow() {
   const [evento, setEvento] = useState(null);
 
   // Extraer el ID
-  const idEvent = params.id.split('-', 2)[0];
+  const idEvent = params.id.split("-", 2)[0];
   // console.log('IODDDDDDDDDDDD', idEvent);
 
   useEffect(() => {
@@ -31,15 +31,15 @@ function EventoShow() {
 
   const ClickTripulaciones = (e) => {
     // console.log(e);
-    const slug = `${e.id}-${e.name.replace(/\s+/g, '-').toLowerCase()}`;
+    const slug = `${e.id}-${e.name.replace(/\s+/g, "-").toLowerCase()}`;
     router.push(`/${slug}/tripulaciones`);
-  }
+  };
 
   const ClickTiempos = (e) => {
     // console.log(e);
-    const slug = `${e.id}-${e.name.replace(/\s+/g, '-').toLowerCase()}`;
+    const slug = `${e.id}-${e.name.replace(/\s+/g, "-").toLowerCase()}`;
     router.push(`/${slug}/tiempos`);
-  }
+  };
 
   return (
     <section>
@@ -56,11 +56,15 @@ function EventoShow() {
               radius="sm"
               alt={evento?.nombre}
               className="object-cover rounded-xl"
-              src={evento?.foto_url != null ? `${url}`+`${evento.foto_url}` : '/img/mono.png'}
+              src={
+                evento?.foto_url != null
+                  ? `${url}` + `${evento.foto_url}`
+                  : "/img/mono.png"
+              }
             />
           </div>
         </div>
-          
+
         {/* izquierdo */}
         <div className="contenedor">
           <div className="grid grid-rows-1 gap-2 mb-2">
@@ -83,7 +87,7 @@ function EventoShow() {
               Ver Tiempos en Vivo
             </Button>
           </div>
-        
+
           <div>
             <p className="text-xl font-bold">{evento?.tipo}</p>
             <p className="text-sm">
@@ -108,7 +112,7 @@ function EventoShow() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-export default EventoShow
+export default EventoShow;

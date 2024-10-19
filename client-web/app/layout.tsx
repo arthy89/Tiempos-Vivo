@@ -83,7 +83,7 @@ export default function RootLayout({
             </footer>
           </div>
         </Providers>
-        
+
         {/* Analytics */}
         <Analytics />
       </body>

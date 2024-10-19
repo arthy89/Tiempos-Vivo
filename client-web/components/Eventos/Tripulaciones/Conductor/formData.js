@@ -1,4 +1,4 @@
 export const formData = {
-  nombre: '',
-  apellidos: '',
+  nombre: "",
+  apellidos: "",
 };

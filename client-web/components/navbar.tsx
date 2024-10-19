@@ -83,10 +83,7 @@ export const Navbar = () => {
         </ul>
       </NavbarContent>
 
-      <NavbarContent
-        className="sm:flex basis-1/5 sm:basis-full"
-        justify="end"
-      >
+      <NavbarContent className="sm:flex basis-1/5 sm:basis-full" justify="end">
         <NavbarItem className="gap-2 sm:flex">
           {/* <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
             <TwitterIcon className="text-default-500" />

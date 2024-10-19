@@ -13,15 +13,19 @@ function Foto({ datos, isOpen, onOpenChange }) {
 
   return (
     <>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center" size="5xl" scrollBehavior='outside'>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        placement="center"
+        size="5xl"
+        scrollBehavior="outside"
+      >
         <ModalContent>
           {(onClose) => (
             <>
               {datos && (
                 <>
-                  <ModalHeader>
-                    Foto
-                  </ModalHeader>
+                  <ModalHeader>Foto</ModalHeader>
                   <ModalBody>
                     <div className="flex justify-center">
                       <Image
@@ -29,7 +33,7 @@ function Foto({ datos, isOpen, onOpenChange }) {
                         radius="sm"
                         src={`${url}` + `${datos}`}
                         alt={"View Foto"}
-                        loading='lazy'
+                        loading="lazy"
                       />
                     </div>
                   </ModalBody>

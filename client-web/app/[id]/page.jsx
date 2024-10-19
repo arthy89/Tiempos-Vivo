@@ -1,10 +1,8 @@
-import React from 'react'
-import EventoShow from '@/components/Eventos/EventoShow'
+import React from "react";
+import EventoShow from "@/components/Eventos/EventoShow";
 
 function page() {
-  return (
-    <EventoShow />
-  )
+  return <EventoShow />;
 }
 
-export default page
+export default page;

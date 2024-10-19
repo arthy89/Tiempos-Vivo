@@ -30,11 +30,10 @@ export default function Home() {
   const { data, mutate, isLoading } = EventoService.getData({
     page,
     rowsPerPage: rowPerPage,
-    order_by: '-id',
+    order_by: "-id",
   });
   // console.log(data?.last_page);
   // console.log(data);
-
 
   return (
     <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
@@ -52,10 +51,12 @@ export default function Home() {
 
           <div>
             <span className={title()}>Rally Cronos&nbsp;</span>
-            <span className={title({ color: "blue" })}>Tiempos en Vivo Perú&nbsp;</span>
+            <span className={title({ color: "blue" })}>
+              Tiempos en Vivo Perú&nbsp;
+            </span>
           </div>
         </div>
-        
+
         <br />
         {/* <span className={title()}>
           websites regardless of your design experience.
@@ -68,7 +69,7 @@ export default function Home() {
       <div className="justify-center py-2">
         {data ? (
           <EventoList eventos={data} />
-        ): (
+        ) : (
           <div className="flex gap-4">
             <CardSkeleton />
             <CardSkeleton />

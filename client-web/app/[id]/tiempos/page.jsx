@@ -1,13 +1,11 @@
-"use client"
-import React from 'react'
+"use client";
+import React from "react";
 import { useRouter, useParams } from "next/navigation";
-import TiemposShow from '@/components/Eventos/Tiempos/TiemposShow'
-import EventoService from '@/services/EventoService';
+import TiemposShow from "@/components/Eventos/Tiempos/TiemposShow";
+import EventoService from "@/services/EventoService";
 
 function page() {
-  return (
-    <TiemposShow />
-  )
+  return <TiemposShow />;
 }
 
-export default page
+export default page;

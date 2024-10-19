@@ -1,4 +1,4 @@
-import PrivateRoute from '@/components/PrivateRoute';
+import PrivateRoute from "@/components/PrivateRoute";
 
 export default function AdminLayout({ children }) {
   return (

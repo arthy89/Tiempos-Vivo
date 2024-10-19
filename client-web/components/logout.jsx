@@ -1,6 +1,6 @@
 // Cerrar sesión en algún componente
-import { useDispatch } from 'react-redux';
-import { logout } from '@/slices/authSlice';
+import { useDispatch } from "react-redux";
+import { logout } from "@/slices/authSlice";
 
 export const LogoutButton = () => {
   const dispatch = useDispatch();

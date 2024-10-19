@@ -18,14 +18,19 @@ import {
   ModalFooter,
   Tooltip,
   Image,
-} from '@nextui-org/react';
+} from "@nextui-org/react";
 import { useRouter } from "next/navigation";
-import { MdAutoFixHigh, MdEdit, MdDeleteForever, MdRemoveRedEye  } from 'react-icons/md';
-import React, { useMemo, useRef, useState } from 'react';
-import EventoService from '@/services/EventoService';
-import { columns } from './columns';
-import Form from './form';
-import Foto from '@/components/Modals/Foto';
+import {
+  MdAutoFixHigh,
+  MdEdit,
+  MdDeleteForever,
+  MdRemoveRedEye,
+} from "react-icons/md";
+import React, { useMemo, useRef, useState } from "react";
+import EventoService from "@/services/EventoService";
+import { columns } from "./columns";
+import Form from "./form";
+import Foto from "@/components/Modals/Foto";
 import Eliminar from "@/components/Modals/Eliminar";
 
 function EventoTable() {
@@ -41,7 +46,7 @@ function EventoTable() {
   const { data, mutate, isLoading } = EventoService.getData({
     page,
     rowsPerPage: rowPerPage,
-    order_by: '-id',
+    order_by: "-id",
   });
   console.log(data?.last_page);
   console.log(data);
@@ -69,35 +74,35 @@ function EventoTable() {
     }
   };
 
-  const loadingState = isLoading || data?.data.legth === 0 ? 'loading' : 'idle';
+  const loadingState = isLoading || data?.data.legth === 0 ? "loading" : "idle";
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const refForm = useRef(null);
 
   const topContent = React.useMemo(() => {
     return (
-      <div className='flex flex-col gap-4'>
-        <div className='flex justify-between gap-3 items-end'>
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
-            className='w-full sm:max-w-[44%]'
-            placeholder='Search by name...'
+            className="w-full sm:max-w-[44%]"
+            placeholder="Search by name..."
           />
-          <div className='flex gap-3'>
+          <div className="flex gap-3">
             <Button
               onPress={() => {
                 setEdit(false);
                 onOpen();
               }}
-              color='primary'
-              endContent={<MdAutoFixHigh size='1.4em' />}
+              color="primary"
+              endContent={<MdAutoFixHigh size="1.4em" />}
             >
               Añadir
             </Button>
             <Modal
               isOpen={isOpen}
               onOpenChange={onOpenChange}
-              placement='center'
-              scrollBehavior='outside'
+              placement="center"
+              scrollBehavior="outside"
             >
               <ModalContent>
                 {(onClose) => (
@@ -115,22 +120,22 @@ function EventoTable() {
             </Modal>
           </div>
         </div>
-        <div className='flex justify-between items-center'>
-          <span className='text-default-400 text-small'>
+        <div className="flex justify-between items-center">
+          <span className="text-default-400 text-small">
             Total {data?.total} users
           </span>
-          <label className='flex items-center text-default-400 text-small'>
+          <label className="flex items-center text-default-400 text-small">
             Rows per page:
             <select
-              className='bg-transparent outline-none text-default-400 text-small'
+              className="bg-transparent outline-none text-default-400 text-small"
               onChange={(e) => {
                 setRowPerPage(e.target.value);
               }}
             >
-              <option value='5'>5</option>
-              <option value='10'>10</option>
-              <option value='15'>15</option>
-              <option value='20'>20</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
             </select>
           </label>
         </div>
@@ -148,7 +153,7 @@ function EventoTable() {
   const ver = (e) => {
     // console.log("XZDDDDDDDDDD", e);
     // router.push(`/admin/eventos/${e.id}`);
-    const slug = `${e.id}-${e.name.replace(/\s+/g, '-').toLowerCase()}`;
+    const slug = `${e.id}-${e.name.replace(/\s+/g, "-").toLowerCase()}`;
     router.push(`/admin/eventos/${slug}`);
   };
 
@@ -179,10 +184,10 @@ function EventoTable() {
     const cellValue = row[columnKey];
 
     switch (columnKey) {
-      case 'id':
+      case "id":
         // return <p>{cellValue}</p>;
-        return <p>{(index !== undefined && index !== null) ? index + 1 : '-'}</p>;
-      case 'ubigeo':
+        return <p>{index !== undefined && index !== null ? index + 1 : "-"}</p>;
+      case "ubigeo":
         // const depNombre = departamento ? departamento.nombre : '-';
         // const provNombre = provincia ? provincia.nombre : '-';
         // return (
@@ -190,56 +195,60 @@ function EventoTable() {
         //     {nombre ? `${nombre} - ${provNombre} - ${depNombre}` : '-'}
         //   </p>
         // );
-        
+
         const { nombre, distrito, provincia, departamento } = row.ubigeo || {};
         return (
           <p>
             {nombre} - {provincia} - {departamento}
           </p>
         );
-      case 'foto_url':
+      case "foto_url":
         return (
           <div>
             <Button variant="light" onClick={() => verFoto(row.foto_url)}>
               <Image
                 radius="md"
-                src={row.foto_url != null ? `${url}`+`${row.foto_url}` : '/img/mono.png'}
+                src={
+                  row.foto_url != null
+                    ? `${url}` + `${row.foto_url}`
+                    : "/img/mono.png"
+                }
                 alt="Prev Img"
                 width={70}
-                loading='lazy'
-              />  
+                loading="lazy"
+              />
             </Button>
           </div>
         );
       // case 'tipo':
       //   return <p>{cellValue}</p>;
-      case 'acciones':
+      case "acciones":
         return (
-          <div className='relative flex items-center gap-2'>
-            <Tooltip content='Editar'>
+          <div className="relative flex items-center gap-2">
+            <Tooltip content="Editar">
               <span
                 onClick={() => editar(row)}
-                className='text-lg text-default-400 cursor-pointer active:opacity-50'
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
               >
-                <MdEdit size='1.4em' />
+                <MdEdit size="1.4em" />
               </span>
             </Tooltip>
 
-            <Tooltip content='Ver'>
+            <Tooltip content="Ver">
               <span
                 onClick={() => ver(row)}
-                className='text-lg text-default-400 cursor-pointer active:opacity-50'
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
               >
-                <MdRemoveRedEye size='1.4em' />
+                <MdRemoveRedEye size="1.4em" />
               </span>
             </Tooltip>
 
-            <Tooltip color='danger' content='Eliminar'>
+            <Tooltip color="danger" content="Eliminar">
               <span
                 onClick={() => eliminar(row)}
-                className='text-lg text-danger cursor-pointer active:opacity-50'
+                className="text-lg text-danger cursor-pointer active:opacity-50"
               >
-                <MdDeleteForever size='1.4em' />
+                <MdDeleteForever size="1.4em" />
               </span>
             </Tooltip>
           </div>
@@ -252,16 +261,16 @@ function EventoTable() {
   return (
     <>
       <Table
-        aria-label='Example static collection table'
+        aria-label="Example static collection table"
         topContent={topContent}
         bottomContent={
           pages > 0 ? (
-            <div className='flex w-full justify-center'>
+            <div className="flex w-full justify-center">
               <Pagination
                 isCompact
                 showControls
                 showShadow
-                color='primary'
+                color="primary"
                 page={page}
                 total={pages}
                 onChange={(page) => setPage(page)}
@@ -274,7 +283,7 @@ function EventoTable() {
           {(column) => (
             <TableColumn
               key={column.uid}
-              align={column.uid === 'actions' ? 'center' : 'start'}
+              align={column.uid === "actions" ? "center" : "start"}
             >
               {column.name}
             </TableColumn>
@@ -312,7 +321,7 @@ function EventoTable() {
         onClose={onClose}
       />
     </>
-  )
+  );
 }
 
-export default EventoTable
+export default EventoTable;

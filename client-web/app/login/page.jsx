@@ -4,27 +4,36 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser, loginUser } from "@/slices/authSlice";
 import { useRouter } from "next/navigation";
-import { Card, CardHeader, CardBody, CardFooter, Divider, Input, Button, Spinner } from "@nextui-org/react";
-import { IoIosEyeOff, IoIosEye  } from "react-icons/io";
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Divider,
+  Input,
+  Button,
+  Spinner,
+} from "@nextui-org/react";
+import { IoIosEyeOff, IoIosEye } from "react-icons/io";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const router = useRouter();
-  const { loading, error } = useSelector((state) => state.auth);  // Obtén el estado del authSlice
+  const { loading, error } = useSelector((state) => state.auth); // Obtén el estado del authSlice
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Despacha la acción de loginUser con email y password
     dispatch(loginUser({ email, password }))
       .unwrap()
       .then(() => {
-        router.push("/admin");  // Redirecciona si el login es exitoso
+        router.push("/admin"); // Redirecciona si el login es exitoso
       })
       .catch((err) => {
-        console.error("Error during login:", err);  // Maneja errores aquí
+        console.error("Error during login:", err); // Maneja errores aquí
       });
   };
 
@@ -41,10 +50,9 @@ export default function LoginPage() {
               <p className="font-bold text-md">Inicio de Sesión</p>
             </div>
           </CardHeader>
-          <Divider/>
+          <Divider />
           <CardBody>
-            
-              {/* <div>
+            {/* <div>
                 <label>Email:</label>
                 <input
                   type="email"
@@ -53,7 +61,7 @@ export default function LoginPage() {
                   required
                 />
               </div> */}
-              {/* <div>
+            {/* <div>
                 <label>Password:</label>
                 <input
                   type="password"
@@ -62,47 +70,47 @@ export default function LoginPage() {
                   required
                 />
               </div> */}
-              <Input
-                isRequired
-                type="email" 
-                label="Usuario" 
-                placeholder="Ingrese su email..." 
-                className="mb-2"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              
-              <Input
-                label="Contraseña"
-                // variant="bordered"
-                placeholder="***"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                isRequired
-                endContent={
-                  <button className="focus:outline-none" type="button" onClick={toggleVisibility} aria-label="toggle password visibility">
-                    {isVisible ? (
-                      <IoIosEyeOff className="text-2xl pointer-events-none text-default-400" />
-                    ) : (
-                      <IoIosEye className="text-2xl pointer-events-none text-default-400" />
-                    )}
-                  </button>
-                }
-                type={isVisible ? "text" : "password"}
-                className="max-w-xs"
-              />
-            
+            <Input
+              isRequired
+              type="email"
+              label="Usuario"
+              placeholder="Ingrese su email..."
+              className="mb-2"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+
+            <Input
+              label="Contraseña"
+              // variant="bordered"
+              placeholder="***"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              isRequired
+              endContent={
+                <button
+                  className="focus:outline-none"
+                  type="button"
+                  onClick={toggleVisibility}
+                  aria-label="toggle password visibility"
+                >
+                  {isVisible ? (
+                    <IoIosEyeOff className="text-2xl pointer-events-none text-default-400" />
+                  ) : (
+                    <IoIosEye className="text-2xl pointer-events-none text-default-400" />
+                  )}
+                </button>
+              }
+              type={isVisible ? "text" : "password"}
+              className="max-w-xs"
+            />
           </CardBody>
-          <Divider/>
+          <Divider />
           <CardFooter>
             {loading && <Spinner />}
             {error && <p style={{ color: "red" }}>{error}</p>}
             {/* <button type="submit" disabled={loading}>Login</button> */}
-            <Button
-              color="primary"
-              type="submit"
-              disabled={loading}
-            >
+            <Button color="primary" type="submit" disabled={loading}>
               Ingresar
             </Button>
           </CardFooter>

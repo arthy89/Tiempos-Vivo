@@ -1,6 +1,6 @@
-"use client"
+"use client";
 import {
-    Table,
+  Table,
   TableHeader,
   TableColumn,
   TableBody,
@@ -18,18 +18,18 @@ import {
   ModalBody,
   ModalFooter,
   Tooltip,
-} from '@nextui-org/react';
+} from "@nextui-org/react";
 import { useRouter, useParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
-import EventoTable from '@/components/Eventos/EventoTable';
-import { LogoutButton } from '@/components/logout';
+import EventoTable from "@/components/Eventos/EventoTable";
+import { LogoutButton } from "@/components/logout";
 
 function page() {
   return (
     <div>
       <EventoTable />
     </div>
-  )
+  );
 }
 
-export default page
+export default page;
