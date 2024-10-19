@@ -15,7 +15,7 @@ RUN npm install
 COPY . .
 
 # Construir la aplicación para producción
-RUN npm run build
+# RUN npm run build
 
 # Exponer el puerto 3000 (puerto predeterminado para Next.js)
 EXPOSE 3000

@@ -5,7 +5,7 @@ services:
   mysql:
     image: mysql:8.0
     container_name: mysql
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: tiempos_en_vivo
@@ -51,9 +51,9 @@ services:
       context: ./client-web
       dockerfile: Dockerfile
     container_name: nextjs
-    restart: always
+    restart: unless-stopped
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_API_URL: http://localhost:8000/
     volumes:
       - ./client-web:/app
     ports:
