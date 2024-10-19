@@ -1,6 +1,15 @@
 FROM php:8.2-fpm-alpine
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-# Instalar dependencias
+COPY ./php/php.ini /usr/local/etc/php/
+
+LABEL MAINTAINER="SATYADEEP G" \
+    "GitHub Link"="https://github.com/satyadeep" \
+    "PHP Version"="8.2" \
+    "Alpine Linux Version"="3.17"
+
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+
 RUN apk update && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && pecl install uploadprogress \
     && docker-php-ext-enable uploadprogress \
@@ -47,32 +56,30 @@ RUN apk update && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
     && php -r "unlink('composer-setup.php');"
 
-# Instalar extensiones de PHP necesarias
-# RUN docker-php-ext-install pdo pdo_mysql gd zip
-
-# Instalar Composer
-# COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Configurar el directorio de trabajo
+# Configura el directorio de trabajo
 WORKDIR /var/www/html
-# Configuración de permisos
-RUN chown -R www-data:www-data /var/www && \
-    chmod -R 755 /var/www
-
+RUN chown -R www-data:www-data /var/www
+RUN chmod 755 /var/www
 # Copia primero los archivos composer.json y composer.lock
 COPY composer.json composer.lock ./
 
-# Copiar archivos de la aplicación
+# Copia el resto de los archivos de tu proyecto Laravel
 COPY . .
-
-# Copiar el archivo de ejemplo .env y generar APP_KEY
-RUN composer install --no-dev --optimize-autoloader
+# Instala las dependencias de Composer
+RUN composer install
 RUN cp .env.example .env
 RUN php artisan passport:key
 RUN php artisan storage:link
+EXPOSE 3306
+#RUN php artisan migrate --seed
+# RUN php artisan passport:key
+#CMD ["php", "artisan", "migrate", "--seed"]
+# CMD ["php", "artisan", "serve", "--host=0.0.0.0"]
 
-# Exponer el puerto 9000 para PHP-FPM
+# Expon el puerto de PHP-FPM (si es necesario)
 EXPOSE 9000
 
-# Ejecutar PHP-FPM
-CMD ["php-fpm"]
+
+# CMD para iniciar PHP-FPM
+# CMD ["php-fpm"]
+# CMD ["sleep", "infinity"]
