@@ -1,7 +1,12 @@
 FROM php:8.2-fpm-alpine
 
 # Instalar dependencias
-RUN apk update && apk add --no-cache \
+RUN apk update && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
+    && pecl install uploadprogress \
+    && docker-php-ext-enable uploadprogress \
+    && apk del .build-deps $PHPIZE_DEPS \
+    && chmod uga+x /usr/local/bin/install-php-extensions && sync \
+    && install-php-extensions bcmath \
     bash \
     git \
     curl \
