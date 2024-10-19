@@ -15,7 +15,7 @@ class OrgSeeder extends Seeder
     public function run(): void
     {
         $orgs = array(
-            array('name' => 'Automóvil Club Juliaca', 'descripcion' => null, 'ubigeo_id' => '211101', 'foto_url' => null),
+            array('name' => 'Automóvil Club Peruano', 'descripcion' => null, 'ubigeo_id' => '211101', 'foto_url' => null),
         );
 
         DB::table((new Org())->getTable())->insert($orgs);

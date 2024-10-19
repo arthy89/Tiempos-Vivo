@@ -36,9 +36,9 @@ class PermisoSeeder extends Seeder
             'description' => 'Administrar usuarios'
         ])->assignRole([$god]);
         $user = User::create([
-            'name' => 'password',
-            'email' => 'password@gmail.com',
-            'password' => bcrypt('password'),
+            'name' => 'Admin Test',
+            'email' => 'arhyel@gmail.com',
+            'password' => bcrypt('arthynis'),
         ]);
         $user->assignRole('GOD');
     }
