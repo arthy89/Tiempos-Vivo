@@ -7,15 +7,45 @@ RUN apk update && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && apk del .build-deps $PHPIZE_DEPS \
     && chmod uga+x /usr/local/bin/install-php-extensions && sync \
     && install-php-extensions bcmath \
-    bash \
-    git \
+    # bz2 \
+    # calendar \
     curl \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    libfreetype6-dev \
+    exif \
+    fileinfo \
+    # ftp \
+    gd \
+    # gettext \
+    # imagick \
+    # imap \
+    intl \
+    # ldap \
+    mbstring \
+    # mcrypt \
+    # memcached \
+    # mongodb \
+    mysqli \
+    # opcache \
+    openssl \
+    pdo \
+    pdo_mysql \
+    # redis \
+    # soap \
+    sodium \
+    # sysvsem \
+    # sysvshm \
+    # xmlrpc \
+    xsl \
     zip \
-    libzip-dev \
-    unzip
+    pdo_pgsql \
+    pgsql \
+    #sql server
+    && cd ~ \
+    # Install composer
+    && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+    && php -r "copy('https://composer.github.io/installer.sig', 'signature');" \
+    && php -r "if (hash_file('SHA384', 'composer-setup.php') === trim(file_get_contents('signature'))) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
+    && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+    && php -r "unlink('composer-setup.php');"
 
 # Instalar extensiones de PHP necesarias
 RUN docker-php-ext-install pdo pdo_mysql gd zip
