@@ -25,21 +25,12 @@ services:
       dockerfile: Dockerfile
     container_name: laravel
     restart: always
-    environment:
-      DB_CONNECTION: mysql
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_DATABASE: tiempos_en_vivo
-      DB_USERNAME: root
-      DB_PASSWORD: root
-      APP_ENV: production
-      APP_DEBUG: false
-      APP_KEY: base64:x5pHJDRtNu/QhYhtRK03M2hv6XDAYVshxw58q5CITVQ=
-      APP_URL: http://localhost:8000
     volumes:
-      - ./backend:/var/www/html
-    ports:
-      - "8000:80"
+      - backend_app:/var/www/apitev/
+    expose:
+      - "9000"  # Exponemos PHP-FPM en el puerto 9000
+    # ports:
+    #   - "9000:9000"
     depends_on:
       - mysql
     networks:
@@ -52,22 +43,49 @@ services:
       dockerfile: Dockerfile
     container_name: nextjs
     restart: always
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000/
-    volumes:
-      - ./client-web:/app
+    # volumes:
+    #   - frontend_app:/app/.next
+
     ports:
-      - "3000:3000"
+      - "3000:3000"  # Exponemos Next.js en el puerto 3000
     depends_on:
       - laravel
+    environment:
+      - NEXT_PUBLIC_SERVER_URI=http://api.rallycronos.com/
+    networks:
+      - app-network
+    command: sh -c "node server.js"
+    
+
+  # Servicio de Nginx
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - frontend_app:/var/www/next_app
+      - backend_app:/var/www/apitev
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    restart: always
+    ports:
+      - "80:80"     # Expone el puerto 80 para el tráfico HTTP
+      - "443:443"   # Expone el puerto 443 para el tráfico HTTPS
+    depends_on:
+      - laravel
+      - nextjs
     networks:
       - app-network
 
 # Definir volúmenes persistentes
 volumes:
   mysql_data:
+    driver: local
+  frontend_app:
+    driver: local
+  backend_app:
+    driver: local
+
 
 # Definir red de la aplicación
 networks:
   app-network:
-    driver: bridge
+    external: true

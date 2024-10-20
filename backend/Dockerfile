@@ -45,8 +45,8 @@ RUN apk update && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     # xmlrpc \
     xsl \
     zip \
-    pdo_pgsql \
-    pgsql \
+    # pdo_pgsql \
+    # pgsql \
     #sql server
     && cd ~ \
     # Install composer
@@ -57,7 +57,7 @@ RUN apk update && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && php -r "unlink('composer-setup.php');"
 
 # Configura el directorio de trabajo
-WORKDIR /var/www/html
+WORKDIR /var/www/apitev
 RUN chown -R www-data:www-data /var/www
 RUN chmod 755 /var/www
 # Copia primero los archivos composer.json y composer.lock
