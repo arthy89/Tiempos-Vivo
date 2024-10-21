@@ -31,6 +31,8 @@ class EventController extends Controller
 
     public function calcularTiemposAcumulados($tiempos)
     {
+        // Cambioooooooooo
+        // CON MILISEGUNDOOOOOOOOOOOOOOOOOOOS
         $tiemposAcumulados = [];
     
         foreach ($tiempos as $tiempo) {
