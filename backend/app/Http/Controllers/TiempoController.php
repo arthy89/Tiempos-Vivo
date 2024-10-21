@@ -23,11 +23,24 @@ class TiempoController extends Controller
         );
     }
 
+    private function parseTime($time)
+    {
+        // Verifica si el tiempo contiene milisegundos
+        if (strpos($time, '.') !== false) {
+            // Si tiene milisegundos, usa el formato con precisión
+            return Carbon::createFromFormat('H:i:s.u', $time);
+        } else {
+            // Si no tiene milisegundos, usa el formato estándar
+            return Carbon::createFromFormat('H:i:s', $time);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreTiempoRequest $request)
     {
+        // return $request;
         // * Crear Tiempo cuando se ingresa directamente el Resultado
         if ($request->hora_marcado) {
             $time_R = $request->except(['hora_salida', 'hora_llegada']);
@@ -40,22 +53,30 @@ class TiempoController extends Controller
         $time_R = $request->all();
 
         // Generar el tiempo con Carbon
-        $hora_salida = Carbon::createFromFormat('H:i:s', $request->hora_salida);
-        $hora_llegada = Carbon::createFromFormat('H:i:s', $request->hora_llegada);
+        $hora_salida = $this->parseTime($request->hora_salida);
+        $hora_llegada = $this->parseTime($request->hora_llegada);
 
-        // Calcular el tiempo resultado
-        $tiempo_resultado = $hora_llegada->diff($hora_salida);
+        // Calcular la diferencia en milisegundos
+        $milisegundos_diferencia = $hora_llegada->diffInMilliseconds($hora_salida, true);
 
         // Agregar penalizacion si es existente
         if ($request->penalizacion) {
-            $penalizacion = Carbon::createFromFormat('H:i:s', $request->penalizacion);
-            $penalizacion_intervalo = $penalizacion->diffAsCarbonInterval(Carbon::createFromFormat('H:i:s', '00:00:00'));
+            $penalizacion = $this->parseTime($request->penalizacion);
+            $milisegundos_penalizacion = $penalizacion->diffInMilliseconds(Carbon::createFromFormat('H:i:s', '00:00:00'), true);
 
-            $tiempo_resultado->add($penalizacion_intervalo);
+            // Sumar penalización a la diferencia de tiempo
+            $milisegundos_diferencia += $milisegundos_penalizacion;
         }
 
-        // Asignar valor 'hora_marcado' con el tiempo resultante en el array para la respesta API
-        $time_R['hora_marcado'] = $tiempo_resultado->format('%H:%I:%S');
+        // Convertir la diferencia de milisegundos a un formato de tiempo
+        $horas = floor($milisegundos_diferencia / (1000 * 60 * 60));
+        $minutos = floor(($milisegundos_diferencia % (1000 * 60 * 60)) / (1000 * 60));
+        $segundos = floor(($milisegundos_diferencia % (1000 * 60)) / 1000);
+        $milisegundos = $milisegundos_diferencia % 1000;
+
+        // Asignar el resultado en formato H:i:s.u
+        $tiempo_resultado = sprintf('%02d:%02d:%02d.%03d', $horas, $minutos, $segundos, $milisegundos);
+        $time_R['hora_marcado'] = $tiempo_resultado;
 
         $tiempo = Tiempo::create($time_R);
         return response()->json($tiempo);
@@ -90,22 +111,30 @@ class TiempoController extends Controller
         $time_R = $request->all();
 
         // Generar el tiempo con Carbon
-        $hora_salida = Carbon::createFromFormat('H:i:s', $request->hora_salida);
-        $hora_llegada = Carbon::createFromFormat('H:i:s', $request->hora_llegada);
+        $hora_salida = $this->parseTime($request->hora_salida);
+        $hora_llegada = $this->parseTime($request->hora_llegada);
 
-        // Calcular el tiempo resultado
-        $tiempo_resultado = $hora_llegada->diff($hora_salida);
+        // Calcular la diferencia en milisegundos
+        $milisegundos_diferencia = $hora_llegada->diffInMilliseconds($hora_salida, true);
 
         // Agregar penalizacion si es existente
         if ($request->penalizacion) {
-            $penalizacion = Carbon::createFromFormat('H:i:s', $request->penalizacion);
-            $penalizacion_intervalo = $penalizacion->diffAsCarbonInterval(Carbon::createFromFormat('H:i:s', '00:00:00'));
+            $penalizacion = $this->parseTime($request->penalizacion);
+            $milisegundos_penalizacion = $penalizacion->diffInMilliseconds(Carbon::createFromFormat('H:i:s', '00:00:00'), true);
 
-            $tiempo_resultado->add($penalizacion_intervalo);
+            // Sumar penalización a la diferencia de tiempo
+            $milisegundos_diferencia += $milisegundos_penalizacion;
         }
 
-        // Asignar valor 'hora_marcado' con el tiempo resultante en el array para la respesta API
-        $time_R['hora_marcado'] = $tiempo_resultado->format('%H:%I:%S');
+        // Convertir la diferencia de milisegundos a un formato de tiempo
+        $horas = floor($milisegundos_diferencia / (1000 * 60 * 60));
+        $minutos = floor(($milisegundos_diferencia % (1000 * 60 * 60)) / (1000 * 60));
+        $segundos = floor(($milisegundos_diferencia % (1000 * 60)) / 1000);
+        $milisegundos = $milisegundos_diferencia % 1000;
+
+        // Asignar el resultado en formato H:i:s.u
+        $tiempo_resultado = sprintf('%02d:%02d:%02d.%03d', $horas, $minutos, $segundos, $milisegundos);
+        $time_R['hora_marcado'] = $tiempo_resultado;
 
         $tiempo = $tiempo->update($time_R);
         return response()->json($tiempo);

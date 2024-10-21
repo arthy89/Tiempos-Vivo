@@ -6,6 +6,7 @@ import {
   ModalHeader,
   Divider,
   TimeInput,
+  Input,
 } from "@nextui-org/react";
 import toast, { Toaster } from "react-hot-toast";
 import { Time } from "@internationalized/date";
@@ -78,6 +79,14 @@ const Form = forwardRef(
       return `${hour}:${minute}:${second}`;
     };
 
+    // * Milisegundos
+    const handleMilisecondChange = (event, field) => {
+      const ms = event.target.value;
+      const currentValue = form.data[field].split('.')[0]; // Remover milisegundos anteriores si existen
+      const newTimeWithMs = currentValue + '.' + ms; // Concatenar el nuevo valor de milisegundos
+      form.setData(field, newTimeWithMs); // Actualizar el campo dinámicamente
+    };
+
     const onSave = async (event) => {
       form.setData("especial_id", especial);
 
@@ -128,39 +137,73 @@ const Form = forwardRef(
               idEvent={idEvent}
             />
 
-            <TimeInput
-              label="Salida"
-              labelPlacement="outside"
-              variant="bordered"
-              hourCycle="24"
-              granularity="second"
-              value={parseTime(form.data.hora_salida)}
-              onChange={(e) => {
-                form.setData("hora_salida", formatTime(e));
-              }}
-              color={form.invalid("hora_salida") ? "danger" : "success"}
-              onBlur={() => form.validate("hora_salida")}
-              isInvalid={form.invalid("hora_salida")}
-              errorMessage={form.errors.hora_salida}
-              isRequired
-            />
+            <div className="flex gap-4">
+              <TimeInput
+                label="Salida"
+                labelPlacement="outside"
+                variant="bordered"
+                hourCycle="24"
+                granularity="second"
+                value={parseTime(form.data.hora_salida?.split('.')[0])}
+                onChange={(e) => {
+                  form.setData("hora_salida", formatTime(e));
+                }}
+                color={form.invalid("hora_salida") ? "danger" : "success"}
+                onBlur={() => form.validate("hora_salida")}
+                isInvalid={form.invalid("hora_salida")}
+                errorMessage={form.errors.hora_salida}
+                isRequired
+              />
 
-            <TimeInput
-              label="Llegada"
-              labelPlacement="outside"
-              variant="bordered"
-              hourCycle="24"
-              granularity="second"
-              value={parseTime(form.data.hora_llegada)}
-              onChange={(e) => {
-                form.setData("hora_llegada", formatTime(e));
-              }}
-              color={form.invalid("hora_llegada") ? "danger" : "success"}
-              onBlur={() => form.validate("hora_llegada")}
-              isInvalid={form.invalid("hora_llegada")}
-              errorMessage={form.errors.hora_llegada}
-              isRequired
-            />
+              <Input
+                className="w-20"
+                type="number"
+                label="Miliseg"
+                labelPlacement="outside"
+                variant="bordered"
+                color="success"
+                min="0"
+                max="9"
+                maxLength="1"
+                placeholder="0"
+                value={form.data.hora_salida?.split('.')[1]}
+                onChange={(e) => handleMilisecondChange(e, "hora_salida")} // Pasar el campo dinámicamente
+              />
+            </div>
+
+            <div className="flex gap-4">
+              <TimeInput
+                label="Llegada"
+                labelPlacement="outside"
+                variant="bordered"
+                hourCycle="24"
+                granularity="second"
+                value={parseTime(form.data.hora_llegada?.split('.')[0])}
+                onChange={(e) => {
+                  form.setData("hora_llegada", formatTime(e));
+                }}
+                color={form.invalid("hora_llegada") ? "danger" : "success"}
+                onBlur={() => form.validate("hora_llegada")}
+                isInvalid={form.invalid("hora_llegada")}
+                errorMessage={form.errors.hora_llegada}
+                isRequired
+              />
+
+              <Input
+                className="w-20"
+                type="number"
+                label="Miliseg"
+                labelPlacement="outside"
+                variant="bordered"
+                color="success"
+                min="0"
+                max="9"
+                maxLength="1"
+                placeholder="0"
+                value={form.data.hora_llegada?.split('.')[1]}
+                onChange={(e) => handleMilisecondChange(e, "hora_llegada")} // Pasar el campo dinámicamente
+              />
+            </div>
 
             <TimeInput
               label="Penalización"
@@ -180,22 +223,39 @@ const Form = forwardRef(
 
             <Divider className="my-1" />
 
-            <TimeInput
-              label="Tiempo Marcado"
-              labelPlacement="outside"
-              variant="bordered"
-              hourCycle="24"
-              granularity="second"
-              value={parseTime(form.data.hora_marcado)}
-              onChange={(e) => {
-                form.setData("hora_marcado", formatTime(e));
-              }}
-              color={form.invalid("hora_marcado") ? "danger" : "success"}
-              onBlur={() => form.validate("hora_marcado")}
-              isInvalid={form.invalid("hora_marcado")}
-              errorMessage={form.errors.hora_marcado}
-              isRequired
-            />
+            <div className="flex gap-4">
+              <TimeInput
+                label="Tiempo Marcado"
+                labelPlacement="outside"
+                variant="bordered"
+                hourCycle="24"
+                granularity="second"
+                value={parseTime(form.data.hora_marcado?.split('.')[0])}
+                onChange={(e) => {
+                  form.setData("hora_marcado", formatTime(e));
+                }}
+                color={form.invalid("hora_marcado") ? "danger" : "success"}
+                onBlur={() => form.validate("hora_marcado")}
+                isInvalid={form.invalid("hora_marcado")}
+                errorMessage={form.errors.hora_marcado}
+                isRequired
+              />
+
+              <Input
+                className="w-20"
+                type="number"
+                label="Miliseg"
+                labelPlacement="outside"
+                variant="bordered"
+                color="success"
+                min="0"
+                max="9"
+                maxLength="1"
+                placeholder="0"
+                value={form.data.hora_marcado?.split('.')[1]}
+                onChange={(e) => handleMilisecondChange(e, "hora_marcado")} // Pasar el campo dinámicamente
+              />
+            </div>
           </ModalBody>
 
           <ModalFooter>

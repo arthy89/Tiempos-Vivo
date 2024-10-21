@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class EventController extends Controller
 {
@@ -31,39 +32,44 @@ class EventController extends Controller
     public function calcularTiemposAcumulados($tiempos)
     {
         $tiemposAcumulados = [];
-
+    
         foreach ($tiempos as $tiempo) {
             $tripulacionId = $tiempo->tripulacion_id;
-
+    
             // Inicializar si no existe
             if (!isset($tiemposAcumulados[$tripulacionId])) {
                 $tiemposAcumulados[$tripulacionId] = [
                     'tripulacion' => $tiempo->tripulacion,
-                    'tiempo_acumulado' => 0,
-                    'penalizacion_acumulada' => 0,
+                    'tiempo_acumulado' => Carbon::createFromFormat('H:i:s.u', '00:00:00.000'),
+                    'penalizacion_acumulada' => Carbon::createFromFormat('H:i:s.u', '00:00:00.000'),
                     'num_especiales' => 0,
                 ];
             }
-
-            // Convertir hora_marcado a segundos
-            $horaMarcado = strtotime($tiempo->hora_marcado) - strtotime('00:00:00');
-
-            // Sumar penalización (convertida a segundos)
-            $penalizacion = strtotime($tiempo->penalizacion ?? '00:00:00') - strtotime('00:00:00');
-
-            // Acumular tiempos y penalizaciones
-            $tiemposAcumulados[$tripulacionId]['tiempo_acumulado'] += $horaMarcado;
-            $tiemposAcumulados[$tripulacionId]['penalizacion_acumulada'] += $penalizacion;
+    
+            // Convertir hora_marcado a Carbon (con milisegundos)
+            $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
+    
+            // Convertir penalización a Carbon (sin milisegundos, formato H:i:s)
+            $penalizacion = Carbon::createFromFormat('H:i:s', $tiempo->penalizacion ?? '00:00:00');
+    
+            // Acumular tiempos y penalizaciones usando diffInMilliseconds con true para evitar valores negativos
+            $tiemposAcumulados[$tripulacionId]['tiempo_acumulado']->addMilliseconds($horaMarcado->diffInMilliseconds(Carbon::createFromFormat('H:i:s.u', '00:00:00.000'), true));
+            $tiemposAcumulados[$tripulacionId]['penalizacion_acumulada']->addSeconds($penalizacion->diffInSeconds(Carbon::createFromFormat('H:i:s', '00:00:00'), true));
             $tiemposAcumulados[$tripulacionId]['num_especiales'] += 1;
         }
-
-        // Formatear los tiempos acumulados (en formato HH:MM:SS)
+    
+        // Formatear los tiempos acumulados (en formato HH:MM:SS.0 para mostrar solo 1 dígito en los milisegundos)
         foreach ($tiemposAcumulados as &$tripulacion) {
-            $totalTiempo = $tripulacion['tiempo_acumulado'] + $tripulacion['penalizacion_acumulada'];
-            $tripulacion['tiempo_acumulado'] = gmdate('H:i:s', $totalTiempo);
-            $tripulacion['penalizacion_acumulada'] = gmdate('H:i:s', $tripulacion['penalizacion_acumulada']);
+            $totalTiempo = $tripulacion['tiempo_acumulado']->copy()->addMilliseconds($tripulacion['penalizacion_acumulada']->diffInMilliseconds(Carbon::createFromFormat('H:i:s.u', '00:00:00.000'), true));
+    
+            // Obtener solo el primer dígito de los milisegundos
+            $milliseconds = (int) floor($totalTiempo->format('u') / 100000); // Obtener solo el primer dígito de los milisegundos
+    
+            // Asignar el formato con un solo dígito de milisegundos
+            $tripulacion['tiempo_acumulado'] = sprintf('%02d:%02d:%02d.%01d', $totalTiempo->hour, $totalTiempo->minute, $totalTiempo->second, $milliseconds);
+            $tripulacion['penalizacion_acumulada'] = $tripulacion['penalizacion_acumulada']->format('H:i:s');
         }
-
+    
         // Ordenar por num_especiales descendente y luego por tiempo_acumulado ascendente
         usort($tiemposAcumulados, function ($a, $b) {
             if ($b['num_especiales'] === $a['num_especiales']) {
@@ -71,7 +77,7 @@ class EventController extends Controller
             }
             return $b['num_especiales'] <=> $a['num_especiales'];
         });
-
+    
         return $tiemposAcumulados;
     }
 

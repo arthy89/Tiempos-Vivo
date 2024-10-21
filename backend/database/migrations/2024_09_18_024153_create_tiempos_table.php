@@ -16,10 +16,10 @@ return new class extends Migration
             $table->foreignId('especial_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('shakedown_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('tripulacion_id')->constrained();
-            $table->time('hora_salida')->nullable();
-            $table->time('hora_llegada')->nullable();
-            $table->time('hora_marcado')->nullable(); // Para subir el tiempo directamente
-            $table->time('penalizacion')->nullable();
+            $table->time('hora_salida', 1)->nullable();
+            $table->time('hora_llegada', 1)->nullable();
+            $table->time('hora_marcado', 1)->nullable(); // Para subir el tiempo directamente
+            $table->time('penalizacion', 1)->nullable();
             $table->text('registrador')->nullable();
             $table->timestamps();
         });

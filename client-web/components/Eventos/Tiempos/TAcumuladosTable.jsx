@@ -89,17 +89,18 @@ function TAcumuladosTable({ idEvent, categorias, modo }) {
 
     // Si el tiempo final es menor que el inicial, significa que el cálculo es incorrecto
     if (end < start) {
-      return `-`; // Ajuste para evitar valores negativos
+        return `-`; // Ajuste para evitar valores negativos
     }
 
     const diff = end - start;
     const hours = Math.floor(diff / (1000 * 60 * 60)); // Calcular horas
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / 60000); // Calcular minutos
-    const seconds = ((diff % 60000) / 1000).toFixed(0); // Calcular segundos
+    const seconds = Math.floor((diff % 60000) / 1000); // Calcular segundos
+    const milliseconds = Math.floor((diff % 1000) / 100); // Obtener el primer dígito de los milisegundos
 
-    // Formatear el tiempo en formato HH:MM:SS o MM:SS
-    return `+ ${hours > 0 ? hours + ":" : ""}${minutes < 10 && hours > 0 ? "0" + minutes : minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
+    // Formatear el tiempo en formato HH:MM:SS.m o MM:SS.m
+    return `+ ${hours > 0 ? hours + ":" : ""}${minutes < 10 && hours > 0 ? "0" + minutes : minutes}:${seconds < 10 ? "0" : ""}${seconds}.${milliseconds}`;
+};
 
   const loadingState = isLoading || data?.legth === 0 ? "loading" : "idle";
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
@@ -257,6 +258,7 @@ function TAcumuladosTable({ idEvent, categorias, modo }) {
   return (
     <>
       <Table
+        isStriped
         aria-label="Example static collection table"
         topContent={topContent}
         bottomContent={

@@ -118,12 +118,14 @@ function TiemposTable({ idEvent, modo }) {
   const calculateTimeDifference = (startTime, endTime) => {
     const diff =
       new Date(`1970-01-01T${endTime}`) - new Date(`1970-01-01T${startTime}`);
+    
     const hours = Math.floor(diff / (1000 * 60 * 60)); // Calculate hours
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / 60000); // Calculate minutes
-    const seconds = ((diff % 60000) / 1000).toFixed(0); // Calculate seconds
-
-    // Return format: HH:MM:SS or MM:SS when no hours involved
-    return `+ ${hours > 0 ? hours + ":" : ""}${minutes < 10 && hours > 0 ? "0" + minutes : minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    const seconds = Math.floor((diff % 60000) / 1000); // Calculate seconds
+    const milliseconds = Math.floor((diff % 1000) / 100); // Get first digit of milliseconds
+  
+    // Return format: HH:MM:SS.m or MM:SS.m when no hours involved
+    return `+ ${hours > 0 ? hours + ":" : ""}${minutes < 10 && hours > 0 ? "0" + minutes : minutes}:${seconds < 10 ? "0" : ""}${seconds}.${milliseconds}`;
   };
 
   // * TOAST
@@ -453,6 +455,7 @@ function TiemposTable({ idEvent, modo }) {
   return (
     <>
       <Table
+        isStriped
         aria-label="Example static collection table"
         topContent={topContent}
         bottomContent={

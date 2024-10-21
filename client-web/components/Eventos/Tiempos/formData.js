@@ -4,7 +4,7 @@ export const formData = {
   shakedown_id: "",
   tripulacion_id: "",
   hora_salida: "",
-  hora_llegada: "00:00:00",
+  hora_llegada: "00:00:00.0",
   hora_marcado: "",
   penalizacion: "",
   registrador: "",
