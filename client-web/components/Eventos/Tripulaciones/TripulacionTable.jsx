@@ -214,6 +214,23 @@ function TripulacionTable({ idEvent, modo }) {
             {row.navegante.nombre} {row.navegante.apellidos}
           </p>
         );
+      case "auto":
+        return (
+          <div>
+            <p className="font-bold">
+              {row.categoria}
+            </p>
+            <p>
+              {row.auto}
+            </p>
+          </div>
+        );
+      case "auto_num":
+        return (
+          <p className="text-center">
+            {row.auto_num}
+          </p>
+        );
       case "foto_url":
         return (
           <div>
@@ -293,6 +310,10 @@ function TripulacionTable({ idEvent, modo }) {
         <TableHeader columns={columns}>
           {(column) => (
             <TableColumn
+              className="sm:text-tiny md:text-base"
+              style={{
+                padding: window.innerWidth < 640 ? '5px' : '15px' // Ejemplo: 5px para pantallas pequeñas, 10px para pantallas más grandes
+              }}
               key={column.uid}
               align={
                 column.uid === "acciones" ||
@@ -314,7 +335,12 @@ function TripulacionTable({ idEvent, modo }) {
           {data?.data?.map((item, index) => (
             <TableRow key={item?.id}>
               {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey, index)}</TableCell>
+                <TableCell 
+                  className="text-tiny md:text-base" 
+                  style={{
+                    padding: window.innerWidth < 640 ? '2px' : '10px' // Ejemplo: 5px para pantallas pequeñas, 10px para pantallas más grandes
+                  }}
+                >{renderCell(item, columnKey, index)}</TableCell>
               )}
             </TableRow>
           ))}

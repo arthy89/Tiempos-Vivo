@@ -13,6 +13,13 @@ module.exports = {
         sans: ["var(--font-sans)"],
         mono: ["var(--font-mono)"],
       },
+      fontSize: {
+        tiny: ['10px', '14px'], // '10px' es el tamaño de fuente, '14px' es la altura de línea opcional
+      },
+      padding: {
+        '5px': '5px',
+        '2px': '2px',
+      }
     },
   },
   darkMode: "class",

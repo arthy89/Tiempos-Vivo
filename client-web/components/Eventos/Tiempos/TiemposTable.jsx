@@ -300,16 +300,29 @@ function TiemposTable({ idEvent, modo }) {
 
         return (
           <p
-            className={`text-lg font-extrabold text-center ${index + 1 <= 3 ? "text-green-500" : ""}`}
+            className={`md:text-lg font-extrabold text-center ${index + 1 <= 3 ? "text-green-500" : ""}`}
           >
             {index !== undefined && index !== null ? index + 1 : "-"}
           </p>
         );
       case "car_num":
         return (
-          <p className="font-bold text-center text-red-500">
-            {row.tripulacion.auto_num}
-          </p>
+          // <p className="font-bold text-center text-red-500">
+          //   {row.tripulacion.auto_num}
+          // </p>
+          <>
+            <p className="font-bold text-center text-red-500">
+              {row.tripulacion.auto_num}
+            </p>
+            <div className="flex items-center gap-2">
+              
+              <IoCarSportOutline size={"1.4em"} style={{ minWidth: "1.4em" }} />
+              <div>
+                <p>{row.tripulacion.auto}</p>
+                <p className="italic font-bold">{row.tripulacion.categoria}</p>
+              </div>
+            </div>
+          </>
         );
 
       //* TRIPULACION
@@ -326,6 +339,14 @@ function TiemposTable({ idEvent, modo }) {
               {row.tripulacion.navegante.nombre}{" "}
               {row.tripulacion.navegante.apellidos}
             </div>
+          </>
+        );
+
+      case "hora_marcado":
+        return (
+          <>
+            <p>{row.hora_marcado}</p>
+            <p className="text-red-500">{row.penalizacion}</p>
           </>
         );
 
@@ -453,6 +474,10 @@ function TiemposTable({ idEvent, modo }) {
         <TableHeader columns={columns}>
           {(column) => (
             <TableColumn
+              className="sm:text-tiny md:text-base"
+              style={{
+                padding: window.innerWidth < 640 ? '5px' : '15px' // Ejemplo: 5px para pantallas pequeñas, 10px para pantallas más grandes
+              }}
               key={column.uid}
               align={
                 column.uid === "acciones" ||
@@ -462,7 +487,15 @@ function TiemposTable({ idEvent, modo }) {
                   : "start"
               }
             >
-              {column.name}
+              {column.uid === "auto" ? (
+                <>
+                  Vehículo
+                  <br />
+                  CAT
+                </>
+              ) : (
+                column.name
+              )}
             </TableColumn>
           )}
         </TableHeader>
@@ -475,7 +508,12 @@ function TiemposTable({ idEvent, modo }) {
           {tiempos?.map((item, index) => (
             <TableRow key={item?.id}>
               {(columnKey) => (
-                <TableCell>
+                <TableCell
+                  className="text-tiny md:text-base" 
+                  style={{
+                    padding: window.innerWidth < 640 ? '2px' : '10px' // Ejemplo: 5px para pantallas pequeñas, 10px para pantallas más grandes
+                  }}
+                >
                   {renderCell(item, columnKey, index, tiempos)}
                 </TableCell>
               )}
