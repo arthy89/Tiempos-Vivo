@@ -59,7 +59,7 @@ function TiemposTable({ idEvent, modo }) {
     page: 1,
     rowPerPage: 20,
     event_id: idEvent,
-    order_by: "nombre",
+    // order_by: "nombre",
   });
 
   // * Optener la lista de las Categorias
