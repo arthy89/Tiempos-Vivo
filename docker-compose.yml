@@ -27,10 +27,9 @@ services:
     restart: always
     volumes:
       - backend_app:/var/www/apitev/
+      # - ./nginx/php/php.ini:/usr/local/etc/php/conf.d/php.ini
     expose:
       - "9000"  # Exponemos PHP-FPM en el puerto 9000
-    # ports:
-    #   - "9000:9000"
     depends_on:
       - mysql
     networks:
