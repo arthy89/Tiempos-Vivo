@@ -62,7 +62,7 @@ class EventController extends Controller
     
         // Formatear los tiempos acumulados (en formato HH:MM:SS.0 para mostrar solo 1 dígito en los milisegundos)
         foreach ($tiemposAcumulados as &$tripulacion) {
-            $totalTiempo = $tripulacion['tiempo_acumulado']->copy()->addMilliseconds($tripulacion['penalizacion_acumulada']->diffInMilliseconds(Carbon::createFromFormat('H:i:s.u', '00:00:00.000'), true));
+            $totalTiempo = $tripulacion['tiempo_acumulado']->copy();
     
             // Obtener solo el primer dígito de los milisegundos
             $milliseconds = (int) floor($totalTiempo->format('u') / 100000); // Obtener solo el primer dígito de los milisegundos
