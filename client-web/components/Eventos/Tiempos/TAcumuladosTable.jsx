@@ -84,23 +84,46 @@ function TAcumuladosTable({ idEvent, categorias, modo }) {
   };
 
   const calculateTimeDifference = (startTime, endTime) => {
-    const start = new Date(`1970-01-01T${startTime}`);
-    const end = new Date(`1970-01-01T${endTime}`);
+    // Función para parsear el tiempo en formato HH:MM:SS.m a horas, minutos, segundos y milisegundos
+    const parseTime = (timeString) => {
+        const [timePart, millisPart] = timeString.split('.'); // Separar la parte de milisegundos
+        const [hours, minutes, seconds] = timePart.split(':').map(Number); // Separar horas, minutos y segundos
+        const milliseconds = millisPart ? parseInt(millisPart.padEnd(3, '0')) : 0; // Completar con ceros si es necesario
+        return { hours, minutes, seconds, milliseconds };
+    };
 
-    // Si el tiempo final es menor que el inicial, significa que el cálculo es incorrecto
-    if (end < start) {
-        return `-`; // Ajuste para evitar valores negativos
+    const start = parseTime(startTime);
+    const end = parseTime(endTime);
+
+    // Convertir todo a milisegundos para hacer la resta
+    const startInMillis = 
+        (start.hours * 3600000) + 
+        (start.minutes * 60000) + 
+        (start.seconds * 1000) + 
+        start.milliseconds;
+
+    const endInMillis = 
+        (end.hours * 3600000) + 
+        (end.minutes * 60000) + 
+        (end.seconds * 1000) + 
+        end.milliseconds;
+
+    // Si el tiempo final es menor que el inicial, retornar "-"
+    if (endInMillis < startInMillis) {
+        return '-';
     }
 
-    const diff = end - start;
-    const hours = Math.floor(diff / (1000 * 60 * 60)); // Calcular horas
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / 60000); // Calcular minutos
-    const seconds = Math.floor((diff % 60000) / 1000); // Calcular segundos
-    const milliseconds = Math.floor((diff % 1000) / 100); // Obtener el primer dígito de los milisegundos
+    const diffInMillis = endInMillis - startInMillis;
 
-    // Formatear el tiempo en formato HH:MM:SS.m o MM:SS.m
-    return `+ ${hours > 0 ? hours + ":" : ""}${minutes < 10 && hours > 0 ? "0" + minutes : minutes}:${seconds < 10 ? "0" : ""}${seconds}.${milliseconds}`;
-};
+    // Convertir la diferencia a horas, minutos, segundos y milisegundos
+    const hoursDiff = Math.floor(diffInMillis / (3600000));
+    const minutesDiff = Math.floor((diffInMillis % (3600000)) / 60000);
+    const secondsDiff = Math.floor((diffInMillis % 60000) / 1000);
+    const millisDiff = Math.floor((diffInMillis % 1000) / 100); // Obtener solo el primer dígito de los milisegundos
+
+    // Formatear el tiempo en formato HH:MM:SS.m
+    return `+ ${hoursDiff > 0 ? hoursDiff + ':' : ''}${minutesDiff < 10 && hoursDiff > 0 ? '0' + minutesDiff : minutesDiff}:${secondsDiff < 10 ? '0' : ''}${secondsDiff}.${millisDiff}`;
+  };
 
   const loadingState = isLoading || data?.legth === 0 ? "loading" : "idle";
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
