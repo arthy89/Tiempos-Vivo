@@ -5,12 +5,9 @@ services:
   mysql:
     image: mysql:8.0
     container_name: mysql
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: tiempos_en_vivo
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
