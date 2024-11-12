@@ -1,17 +1,16 @@
 version: '3.8'
-
 services:
-  # Servicio de la base de datos MySQL
   mysql:
-    image: mysql:8.0
+    image: mysql
     container_name: mysql
+    restart: always
+    ports:
+      - 3308:3306
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: tiempos_en_vivo
     volumes:
       - mysql_data:/var/lib/mysql
-    ports:
-      - "3306:3306"
     networks:
       - app-network
 
