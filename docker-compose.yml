@@ -52,21 +52,78 @@ services:
     command: sh -c "node server.js"
     
 
+  # ! MANUAL SIN SSL LARAVEL + NEXTJS
   # Servicio de Nginx
-  nginx:
-    image: nginx:latest
-    container_name: nginx
+  # nginx:
+  #   image: nginx:latest
+  #   container_name: nginx
+  #   volumes:
+  #     - frontend_app:/var/www/next_app
+  #     - backend_app:/var/www/apitev
+  #     - ./nginx/conf.d/:/etc/nginx/conf.d/
+  #   restart: always
+  #   ports:
+  #     - "80:80"     # Expone el puerto 80 para el tráfico HTTP
+  #     - "443:443"   # Expone el puerto 443 para el tráfico HTTPS
+  #   depends_on:
+  #     - laravel
+  #     - nextjs
+  #   networks:
+  #     - app-network
+
+  # ? Intento de levantar ambos, (solo sirvio para nextjs)
+  # nginx:
+  #   image: 'jc21/nginx-proxy-manager:latest'
+  #   container_name: nginx
+  #   volumes:
+  #     - frontend_app:/var/www/next_app
+  #     - backend_app:/var/www/apitev
+  #     - ./letsencrypt:/etc/letsencrypt
+  #     - ./data:/data
+  #     - ./nginx-proxy-manager:/config
+  #   restart: always
+  #   ports:
+  #     - '80:80'
+  #     - '443:443'
+  #     # Admin Web Port:
+  #     - '81:81'
+  #   depends_on:
+  #     - laravel
+  #     - nextjs
+  #   networks:
+  #     - app-network
+
+  # # todo intento para levantar separados
+  # # Servicio de Nginx Proxy Manager
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy-manager
     volumes:
-      - frontend_app:/var/www/next_app
+      - ./letsencrypt:/etc/letsencrypt
+      - ./data:/data
+      - ./nginx-proxy-manager:/config
+    restart: always
+    ports:
+      - '80:80'      # Exposición de HTTP para el frontend Next.js
+      - '443:443'    # Exposición de HTTPS para el frontend Next.js
+      - '81:81'      # Puerto para el panel de administración de Nginx Proxy Manager
+    depends_on:
+      - nextjs
+    networks:
+      - app-network
+
+  # Servicio de Nginx manual para la API de Laravel
+  nginx-laravel:
+    image: nginx:latest
+    container_name: nginx-laravel
+    volumes:
       - backend_app:/var/www/apitev
       - ./nginx/conf.d/:/etc/nginx/conf.d/
     restart: always
     ports:
-      - "80:80"     # Expone el puerto 80 para el tráfico HTTP
-      - "443:443"   # Expone el puerto 443 para el tráfico HTTPS
+      - "8080:80"   # Exposición de HTTP en el puerto 8080 para la API de Laravel
     depends_on:
       - laravel
-      - nextjs
     networks:
       - app-network
 

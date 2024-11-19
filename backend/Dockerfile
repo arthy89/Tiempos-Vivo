@@ -72,7 +72,7 @@ RUN composer install
 RUN cp .env.example .env
 RUN php artisan passport:key
 RUN php artisan storage:link
-EXPOSE 3306
+# EXPOSE 3306
 #RUN php artisan migrate --seed
 # RUN php artisan passport:key
 #CMD ["php", "artisan", "migrate", "--seed"]

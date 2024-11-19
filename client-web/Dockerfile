@@ -27,7 +27,7 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
 
-ARG NEXT_PUBLIC_SERVER_URI=http://api.rallycronos.com/
+ARG NEXT_PUBLIC_SERVER_URI=https://api.rallycronos.com/
 ARG NEXT_PUBLIC_CLIENT_SECRET=g179NrxEhLKvZTNDAZy6muwpR8TQ7WPoWuIJr6tz
 ARG NEXT_PUBLIC_SECURE_KEY=7mARe8nTS5CWefBEaHP6jzIRnDGM44NXiWuAvkNJ
 ARG NEXT_PUBLIC_GA_ID=G-2SKBJB5HQ0
