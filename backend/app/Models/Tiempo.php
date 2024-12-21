@@ -21,7 +21,7 @@ class Tiempo extends Model
         'registrador',
     ];
 
-    protected $with = ['tripulacion'];
+    protected $with = ['tripulacion', 'especial'];
 
     public function especial(): BelongsTo
     {

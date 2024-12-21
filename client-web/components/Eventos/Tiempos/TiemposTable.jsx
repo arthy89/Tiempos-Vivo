@@ -39,6 +39,9 @@ import { columns as allColumns } from "./columns";
 import Form from "./form";
 import Foto from "@/components/Modals/Foto";
 import Eliminar from "@/components/Modals/Eliminar";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+// import Gen_Pdf from "@/components/PDF/Gen_Pdf";
 
 function TiemposTable({ idEvent, modo }) {
   // console.log('IDEVENT desde TIEMPOS', idEvent);
@@ -53,6 +56,8 @@ function TiemposTable({ idEvent, modo }) {
   const [rowPerPage, setRowPerPage] = useState(200);
   const [edit, setEdit] = useState(false);
   const [id, setId] = useState(0);
+
+  const [dataForPdf, setDataForPdf] = useState(null);
 
   // * Optener la lista de Especiales
   const { data: especiales } = EspecialService.getData({
@@ -71,7 +76,7 @@ function TiemposTable({ idEvent, modo }) {
 
   useEffect(() => {
     setSelEsp(especiales?.data[0].id);
-    // console.log('ESSSSSSSSSSS', selEsp);f
+    // console.log('ESSSSSSSSSSS', selEsp);
   }, [especiales]);
 
   const { data, mutate, isLoading } = EspecialService.get({
@@ -88,7 +93,9 @@ function TiemposTable({ idEvent, modo }) {
     if (data && data.data) {
       setTiempos(data.data);
     }
+    // console.log('TIEMPOS11111', data);
     // console.log('TIEMPOS', tiempos);
+    // console.log('ESP SELECT', selEsp);
   }, [tiempos, data]);
 
   const pages = useMemo(() => {
@@ -126,6 +133,50 @@ function TiemposTable({ idEvent, modo }) {
   
     // Return format: HH:MM:SS.m or MM:SS.m when no hours involved
     return `+ ${hours > 0 ? hours + ":" : ""}${minutes < 10 && hours > 0 ? "0" + minutes : minutes}:${seconds < 10 ? "0" : ""}${seconds}.${milliseconds}`;
+  };
+  
+
+  // * Para el PDF
+  const pressPdf = () => {
+    const generatePdf = () => {
+      const tiempos = data.data;
+  
+      const doc = new jsPDF();
+      doc.setFontSize(18);
+      doc.text(`${tiempos[0].especial.nombre}`, 14, 20);
+  
+      const columns = [
+        "Nº",
+        "COCHE",
+        "PILOTO",
+        "CAT",
+        "H. SALIDA",
+        "H. LLEGADA",
+        "PENA",
+        "TIEMPO",
+      ];
+  
+      const tableData = tiempos.map((tiempo, index) => [
+        index + 1,
+        tiempo.tripulacion.auto_num,
+        `${tiempo.tripulacion.piloto.nombre} ${tiempo.tripulacion.piloto.apellidos}`,
+        tiempo.tripulacion.categoria,
+        tiempo.hora_salida,
+        tiempo.hora_llegada,
+        tiempo.penalizacion,
+        tiempo.hora_marcado,
+      ]);
+  
+      doc.autoTable({
+        head: [columns],
+        body: tableData,
+        startY: 25,
+      });
+  
+      doc.save(`tiempos-${selCat}-${tiempos[0].especial.nombre}.pdf`);
+    };
+  
+    generatePdf();
   };
 
   // * TOAST
@@ -179,6 +230,15 @@ function TiemposTable({ idEvent, modo }) {
               >
                 Añadir
               </Button>
+
+              <Button
+                onPress={() => pressPdf()}
+                color="success"
+                // endContent={<MdAutoFixHigh size="1.4em" />}
+              >
+                PDF
+              </Button>
+              
               <Modal
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
@@ -318,7 +378,8 @@ function TiemposTable({ idEvent, modo }) {
             </p>
             <div className="flex items-center gap-2">
               
-              <IoCarSportOutline size={"1.4em"} style={{ minWidth: "1.4em" }} />
+              {/* ICONOOOOOOOOOOO */}
+              {/* <IoCarSportOutline size={"1.4em"} style={{ minWidth: "1.4em" }} /> */}
               <div>
                 <p>{row.tripulacion.auto}</p>
                 <p className="italic font-bold">{row.tripulacion.categoria}</p>
@@ -332,12 +393,12 @@ function TiemposTable({ idEvent, modo }) {
         return (
           <>
             <div className="flex items-center gap-2 mb-2">
-              <FaUserAstronaut size={"1.4em"} style={{ minWidth: "1.4em" }} />
+              {/* <FaUserAstronaut size={"1.4em"} style={{ minWidth: "1.4em" }} /> */}
               {row.tripulacion.piloto.nombre} {row.tripulacion.piloto.apellidos}
             </div>
 
             <div className="flex items-center gap-2">
-              <FaUserAstronaut size={"1.4em"} style={{ minWidth: "1.4em" }} />
+              {/* <FaUserAstronaut size={"1.4em"} style={{ minWidth: "1.4em" }} /> */}
               {row.tripulacion.navegante.nombre}{" "}
               {row.tripulacion.navegante.apellidos}
             </div>
@@ -543,6 +604,9 @@ function TiemposTable({ idEvent, modo }) {
         delFicha={delFicha}
         onClose={onClose}
       />
+
+      {/* PDF */}
+      {/* {dataForPdf && <Gen_Pdf dataForPdf={dataForPdf} onComplete={() => setDataForPdf(null)} />} */}
     </>
   );
 }
