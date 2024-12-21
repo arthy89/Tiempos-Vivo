@@ -70,7 +70,8 @@ COPY . .
 # Instala las dependencias de Composer
 RUN composer install
 RUN cp .env.example .env
-RUN php artisan passport:key
+# RUN php artisan passport:key
+RUN php artisan passport:key --force
 RUN php artisan storage:link
 # EXPOSE 3306
 #RUN php artisan migrate --seed

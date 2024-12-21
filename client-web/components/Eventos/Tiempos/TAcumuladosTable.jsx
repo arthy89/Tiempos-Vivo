@@ -29,16 +29,23 @@ import CategoriaService from "@/services/CategoriaService";
 import EventoService from "@/services/EventoService";
 import { columns as allColumns } from "./columns2";
 import Foto from "@/components/Modals/Foto";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
-function TAcumuladosTable({ idEvent, categorias, modo }) {
+function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
   // console.log('IDEVENT desde TIEMPOS', idEvent);
   // console.log('CATS DESDE', categorias);
+  // console.log('EVENTOOOOOOO', evento);
   const url = process.env.NEXT_PUBLIC_SERVER_URI;
 
   const [selCat, setSelCat] = useState("todas");
 
   const [page, setPage] = useState(1);
   const [rowPerPage, setRowPerPage] = useState(200);
+
+  const tiemposRef = useRef(null);
+  const dataRef = useRef(null);
+  const catRef = useRef(null);
 
   const { data, isLoading } = EventoService.getTimes({
     event_id: idEvent,
@@ -50,10 +57,16 @@ function TAcumuladosTable({ idEvent, categorias, modo }) {
   useEffect(() => {
     if (data && data?.tiempos_acumulados) {
       setTiempos(data.tiempos_acumulados);
+      tiemposRef.current = data.tiempos_acumulados;
+      // console.log(tiempos)
     }
+    dataRef.current = data;
   }, [tiempos, data]);
 
   // console.log('tiempo', tiempos);
+  // console.log('NAMEEEEEEEE', evento);
+
+  // console.log('DATAAAAAAAAA', data);
 
   const pages = useMemo(() => {
     return data?.last_page;
@@ -81,6 +94,7 @@ function TAcumuladosTable({ idEvent, categorias, modo }) {
 
   const handleSelCategoria = (e) => {
     setSelCat(e.target.value);
+    catRef.current = e.target.value;
   };
 
   const calculateTimeDifference = (startTime, endTime) => {
@@ -125,6 +139,44 @@ function TAcumuladosTable({ idEvent, categorias, modo }) {
     return `+ ${hoursDiff > 0 ? hoursDiff + ':' : ''}${minutesDiff < 10 && hoursDiff > 0 ? '0' + minutesDiff : minutesDiff}:${secondsDiff < 10 ? '0' : ''}${secondsDiff}.${millisDiff}`;
   };
 
+  // * Para el PDF
+  const pressPdf = () => {
+    // console.log("Tiempos desde Ref:", tiemposRef.current);
+    // console.log("Data desde Ref:", dataRef.current);
+
+    let tiempos = tiemposRef.current;
+    
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text(`${evento.name}`, 14, 20);
+
+    doc.setFontSize(15); // Tamaño del título principal
+    doc.text(`Tabla General`, 14, 26);
+    
+    doc.setFontSize(10); // Tamaño del título principal
+    doc.text(`EC: Especiales Completados`, 14, 30);
+
+    const columns = ["Nº", "COCHE", "PILOTO", "CAT", "EC", "PENA", "TIEMPO"];
+
+    const tableData = tiempos.map((tiempo, index) => [
+      index + 1,
+      tiempo.tripulacion.auto_num,
+      `${tiempo.tripulacion.piloto.nombre} ${tiempo.tripulacion.piloto.apellidos}`,
+      tiempo.tripulacion.categoria,
+      tiempo.num_especiales,
+      tiempo.penalizacion_acumulada,
+      tiempo.tiempo_acumulado,
+    ]);
+
+    doc.autoTable({
+      head: [columns],
+      body: tableData,
+      startY: 35,
+    });
+
+    doc.save(`GENERAL-${catRef.current}-${evento.name}.pdf`);
+  };
+
   const loadingState = isLoading || data?.legth === 0 ? "loading" : "idle";
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
@@ -153,6 +205,13 @@ function TAcumuladosTable({ idEvent, categorias, modo }) {
               </SelectItem>
             ))}
           </Select>
+
+          <Button
+            onPress={pressPdf}
+            color="success"
+          >
+            PDF
+          </Button>
         </div>
       </div>
     );

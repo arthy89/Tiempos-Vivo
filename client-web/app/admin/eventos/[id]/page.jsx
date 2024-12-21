@@ -56,6 +56,7 @@ function Page() {
             <TAcumuladosTable
               idEvent={idEvent}
               categorias={evento?.categorias}
+              evento={evento}
             />
           </Tab>
         </Tabs>

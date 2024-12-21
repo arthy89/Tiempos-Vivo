@@ -27,6 +27,8 @@ function TiemposShow() {
     <>
       <div className="pb-2">
         <span className={title({ color: "blue" })}>{evento?.name}</span>
+        <br/>
+        <span>Tiempos No Oficiales a espera de resultados finales</span>
       </div>
       <div className="flex flex-col w-full">
         <Tabs aria-label="Options" color="success">
