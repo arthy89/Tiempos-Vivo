@@ -26,14 +26,19 @@ function TiemposShow() {
   return (
     <>
       <div className="pb-2">
-        <span className={title({ color: "blue" })}>{evento?.name}</span>
+        <span className={title({ color: "blue", size: "xs" })}>{evento?.name}</span>
         <br/>
         <span>Tiempos No Oficiales a espera de resultados finales</span>
       </div>
       <div className="flex flex-col w-full">
         <Tabs aria-label="Options" color="success">
           <Tab key="especiales" title="Por Especiales">
-            <TiemposTable idEvent={idEvent} modo="client" />
+            <TiemposTable 
+              idEvent={idEvent}
+              modo="client"
+              etapas={evento?.etapas}
+              categorias={evento?.categorias}
+            />
           </Tab>
           <Tab key="acumulado" title="Tiempo Acumulado">
             <TAcumuladosTable

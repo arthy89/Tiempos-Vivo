@@ -43,7 +43,9 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 // import Gen_Pdf from "@/components/PDF/Gen_Pdf";
 
-function TiemposTable({ idEvent, modo }) {
+function TiemposTable({ idEvent, etapas, categorias, modo }) {
+  // console.log(categorias);
+  // return "xd";
   // console.log('IDEVENT desde TIEMPOS', idEvent);
   const router = useRouter();
 
@@ -59,25 +61,17 @@ function TiemposTable({ idEvent, modo }) {
 
   const [dataForPdf, setDataForPdf] = useState(null);
 
-  // * Optener la lista de Especiales
-  const { data: especiales } = EspecialService.getData({
-    page: 1,
-    rowPerPage: 20,
-    event_id: idEvent,
-    // order_by: "nombre",
-  });
-
-  // * Optener la lista de las Categorias
-  const { data: categorias } = CategoriaService.getData({
-    page: 1,
-    rowsPerPage: 100,
-    event_id: idEvent,
-  });
+  const especiales_ = useRef([]);
+  const esp_title = useRef("");
 
   useEffect(() => {
-    setSelEsp(especiales?.data[0].id);
-    // console.log('ESSSSSSSSSSS', selEsp);
-  }, [especiales]);
+    especiales_.current = etapas?.flatMap(etapa => etapa.especiales || []);
+    // console.log('ESPECIALES', especiales_.current)
+    if(especiales_.current?.length > 0) {
+      setSelEsp(especiales_.current[0].id);
+      esp_title.current = especiales_.current[0];
+    }
+  }, [etapas]);
 
   const { data, mutate, isLoading } = EspecialService.get({
     page: 1,
@@ -116,6 +110,7 @@ function TiemposTable({ idEvent, modo }) {
 
   const handleSelEsp = (e) => {
     setSelEsp(e.target.value);
+    esp_title.current = especiales_.current.find((esp) => esp.id === parseInt(e.target.value, 10));
   };
 
   const handleSelCategoria = (e) => {
@@ -217,7 +212,7 @@ function TiemposTable({ idEvent, modo }) {
     return (
       <div className="flex flex-col gap-4">
         <div className="flex items-end justify-between gap-3">
-          <span className="text-xl font-bold">Tabla de Tiempos</span>
+          <span className="text-xl font-bold">Tabla de Tiempos - {esp_title.current?.nombre}</span>
           {modo != "client" && (
             <div className="flex gap-3">
               <Button
@@ -275,17 +270,11 @@ function TiemposTable({ idEvent, modo }) {
             defaultSelectedKeys={[selEsp]}
             onChange={(e) => handleSelEsp(e)}
           >
-            {especiales?.data?.length > 0 ? (
-              especiales.data.map((esp) => (
-                <SelectItem key={esp.id} value={esp.nombre}>
-                  {esp.nombre}
-                </SelectItem>
-              ))
-            ) : (
-              <SelectItem value="" disabled>
-                Cargando...
-              </SelectItem>
-            )}
+            {especiales_.current?.map((esp) => (
+              <SelectItem key={esp.id} value={esp.nombre}>
+              {esp.nombre}
+            </SelectItem>
+            ))}
           </Select>
 
           <Select
@@ -298,7 +287,7 @@ function TiemposTable({ idEvent, modo }) {
             <SelectItem key={"todas"} value={"todas"}>
               Todas
             </SelectItem>
-            {categorias?.data.map((cat) => (
+            {categorias?.map((cat) => (
               <SelectItem key={cat.name} value={cat.name}>
                 {cat.name}
               </SelectItem>
@@ -519,21 +508,21 @@ function TiemposTable({ idEvent, modo }) {
         isStriped
         aria-label="Example static collection table"
         topContent={topContent}
-        bottomContent={
-          pages > 0 ? (
-            <div className="flex justify-center w-full">
-              <Pagination
-                isCompact
-                showControls
-                showShadow
-                color="primary"
-                page={page}
-                total={pages}
-                onChange={(page) => setPage(page)}
-              />
-            </div>
-          ) : null
-        }
+        // bottomContent={
+        //   pages > 0 ? (
+        //     <div className="flex justify-center w-full">
+        //       <Pagination
+        //         isCompact
+        //         showControls
+        //         showShadow
+        //         color="primary"
+        //         page={page}
+        //         total={pages}
+        //         onChange={(page) => setPage(page)}
+        //       />
+        //     </div>
+        //   ) : null
+        // }
       >
         <TableHeader columns={columns}>
           {(column) => (
