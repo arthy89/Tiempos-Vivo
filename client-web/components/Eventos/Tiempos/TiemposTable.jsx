@@ -43,7 +43,34 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 // import Gen_Pdf from "@/components/PDF/Gen_Pdf";
 
+import echo from "@/components/utils/echo";
+
 function TiemposTable({ idEvent, etapas, categorias, modo }) {
+  // Escuchar el evento
+  useEffect(() => {
+    console.log("Conectando al WebSocket...");
+  
+    const channel = echo.channel("tiempos");
+  
+    channel.listen(".TiempoCreado", (data) => {
+      console.log("Nuevo tiempo recibido: ", data);
+
+      // Actualizar la lista de Tiempos
+      setTiempos((prevTiempos) => {
+        if (!prevTiempos) return [data.tiempos];
+
+        return [ ...prevTiempos, data.tiempo];
+      });
+    });
+  
+    return () => {
+      console.log("Desuscribiendo del canal tiempos...");
+      channel.stopListening(".TiempoCreado");
+      echo.leaveChannel("tiempos");
+    };
+  }, []);
+
+
   // console.log(categorias);
   // return "xd";
   // console.log('IDEVENT desde TIEMPOS', idEvent);
@@ -200,7 +227,8 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
   };
 
   const onSave = () => {
-    mutate();
+    // mutate();
+    console.log("xddd");
     onClose();
   };
 

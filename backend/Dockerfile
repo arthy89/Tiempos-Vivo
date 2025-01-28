@@ -15,6 +15,7 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 RUN apk update && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && pecl install uploadprogress \
     && docker-php-ext-enable uploadprogress \
+    && docker-php-ext-install pcntl \
     && apk del .build-deps $PHPIZE_DEPS \
     && chmod uga+x /usr/local/bin/install-php-extensions && sync \
     && install-php-extensions bcmath \
@@ -78,6 +79,15 @@ RUN php artisan storage:link
 # RUN php artisan passport:key
 #CMD ["php", "artisan", "migrate", "--seed"]
 # CMD ["php", "artisan", "serve", "--host=0.0.0.0"]
+
+# Instalar supervisord
+RUN apk add --no-cache supervisor
+# Crear directorio de supervisord
+RUN mkdir -p /etc/supervisor/conf.d
+# Copiar configuración de supervisord
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+# CMD para iniciar supervisord y otros servicios
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
 # Expon el puerto de PHP-FPM (si es necesario)
 EXPOSE 9000

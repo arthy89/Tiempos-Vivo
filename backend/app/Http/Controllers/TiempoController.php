@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\TiempoCreado;
 use App\Models\Tiempo;
 use App\Http\Requests\StoreTiempoRequest;
 use Illuminate\Http\Request;
@@ -46,6 +47,10 @@ class TiempoController extends Controller
             $time_R = $request->except(['hora_salida', 'hora_llegada']);
 
             $tiempo = Tiempo::create($time_R);
+
+            // ! Emitir evento
+            broadcast(new TiempoCreado($tiempo))->toOthers();
+
             return response()->json($tiempo);
         }
 
@@ -79,6 +84,10 @@ class TiempoController extends Controller
         $time_R['hora_marcado'] = $tiempo_resultado;
 
         $tiempo = Tiempo::create($time_R);
+
+        // ! Emitir evento
+        broadcast(new TiempoCreado($tiempo))->toOthers();
+        
         return response()->json($tiempo);
     }
 

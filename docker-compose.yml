@@ -26,6 +26,9 @@ services:
       # - ./nginx/php/php.ini:/usr/local/etc/php/conf.d/php.ini
     expose:
       - "9000"  # Exponemos PHP-FPM en el puerto 9000
+      # - "6001" # Puerto del WebSockets
+    ports:
+      - "6001:6001"
     depends_on:
       - mysql
     networks:

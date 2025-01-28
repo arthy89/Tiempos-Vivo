@@ -10,6 +10,7 @@
         "laravel-lang/publisher": "^16.4",
         "laravel/framework": "^11.0",
         "laravel/passport": "^12.0",
+        "laravel/reverb": "^1.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.8",
         "spatie/laravel-permission": "^6.0"
