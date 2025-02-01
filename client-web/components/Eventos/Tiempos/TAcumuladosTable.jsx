@@ -175,7 +175,11 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
       startY: 35,
     });
 
-    doc.save(`GENERAL-${catRef.current}-${evento.name}.pdf`);
+    if (catRef.current == 'todas') {
+      catRef.current = 'GENERAL';
+    }
+
+    doc.save(`Acumulado-${catRef.current || "GENERAL"}-${evento.name}.pdf`);
   };
 
   const loadingState = isLoading || data?.legth === 0 ? "loading" : "idle";

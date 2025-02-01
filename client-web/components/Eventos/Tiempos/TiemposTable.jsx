@@ -47,7 +47,7 @@ import "jspdf-autotable";
 
 import echo from "@/components/utils/echo";
 
-function TiemposTable({ idEvent, etapas, categorias, modo }) {
+function TiemposTable({ idEvent, etapas, categorias, modo, eventName }) {
   // console.log(categorias);
   // return "xd";
   // console.log('IDEVENT desde TIEMPOS', idEvent);
@@ -170,6 +170,7 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
 
   const handleSelCategoria = (e) => {
     setSelCat(e.target.value);
+    catRef.current = e.target.value;
   };
 
   const calculateTimeDifference = (startTime, endTime) => {
@@ -185,6 +186,7 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
     return `+ ${hours > 0 ? hours + ":" : ""}${minutes < 10 && hours > 0 ? "0" + minutes : minutes}:${seconds < 10 ? "0" : ""}${seconds}.${milliseconds}`;
   };
   
+  const catRef = useRef('todas');
 
   // * Para el PDF
   const pressPdf = () => {
@@ -193,7 +195,7 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
   
       const doc = new jsPDF();
       doc.setFontSize(18);
-      doc.text(`${tiempos[0].especial.nombre}`, 14, 20);
+      doc.text(`${tiempos[0].especial.nombre} - ${eventName}`, 14, 20);
   
       const columns = [
         "Nº",
@@ -222,8 +224,12 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
         body: tableData,
         startY: 25,
       });
+
+      if (catRef.current == 'todas') {
+        catRef.current = 'GENERAL';
+      }
   
-      doc.save(`tiempos-${selCat}-${tiempos[0].especial.nombre}.pdf`);
+      doc.save(`${tiempos[0].especial.nombre}-${catRef.current}-${eventName}.pdf`);
     };
   
     generatePdf();

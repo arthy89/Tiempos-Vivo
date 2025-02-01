@@ -54,6 +54,7 @@ function Page() {
               idEvent={idEvent}
               etapas={evento?.etapas}
               categorias={evento?.categorias}
+              eventName={evento?.name}
             />
           </Tab>
           <Tab key="acumulado" title="Tiempo Acumulado">
