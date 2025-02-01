@@ -42,7 +42,7 @@ function EventoShow() {
   };
 
   return (
-    <section>
+    <section className="px-6">
       <div className="flex justify-center mb-5">
         <h1 className={title({ color: "blue" })}>{evento?.name}</h1>
       </div>

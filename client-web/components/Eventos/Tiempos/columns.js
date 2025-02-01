@@ -7,7 +7,7 @@ export const columns = [
   { name: "H. Llegada", uid: "hora_llegada" },
   // { name: "Penalización", uid: "penalizacion" },
   { name: "Tiempo", uid: "hora_marcado" },
-  { name: "Difs", uid: "diferencias" },
+  { name: "Diferencias", uid: "diferencias", width: "100px" },
   { name: "Foto", uid: "foto" },
   { name: "Acciones", uid: "acciones" },
 ];
