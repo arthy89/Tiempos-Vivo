@@ -44,7 +44,7 @@ function TripulacionTable({ idEvent, modo }) {
   const url = process.env.NEXT_PUBLIC_SERVER_URI;
 
   const [page, setPage] = useState(1);
-  const [rowPerPage, setRowPerPage] = useState(100);
+  const [rowPerPage, setRowPerPage] = useState(500);
   const [edit, setEdit] = useState(false);
   const [id, setId] = useState(0);
 
@@ -92,7 +92,7 @@ function TripulacionTable({ idEvent, modo }) {
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 px-4">
         <div className="flex items-end justify-between gap-3">
           <span className="text-xl font-bold">Lista de Tripulaciones</span>
           {modo != "client" && (
@@ -147,7 +147,7 @@ function TripulacionTable({ idEvent, modo }) {
             </div>
           )}
         </div>
-        <div className="flex items-center justify-between">
+        {/* <div className="flex items-center justify-between">
           <span className="text-default-400 text-small">
             Total {data?.total}
           </span>
@@ -165,7 +165,7 @@ function TripulacionTable({ idEvent, modo }) {
               <option value="20">20</option>
             </select>
           </label>
-        </div>
+        </div> */}
       </div>
     );
   }, [rowPerPage, data?.total, isOpen]);
@@ -289,23 +289,25 @@ function TripulacionTable({ idEvent, modo }) {
   return (
     <>
       <Table
-        aria-label="Example static collection table"
+        className="px-2"
+        removeWrapper
+        aria-label="Tabla de tripulaciones"
         topContent={topContent}
-        bottomContent={
-          pages > 0 ? (
-            <div className="flex justify-center w-full">
-              <Pagination
-                isCompact
-                showControls
-                showShadow
-                color="primary"
-                page={page}
-                total={pages}
-                onChange={(page) => setPage(page)}
-              />
-            </div>
-          ) : null
-        }
+        // bottomContent={
+        //   pages > 0 ? (
+        //     <div className="flex justify-center w-full">
+        //       <Pagination
+        //         isCompact
+        //         showControls
+        //         showShadow
+        //         color="primary"
+        //         page={page}
+        //         total={pages}
+        //         onChange={(page) => setPage(page)}
+        //       />
+        //     </div>
+        //   ) : null
+        // }
       >
         <TableHeader columns={columns}>
           {(column) => (
