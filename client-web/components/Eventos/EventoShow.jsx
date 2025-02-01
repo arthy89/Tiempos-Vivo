@@ -1,12 +1,14 @@
 "use client";
 import { IoCarSport, IoTimeSharp } from "react-icons/io5";
 import { FaUserAstronaut } from "react-icons/fa";
+import { FaRoute } from "react-icons/fa6";
 import { Image, Button, Chip } from "@nextui-org/react";
 import { title } from "@/components/primitives";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { formatDate, formatTime } from "@/utils/formatDateTime";
 import EventoService from "@/services/EventoService";
+import Ruta from "@/components/Modals/Ruta";
 
 function EventoShow() {
   const url = process.env.NEXT_PUBLIC_SERVER_URI;
@@ -40,6 +42,18 @@ function EventoShow() {
     const slug = `${e.id}-${e.name.replace(/\s+/g, "-").toLowerCase()}`;
     router.push(`/${slug}/tiempos`);
   };
+
+  const [isRutaModal, SetIsRutaModal] = useState(false);
+  const [rutaSel, SetRutaSel] = useState(false);
+  const ClickRuta = (e) => {
+    // console.log(e);
+    // SetRutaSel(e);
+
+    if (e) {
+      SetRutaSel(e);
+      SetIsRutaModal(true);
+    }
+  }
 
   return (
     <section className="px-6">
@@ -77,6 +91,20 @@ function EventoShow() {
             >
               Tripulaciones Inscritas
             </Button>
+
+            {evento?.ruta_url != null && (
+              <Button
+                color="primary"
+                variant="ghost"
+                startContent={<FaRoute />}
+                className="font-bold"
+                onPress={() => ClickRuta(evento.ruta_url)}
+              >
+                Ver Ruta
+              </Button>
+            )}
+            
+            
             <Button
               color="danger"
               variant="shadow"
@@ -109,8 +137,27 @@ function EventoShow() {
               ))}
             </div>
           </div>
+
+          {/* <div>
+            <div className="relative pb-[78.2227%] h-0 overflow-hidden">
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src="https://cdn.embedly.com/widgets/media.html?src=https://www.relive.cc/view/vdvm1R2D8Nv/widget?r=embed-site&url=https://www.relive.cc/view/vdvm1R2D8Nv?r=embed-site&image=https://www.relive.cc/view/vdvm1R2D8Nv/png?x-ref=embed-site&key=f1631a41cb254ca5b035dc5747a5bd75&type=text/html&schema=relive"
+                frameBorder="0"
+                allowFullScreen
+                scrolling="no"
+              ></iframe>
+            </div>
+          </div> */}
         </div>
       </div>
+
+      {/* Modal de Ruta */}
+      <Ruta
+        isOpen={isRutaModal}
+        onOpenChange={SetIsRutaModal}
+        datos={rutaSel}
+      />
     </section>
   );
 }
