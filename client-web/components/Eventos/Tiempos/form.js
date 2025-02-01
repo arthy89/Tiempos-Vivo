@@ -102,8 +102,8 @@ const Form = forwardRef(
 
       form
         .submit()
-        .then(() => {
-          save();
+        .then((e) => {
+          save(e);
           showToast("Tiempo guardado", "success");
         })
         .catch((e) => {
