@@ -77,9 +77,9 @@ function TiemposTable({ idEvent, etapas, categorias, modo, eventName }) {
     }
   }, [etapas]);
 
-  const { data: swrData, mutate, isLoading } = EspecialService.get({
+  const { data: swrData, mutate: mutarList, isLoading } = EspecialService.get({
     page: 1,
-    rowsPerPage: 200,
+    rowsPerPage: 500,
     especial: selEsp,
     categoria: selCat,
   });
@@ -100,6 +100,7 @@ function TiemposTable({ idEvent, etapas, categorias, modo, eventName }) {
   
     const channel = echo.channel("tiempos");
   
+    // * Tiempo Creado
     channel.listen(".TiempoCreado", (data) => {
       console.log("Nuevo tiempo recibido: ", data);
       showToast("Nuevo Tiempo", "success");
@@ -139,10 +140,18 @@ function TiemposTable({ idEvent, etapas, categorias, modo, eventName }) {
       
       // console.log("despues", tiempos);
     });
+
+    // Todo Tiempo Editado
+    channel.listen(".TiempoEditado", (data) => {
+      console.log("Tiempo editado recibido: ", data);
+      showToast("Tiempo Editado", "success");
+      mutarList();
+    });
   
     return () => {
       console.log("Desuscribiendo del canal tiempos...");
       channel.stopListening(".TiempoCreado");
+      channel.stopListening(".TiempoEditado");
       echo.leaveChannel("tiempos");
     };
   }, []);
@@ -401,7 +410,7 @@ function TiemposTable({ idEvent, etapas, categorias, modo, eventName }) {
   //* Funcion para eliminar el Registro (Depende del archivo Servicios)
   const delFicha = async (id) => {
     await TIemposService.delete(id);
-    mutate();
+    mutarList();
     setDel(false);
   };
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\TiempoCreado;
+use App\Events\TiempoEditado;
 use App\Models\Tiempo;
 use App\Http\Requests\StoreTiempoRequest;
 use Illuminate\Http\Request;
@@ -61,6 +62,19 @@ class TiempoController extends Controller
         $hora_salida = $this->parseTime($request->hora_salida);
         $hora_llegada = $this->parseTime($request->hora_llegada);
 
+        // Validar si la hora de llegada es "00:00:00.0"
+        if ($hora_llegada->toTimeString() === '00:00:00') {
+            $tiempo_resultado = '00:00:00.0';
+            $time_R['hora_marcado'] = $tiempo_resultado;
+
+            $tiempo = Tiempo::create($time_R);
+
+            // ! Emitir evento
+            broadcast(new TiempoCreado($tiempo))->toOthers();
+
+            return response()->json($tiempo);
+        }
+
         // Calcular la diferencia en milisegundos
         $milisegundos_diferencia = $hora_llegada->diffInMilliseconds($hora_salida, true);
 
@@ -112,7 +126,11 @@ class TiempoController extends Controller
         if ($request->hora_marcado) {
             $time_R = $request->except(['hora_salida', 'hora_llegada']);
 
-            $tiempo = $tiempo->update($time_R);
+            $tiempo->update($time_R);
+
+            // ! Emitir evento editar
+            broadcast(new TiempoEditado($tiempo))->toOthers();
+
             return response()->json($tiempo);
         }
 
@@ -122,6 +140,19 @@ class TiempoController extends Controller
         // Generar el tiempo con Carbon
         $hora_salida = $this->parseTime($request->hora_salida);
         $hora_llegada = $this->parseTime($request->hora_llegada);
+
+        // Validar si la hora de llegada es "00:00:00.0"
+        if ($hora_llegada->toTimeString() === '00:00:00') {
+            $tiempo_resultado = '00:00:00.0';
+            $time_R['hora_marcado'] = $tiempo_resultado;
+
+            $tiempo->update($time_R);
+
+            // ! Emitir evento
+            broadcast(new TiempoEditado($tiempo))->toOthers();
+
+            return response()->json($tiempo);
+        }
 
         // Calcular la diferencia en milisegundos
         $milisegundos_diferencia = $hora_llegada->diffInMilliseconds($hora_salida, true);
@@ -145,7 +176,11 @@ class TiempoController extends Controller
         $tiempo_resultado = sprintf('%02d:%02d:%02d.%03d', $horas, $minutos, $segundos, $milisegundos);
         $time_R['hora_marcado'] = $tiempo_resultado;
 
-        $tiempo = $tiempo->update($time_R);
+        $tiempo->update($time_R);
+
+        // ! Emitir evento
+        broadcast(new TiempoEditado($tiempo))->toOthers();
+
         return response()->json($tiempo);
     }
 
