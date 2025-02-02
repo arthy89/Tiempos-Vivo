@@ -34,12 +34,12 @@ export default function Home() {
   // console.log(data);
 
   return (
-    <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+    <section className="flex flex-col items-center justify-center gap-4 py-2 md:py-5">
       <div className="justify-center inline-block max-w-xl text-center">
         <div className="items-center justify-center gap-4 sm:flex">
           <div className="flex justify-center">
             <Image
-              className="w-24 sm:w-40 md:w-60 lg:w-80"
+              className="w-14 sm:w-20 md:w-10 lg:w-60"
               isBlurred
               radius="full"
               alt="NextUI hero Image"
@@ -47,9 +47,9 @@ export default function Home() {
             />
           </div>
 
-          <div>
-            <span className={title()}>Rally Cronos&nbsp;</span>
-            <span className={title({ color: "blue" })}>
+          <div className="px-2">
+            <span className={title({ color: "red" })}>Rally Cronos&nbsp;</span>
+            <span className={title()}>
               Tiempos en Vivo Perú&nbsp;
             </span>
           </div>
@@ -69,8 +69,6 @@ export default function Home() {
           <EventoList eventos={data} />
         ) : (
           <div className="flex gap-4">
-            <CardSkeleton />
-            <CardSkeleton />
             <CardSkeleton />
             <CardSkeleton />
           </div>
