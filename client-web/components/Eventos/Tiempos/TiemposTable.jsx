@@ -24,6 +24,8 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import { FaUserAstronaut } from "react-icons/fa";
 import { IoCarSportOutline } from "react-icons/io5";
+import { FaCirclePlus } from "react-icons/fa6";
+import { FaFile } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import {
   MdAutoFixHigh,
@@ -45,32 +47,7 @@ import "jspdf-autotable";
 
 import echo from "@/components/utils/echo";
 
-function TiemposTable({ idEvent, etapas, categorias, modo }) {
-  // Escuchar el evento
-  useEffect(() => {
-    console.log("Conectando al WebSocket...");
-  
-    const channel = echo.channel("tiempos");
-  
-    channel.listen(".TiempoCreado", (data) => {
-      console.log("Nuevo tiempo recibido: ", data);
-
-      // Actualizar la lista de Tiempos
-      setTiempos((prevTiempos) => {
-        if (!prevTiempos) return [data.tiempos];
-
-        return [ ...prevTiempos, data.tiempo];
-      });
-    });
-  
-    return () => {
-      console.log("Desuscribiendo del canal tiempos...");
-      channel.stopListening(".TiempoCreado");
-      echo.leaveChannel("tiempos");
-    };
-  }, []);
-
-
+function TiemposTable({ idEvent, etapas, categorias, modo, eventName }) {
   // console.log(categorias);
   // return "xd";
   // console.log('IDEVENT desde TIEMPOS', idEvent);
@@ -100,28 +77,88 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
     }
   }, [etapas]);
 
-  const { data, mutate, isLoading } = EspecialService.get({
+  const { data: swrData, mutate: mutarList, isLoading } = EspecialService.get({
     page: 1,
-    rowsPerPage: 200,
+    rowsPerPage: 500,
     especial: selEsp,
     categoria: selCat,
   });
 
   // console.log('times', data)
 
-  const [tiempos, setTiempos] = useState(null);
+  const [tiempos, setTiempos] = useState([]);
   useEffect(() => {
-    if (data && data.data) {
-      setTiempos(data.data);
+    if (swrData  && swrData .data) {
+      setTiempos(swrData .data);
     }
-    // console.log('TIEMPOS11111', data);
-    // console.log('TIEMPOS', tiempos);
-    // console.log('ESP SELECT', selEsp);
-  }, [tiempos, data]);
+    
+  }, [swrData ]);
 
-  const pages = useMemo(() => {
-    return data?.last_page;
-  }, [data?.total, rowPerPage]);
+  //! WEBSOCKETS - Escuchar el evento
+  useEffect(() => {
+    console.log("Conectando al WebSocket...");
+  
+    const channel = echo.channel("tiempos");
+  
+    // * Tiempo Creado
+    channel.listen(".TiempoCreado", (data) => {
+      console.log("Nuevo tiempo recibido: ", data);
+      showToast("Nuevo Tiempo", "success");
+
+      // console.log("antes", tiempos);
+
+      const convertirHoraASegundos = (hora) => {
+        const [horas, minutos, segundos] = hora.split(":").map(Number);
+        return horas * 3600 + minutos * 60 + segundos;
+      };
+      
+      // Actualizar la lista de Tiempos
+      setTiempos((prevTiempos) => {
+        if (!prevTiempos) return [data.tiempo];
+        
+        // Verificar si el tiempo ya existe en la lista (evitar duplicados)
+        const tiempoYaExiste = prevTiempos.some((tiempo) => tiempo.id === data.tiempo.id);
+        if (tiempoYaExiste) return prevTiempos; // Si ya existe, no hagas nada
+
+        // Agregar el nuevo tiempo a la lista
+        const nuevosTiempos = [...prevTiempos, data.tiempo];
+
+        // Ordenar los tiempos por hora_marcado (ascendente)
+        nuevosTiempos.sort((a, b) => {
+          const tiempoA = a.hora_marcado; // Obtener hora_marcado del tiempo A
+          const tiempoB = b.hora_marcado; // Obtener hora_marcado del tiempo B
+
+          // Convertir las horas a segundos para compararlas
+          const segundosA = convertirHoraASegundos(tiempoA);
+          const segundosB = convertirHoraASegundos(tiempoB);
+
+          return segundosA - segundosB; // Orden ascendente
+        });
+
+        return nuevosTiempos;
+      });
+      
+      // console.log("despues", tiempos);
+    });
+
+    // Todo Tiempo Editado
+    channel.listen(".TiempoEditado", (data) => {
+      console.log("Tiempo editado recibido: ", data);
+      showToast("Tiempo Editado", "success");
+      mutarList();
+    });
+  
+    return () => {
+      console.log("Desuscribiendo del canal tiempos...");
+      channel.stopListening(".TiempoCreado");
+      channel.stopListening(".TiempoEditado");
+      echo.leaveChannel("tiempos");
+    };
+  }, []);
+
+  // const pages = useMemo(() => {
+  //   return data?.last_page;
+  // }, [data?.total, rowPerPage]);
 
   // Filtrar las columnas basadas en el valor de `modo`
   const columns = useMemo(() => {
@@ -142,6 +179,7 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
 
   const handleSelCategoria = (e) => {
     setSelCat(e.target.value);
+    catRef.current = e.target.value;
   };
 
   const calculateTimeDifference = (startTime, endTime) => {
@@ -157,15 +195,16 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
     return `+ ${hours > 0 ? hours + ":" : ""}${minutes < 10 && hours > 0 ? "0" + minutes : minutes}:${seconds < 10 ? "0" : ""}${seconds}.${milliseconds}`;
   };
   
+  const catRef = useRef('todas');
 
   // * Para el PDF
   const pressPdf = () => {
     const generatePdf = () => {
-      const tiempos = data.data;
+      const tiempos = swrData.data;
   
       const doc = new jsPDF();
       doc.setFontSize(18);
-      doc.text(`${tiempos[0].especial.nombre}`, 14, 20);
+      doc.text(`${tiempos[0].especial.nombre} - ${eventName}`, 14, 20);
   
       const columns = [
         "Nº",
@@ -194,8 +233,12 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
         body: tableData,
         startY: 25,
       });
+
+      if (catRef.current == 'todas') {
+        catRef.current = 'GENERAL';
+      }
   
-      doc.save(`tiempos-${selCat}-${tiempos[0].especial.nombre}.pdf`);
+      doc.save(`${tiempos[0].especial.nombre}-${catRef.current}-${eventName}.pdf`);
     };
   
     generatePdf();
@@ -226,13 +269,14 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
     }
   };
 
-  const onSave = () => {
+  const onSave = (e) => {
     // mutate();
-    console.log("xddd");
+    // console.log("xddd", e);
+    
     onClose();
   };
 
-  const loadingState = isLoading || data?.data.legth === 0 ? "loading" : "idle";
+  const loadingState = isLoading || swrData?.data.legth === 0 ? "loading" : "idle";
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const refForm = useRef(null);
 
@@ -240,7 +284,7 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
     return (
       <div className="flex flex-col gap-4">
         <div className="flex items-end justify-between gap-3">
-          <span className="text-xl font-bold">Tabla de Tiempos - {esp_title.current?.nombre}</span>
+          <span className="px-2 text-xl font-bold">{esp_title.current?.nombre}</span>
           {modo != "client" && (
             <div className="flex gap-3">
               <Button
@@ -249,8 +293,8 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
                   onOpen();
                 }}
                 color="primary"
-                endContent={<MdAutoFixHigh size="1.4em" />}
               >
+                <FaCirclePlus  size={"1.4em"} style={{ minWidth: "1.4em" }} />
                 Añadir
               </Button>
 
@@ -259,6 +303,7 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
                 color="success"
                 // endContent={<MdAutoFixHigh size="1.4em" />}
               >
+                <FaFile size={"1.4em"} style={{ minWidth: "1.4em" }} />
                 PDF
               </Button>
               
@@ -322,9 +367,9 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
             ))}
           </Select>
         </div>
-        <div className="flex items-center justify-between">
+        {/* <div className="flex items-center justify-between">
           <span className="text-default-400 text-small">
-            Total {data?.total}
+            Total {swrData?.total}
           </span>
           <label className="flex items-center text-default-400 text-small">
             Filas por página
@@ -340,10 +385,10 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
               <option value="20">20</option>
             </select>
           </label>
-        </div>
+        </div> */}
       </div>
     );
-  }, [rowPerPage, data?.total, isOpen]);
+  }, [rowPerPage, swrData?.total, isOpen]);
 
   const editar = (e) => {
     console.log(e);
@@ -365,7 +410,7 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
   //* Funcion para eliminar el Registro (Depende del archivo Servicios)
   const delFicha = async (id) => {
     await TIemposService.delete(id);
-    mutate();
+    mutarList();
     setDel(false);
   };
 
@@ -459,7 +504,7 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
 
         return (
           <>
-            <div className="text-blue-500">{diffWithFirst}</div>
+            <div className="text-blue-500 ">{diffWithFirst}</div>
             {diffWithPrev && (
               <div className="text-purple-500">{diffWithPrev}</div>
             )}
@@ -533,24 +578,10 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
   return (
     <>
       <Table
-        isStriped
-        aria-label="Example static collection table"
+        // isStriped
+        removeWrapper
+        aria-label="Tabla de tiempos por especial"
         topContent={topContent}
-        // bottomContent={
-        //   pages > 0 ? (
-        //     <div className="flex justify-center w-full">
-        //       <Pagination
-        //         isCompact
-        //         showControls
-        //         showShadow
-        //         color="primary"
-        //         page={page}
-        //         total={pages}
-        //         onChange={(page) => setPage(page)}
-        //       />
-        //     </div>
-        //   ) : null
-        // }
       >
         <TableHeader columns={columns}>
           {(column) => (
@@ -568,15 +599,7 @@ function TiemposTable({ idEvent, etapas, categorias, modo }) {
                   : "start"
               }
             >
-              {column.uid === "auto" ? (
-                <>
-                  Vehículo
-                  <br />
-                  CAT
-                </>
-              ) : (
-                column.name
-              )}
+              {column.name}
             </TableColumn>
           )}
         </TableHeader>

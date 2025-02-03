@@ -11,6 +11,7 @@ export const title = tv({
       green: "from-[#6FEE8D] to-[#17c964]",
       pink: "from-[#FF72E1] to-[#F54C7A]",
       foreground: "dark:from-[#FFFFFF] dark:to-[#4B4B4B]",
+      red: "from-[#ff0000] to-[#F54C7A]",
     },
     size: {
       xs: "text-2xl lg:text-3xl",
@@ -35,6 +36,7 @@ export const title = tv({
         "green",
         "pink",
         "foreground",
+        "red",
       ],
       class: "bg-clip-text text-transparent bg-gradient-to-b",
     },

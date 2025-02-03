@@ -13,6 +13,7 @@ import Compressor from "compressorjs";
 import { useDropzone } from "react-dropzone";
 
 import { formData } from "./formData";
+import imgToWebP from "@/components/utils/imgToWebP";
 
 import TripulacionService from "@/services/TripulacionService";
 import SearchInput from "@/components/utils/SearchInput";
@@ -75,11 +76,15 @@ const Form = forwardRef(
             quality: 0.6,
             convertSize: 500000,
             success(compressedResult) {
-              const compressedFile = new File([compressedResult], file.name, {
-                type: compressedResult.type,
+              // Convertir la imagen a WebP
+              imgToWebP(compressedResult).then((webpFile) => {
+                form.setData("foto_url", webpFile); // Asignar la imagen en formato WebP al form
               });
+              // const compressedFile = new File([compressedResult], file.name, {
+              //   type: compressedResult.type,
+              // });
 
-              form.setData("foto_url", compressedFile); // Asignar la imagen comprimida al form
+              // form.setData("foto_url", compressedFile); // Asignar la imagen comprimida al form
             },
             error(err) {
               console.log(err.message);

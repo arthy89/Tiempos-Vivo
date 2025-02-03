@@ -24,7 +24,7 @@ class StoreTiempoRequest extends FormRequest
         return [
             'especial_id' => 'nullable|numeric',
             'shakedown_id' => 'nullable|numeric',
-            'tripulacion_id' => 'required|numeric',
+            'tripulacion_id' => 'nullable|numeric',
             'hora_salida' => 'nullable',
             'hora_llegada' => 'nullable',
             'hora_marcado' => 'nullable',

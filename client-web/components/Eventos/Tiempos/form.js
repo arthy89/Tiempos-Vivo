@@ -102,8 +102,8 @@ const Form = forwardRef(
 
       form
         .submit()
-        .then(() => {
-          save();
+        .then((e) => {
+          save(e);
           showToast("Tiempo guardado", "success");
         })
         .catch((e) => {
@@ -119,7 +119,7 @@ const Form = forwardRef(
         <form ref={ref} onSubmit={onSave} className="flex flex-col gap-2">
           <ModalHeader className="flex flex-col gap-1">
             {isEdit
-              ? `Editar Tripulación ${form.data?.tripulacion?.auto_num}`
+              ? `Editar Tiempo - ${form.data?.tripulacion?.auto_num}`
               : "Registrar Nuevo Tiempo"}
           </ModalHeader>
 

@@ -35,11 +35,11 @@ function Page() {
 
   return (
     <>
-      <div className="pb-2">
+      <div className="px-4 pb-2">
         <span className={title({ color: "blue", size: "xs" })}>{evento?.name}</span>
       </div>
       <div className="flex flex-col w-full">
-        <Tabs aria-label="Options" color="success">
+        <Tabs aria-label="Options" color="success" className="px-2">
           <Tab key="etapas" title="Etapas">
             <EtapaTable idEvent={idEvent} />
           </Tab>
@@ -54,6 +54,7 @@ function Page() {
               idEvent={idEvent}
               etapas={evento?.etapas}
               categorias={evento?.categorias}
+              eventName={evento?.name}
             />
           </Tab>
           <Tab key="acumulado" title="Tiempo Acumulado">

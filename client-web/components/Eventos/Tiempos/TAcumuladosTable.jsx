@@ -23,6 +23,7 @@ import {
 } from "@nextui-org/react";
 import { FaUserAstronaut } from "react-icons/fa";
 import { IoCarSportOutline } from "react-icons/io5";
+import { FaFile } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import CategoriaService from "@/services/CategoriaService";
@@ -174,7 +175,11 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
       startY: 35,
     });
 
-    doc.save(`GENERAL-${catRef.current}-${evento.name}.pdf`);
+    if (catRef.current == 'todas') {
+      catRef.current = 'GENERAL';
+    }
+
+    doc.save(`Acumulado-${catRef.current || "GENERAL"}-${evento.name}.pdf`);
   };
 
   const loadingState = isLoading || data?.legth === 0 ? "loading" : "idle";
@@ -206,12 +211,16 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
             ))}
           </Select>
 
-          <Button
-            onPress={pressPdf}
-            color="success"
-          >
-            PDF
-          </Button>
+          {modo != "client" && (
+            <Button
+              onPress={pressPdf}
+              color="success"
+            >
+              <FaFile size={"1.4em"} style={{ minWidth: "1.4em" }} />
+              PDF
+            </Button>
+          )}
+
         </div>
       </div>
     );
@@ -240,7 +249,7 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
             </p>
             <div className="flex items-center gap-2">
               
-              <IoCarSportOutline size={"1.4em"} style={{ minWidth: "1.4em" }} />
+              {/* <IoCarSportOutline size={"1.4em"} style={{ minWidth: "1.4em" }} /> */}
               <div>
                 <p>{row.tripulacion.auto}</p>
                 <p className="italic font-bold">{row.tripulacion.categoria}</p>
@@ -254,12 +263,12 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
         return (
           <>
             <div className="flex items-center gap-2 mb-2">
-              <FaUserAstronaut size={"1.4em"} style={{ minWidth: "1.4em" }} />
+              {/* <FaUserAstronaut size={"1.4em"} style={{ minWidth: "1.4em" }} /> */}
               {row.tripulacion.piloto.nombre} {row.tripulacion.piloto.apellidos}
             </div>
 
             <div className="flex items-center gap-2">
-              <FaUserAstronaut size={"1.4em"} style={{ minWidth: "1.4em" }} />
+              {/* <FaUserAstronaut size={"1.4em"} style={{ minWidth: "1.4em" }} /> */}
               {row.tripulacion.navegante.nombre}{" "}
               {row.tripulacion.navegante.apellidos}
             </div>
@@ -340,7 +349,7 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
   return (
     <>
       <Table
-        isStriped
+        removeWrapper
         aria-label="Example static collection table"
         topContent={topContent}
         bottomContent={

@@ -25,7 +25,7 @@ function EventoCard({ evento }) {
   };
 
   return (
-    <Card className="py-4" isPressable onClick={() => handleClick(evento)}>
+    <Card className="py-4" isPressable onPress={() => handleClick(evento)}>
       <CardHeader className="flex-col items-start px-4 pt-2 pb-0">
         <p className="font-bold uppercase text-tiny">
           {formatDate(evento.fecha)}
