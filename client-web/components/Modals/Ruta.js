@@ -36,6 +36,7 @@ function Ruta({ datos, isOpen, onOpenChange }) {
                   <ModalBody>
                     <div className="relative pb-[56.5%] h-0 overflow-hidden rounded-lg shadow-lg">
                       <iframe
+                        title="Ruta del evento"
                         className="absolute top-0 left-0 w-full h-[120%]" // Ajusta la altura para ocultar la parte inferior
                         src={`https://cdn.embedly.com/widgets/media.html?src=${ruta}/widget?r=embed-site&url=${ruta}?r=embed-site&image=${ruta}/png?x-ref=embed-site&key=f1631a41cb254ca5b035dc5747a5bd75&type=text/html&schema=relive`}
                         frameBorder="0"
