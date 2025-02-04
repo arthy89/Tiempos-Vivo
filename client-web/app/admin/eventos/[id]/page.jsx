@@ -35,7 +35,7 @@ function Page() {
 
   return (
     <>
-      <div className="px-4 pb-2">
+      <div className="px-4">
         <span className={title({ color: "blue", size: "xs" })}>{evento?.name}</span>
       </div>
       <div className="flex flex-col w-full">

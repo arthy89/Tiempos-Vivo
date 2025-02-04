@@ -6,6 +6,6 @@ export const columns = [
   // { name: "Esp", uid: "num_especiales" },
   // { name: "Penalización", uid: "penalizacion_acumulada" },
   { name: "Tiempo", uid: "tiempo_acumulado" },
-  { name: "Difs", uid: "diferencias" },
+  { name: "Diferencias", uid: "diferencias" },
   { name: "Foto", uid: "foto" },
 ];

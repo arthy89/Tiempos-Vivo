@@ -185,47 +185,6 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
   const loadingState = isLoading || data?.legth === 0 ? "loading" : "idle";
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
-  const topContent = React.useMemo(() => {
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="flex items-end justify-between gap-3">
-          <span className="text-xl font-bold">Tabla General</span>
-        </div>
-
-        {/* Filtrar por Categorias */}
-        <div className="flex items-center justify-between gap-4">
-          <Select
-            label="Categorías"
-            size="sm"
-            className="max-w-xs"
-            defaultSelectedKeys={["todas"]}
-            onChange={(e) => handleSelCategoria(e)}
-          >
-            <SelectItem key={"todas"} value={"todas"}>
-              Todas
-            </SelectItem>
-            {categorias.map((cat) => (
-              <SelectItem key={cat.name} value={cat.name}>
-                {cat.name}
-              </SelectItem>
-            ))}
-          </Select>
-
-          {modo != "client" && (
-            <Button
-              onPress={pressPdf}
-              color="success"
-            >
-              <FaFile size={"1.4em"} style={{ minWidth: "1.4em" }} />
-              PDF
-            </Button>
-          )}
-
-        </div>
-      </div>
-    );
-  }, [rowPerPage, data?.total, isOpen]);
-
   const renderCell = React.useCallback((row, columnKey, index, tiempos) => {
     const cellValue = row[columnKey];
 
@@ -348,25 +307,46 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
 
   return (
     <>
+      <div className="flex flex-col gap-4 px-1 pb-2">
+        <div className="flex items-end justify-between">
+          <span className="text-lg font-bold">Tabla Acumulada</span>
+        </div>
+
+        {/* Filtrar por Categorias */}
+        <div className="flex items-center justify-between gap-4">
+          <Select
+            label="Categorías"
+            size="sm"
+            className="max-w-xs"
+            defaultSelectedKeys={["todas"]}
+            onChange={(e) => handleSelCategoria(e)}
+          >
+            <SelectItem key={"todas"} value={"todas"}>
+              Todas
+            </SelectItem>
+            {categorias.map((cat) => (
+              <SelectItem key={cat.name} value={cat.name}>
+                {cat.name}
+              </SelectItem>
+            ))}
+          </Select>
+
+          {modo != "client" && (
+            <Button
+              onPress={pressPdf}
+              color="success"
+            >
+              <FaFile size={"1.4em"} style={{ minWidth: "1.4em" }} />
+              PDF
+            </Button>
+          )}
+
+        </div>
+      </div>
       <Table
-        removeWrapper
-        aria-label="Example static collection table"
-        topContent={topContent}
-        bottomContent={
-          pages > 0 ? (
-            <div className="flex justify-center w-full">
-              <Pagination
-                isCompact
-                showControls
-                showShadow
-                color="primary"
-                page={page}
-                total={pages}
-                onChange={(page) => setPage(page)}
-              />
-            </div>
-          ) : null
-        }
+        isStriped
+        aria-label="Tabla de tiempos acumulados"
+        // topContent={topContent}
       >
         <TableHeader columns={columns}>
           {(column) => (
