@@ -290,7 +290,7 @@ function TripulacionTable({ idEvent, modo }) {
     <>
       <Table
         className="px-2"
-        removeWrapper
+        isStriped
         aria-label="Tabla de tripulaciones"
         topContent={topContent}
         // bottomContent={
