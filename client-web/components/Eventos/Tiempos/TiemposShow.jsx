@@ -25,10 +25,10 @@ function TiemposShow() {
 
   return (
     <>
-      <div className="px-4 pb-2">
+      <div className="px-4">
         <span className={title({ color: "blue", size: "xs" })}>{evento?.name}</span>
         <br/>
-        <span className="text-sm">Tiempos No Oficiales a espera de resultados finales</span>
+        <span className="text-xs">Tiempos <strong>No Oficiales</strong> a espera de resultados finales</span>
       </div>
       <div className="flex flex-col w-full">
         <Tabs aria-label="Options" color="success" className="px-3">

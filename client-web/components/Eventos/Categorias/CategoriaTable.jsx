@@ -39,7 +39,7 @@ function CategoriaTable({ idEvent }) {
   const url = process.env.NEXT_PUBLIC_SERVER_URI;
 
   const [page, setPage] = useState(1);
-  const [rowPerPage, setRowPerPage] = useState(5);
+  const [rowPerPage, setRowPerPage] = useState(100);
   const [edit, setEdit] = useState(false);
   const [id, setId] = useState(0);
 
