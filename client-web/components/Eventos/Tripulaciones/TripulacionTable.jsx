@@ -51,7 +51,7 @@ function TripulacionTable({ idEvent, modo }) {
   const { data, mutate, isLoading } = TripulacionService.getData({
     page,
     rowsPerPage: rowPerPage,
-    // order_by: '-id',
+    order_by: 'categoria',
     event_id: idEvent,
   });
   console.log(data?.last_page);
