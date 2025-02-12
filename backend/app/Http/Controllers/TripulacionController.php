@@ -28,7 +28,7 @@ class TripulacionController extends Controller
             'navegante.apellidos',
             'auto_num'
             ],
-            ['id', 'piloto', 'navegante'],
+            ['id', 'piloto', 'navegante', 'categoria'],
         );
     }
 
