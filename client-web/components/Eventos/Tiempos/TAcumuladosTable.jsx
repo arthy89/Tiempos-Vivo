@@ -22,6 +22,7 @@ import {
   SelectItem,
 } from "@nextui-org/react";
 import { FaUserAstronaut } from "react-icons/fa";
+import { CiSearch } from "react-icons/ci";
 import { IoCarSportOutline } from "react-icons/io5";
 import { FaFile } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
@@ -42,7 +43,8 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
   const [selCat, setSelCat] = useState("todas");
 
   const [page, setPage] = useState(1);
-  const [rowPerPage, setRowPerPage] = useState(200);
+  const [rowPerPage, setRowPerPage] = useState(500);
+  const [search, setSearch] = useState("");
 
   const tiemposRef = useRef(null);
   const dataRef = useRef(null);
@@ -51,6 +53,7 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
   const { data, isLoading } = EventoService.getTimes({
     event_id: idEvent,
     categoria: selCat,
+    search,
   });
 
   const [tiempos, setTiempos] = useState(null);
@@ -91,6 +94,10 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
       setSelectFoto(e);
       setFotoModalOpen(true);
     }
+  };
+
+  const handleSearch = (value) => {
+    setSearch(value);
   };
 
   const handleSelCategoria = (e) => {
@@ -307,7 +314,7 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
 
   return (
     <>
-      <div className="flex flex-col gap-4 px-1 pb-2">
+      <div className="flex flex-col gap-2 px-1 pb-2">
         <div className="flex items-end justify-between">
           <span className="text-lg font-bold">Tabla Acumulada</span>
         </div>
@@ -342,6 +349,20 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
           )}
 
         </div>
+
+        {/*! BUSQUEDAAAAAAAAAAA  */}
+        {/* <div>
+          <Input
+            className="w-full"
+            size="sm"
+            placeholder="Buscar..."
+            isClearable
+            startContent={<CiSearch size="1.4em" />}
+            defaultValue={search}
+            onChange={(e) => handleSearch(e.target.value)}
+            onClear={() => setSearch("")}
+          />
+        </div> */}
       </div>
       <Table
         isStriped

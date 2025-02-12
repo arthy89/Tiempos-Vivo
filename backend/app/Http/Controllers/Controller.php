@@ -126,6 +126,51 @@ class Controller extends BaseController
         return $this->getPageSize() ? $querySet->paginate($this->getPageSize()) : response()->json(['data' => $querySet->get()]);
     }
 
+    public function BestGenerateViewSetList(Request $request, $query, $filters = [], $searchByColumns = [], $relations = [])
+    {
+        // Aplicar filtros específicos si los hay
+        foreach ($filters as $column => $value) {
+            if (!is_null($value)) {
+                $query->where($column, $value);
+            }
+        }
+
+        // Aplicar búsqueda en múltiples columnas
+        if ($request->has('search') && !empty($request->input('search'))) {
+            $searchTerm = $request->input('search');
+
+            $query->where(function ($q) use ($searchByColumns, $searchTerm) {
+                foreach ($searchByColumns as $searchByCol) {
+                    if (strpos($searchByCol, '.') !== false) {
+                        $relations = explode('.', $searchByCol);
+                        $column = array_pop($relations); // Extrae la columna (último elemento)
+                        $relationPath = implode('.', $relations); // Une las relaciones
+
+                        $q->orWhereHas($relationPath, function ($query) use ($column, $searchTerm) {
+                            $query->where($column, 'like', '%' . $searchTerm . '%');
+                        });
+                    } else {
+                        $q->orWhere($searchByCol, 'like', '%' . $searchTerm . '%');
+                    }
+                }
+            });
+        }
+
+        // Cargar relaciones especificadas
+        if (!empty($relations)) {
+            $query->with($relations);
+        }
+
+        // Ordenación si se especifica
+        if ($request->has('sort_by') && $request->has('sort_order')) {
+            $query->orderBy($request->input('sort_by'), $request->input('sort_order'));
+        }
+
+        // Paginación
+        $perPage = $request->input('per_page', 10);
+        return $query->paginate($perPage);
+    }
+
 
     /**
      * Función auxiliar para manejar la carga de archivos.

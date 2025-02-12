@@ -33,6 +33,7 @@ import {
   MdDeleteForever,
   MdRemoveRedEye,
 } from "react-icons/md";
+import { CiSearch } from "react-icons/ci";
 import { PiPencilSimpleFill } from "react-icons/pi";
 import { BsTrash2Fill } from "react-icons/bs";
 import React, { useMemo, useRef, useState, useEffect } from "react";
@@ -64,6 +65,7 @@ function TiemposTable({ idEvent, etapas, categorias, modo, eventName }) {
   const [rowPerPage, setRowPerPage] = useState(500);
   const [edit, setEdit] = useState(false);
   const [id, setId] = useState(0);
+  const [search, setSearch] = useState("");
 
   const [dataForPdf, setDataForPdf] = useState(null);
 
@@ -84,6 +86,7 @@ function TiemposTable({ idEvent, etapas, categorias, modo, eventName }) {
     rowsPerPage: 500,
     especial: selEsp,
     categoria: selCat,
+    search,
   });
 
   // console.log('times', data)
@@ -182,6 +185,10 @@ function TiemposTable({ idEvent, etapas, categorias, modo, eventName }) {
   const handleSelCategoria = (e) => {
     setSelCat(e.target.value);
     catRef.current = e.target.value;
+  };
+
+  const handleSearch = (value) => {
+    setSearch(value);
   };
 
   const calculateTimeDifference = (startTime, endTime) => {
@@ -456,7 +463,7 @@ function TiemposTable({ idEvent, etapas, categorias, modo, eventName }) {
 
   return (
     <>
-      <div className="flex flex-col gap-4 pb-2">
+      <div className="flex flex-col gap-2 pb-2">
         <div className="flex items-end justify-between gap-3">
           <span className="px-2 text-xl font-bold">{esp_title.current?.nombre}</span>
           {modo != "client" && (
@@ -540,6 +547,19 @@ function TiemposTable({ idEvent, etapas, categorias, modo, eventName }) {
               </SelectItem>
             ))}
           </Select>
+        </div>
+
+        <div>
+          <Input
+            className="w-full"
+            size="sm"
+            placeholder="Buscar..."
+            isClearable
+            startContent={<CiSearch size="1.4em" />}
+            defaultValue={search}
+            onChange={(e) => handleSearch(e.target.value)}
+            onClear={() => setSearch("")}
+          />
         </div>
         {/* <div className="flex items-center justify-between">
           <span className="text-default-400 text-small">

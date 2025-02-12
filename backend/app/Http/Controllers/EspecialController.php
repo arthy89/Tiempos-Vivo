@@ -93,12 +93,18 @@ class EspecialController extends Controller
         }
 
         // Genera la vista o lista con la función personalizada
-        return $this->generateViewSetList(
+        return $this->BestGenerateViewSetList(
             $request,
             $query,
             [],
-            [],  // Sin filtros adicionales en esta parte
-            []   // Sin ordenamientos adicionales
+            [
+                'tripulacion.auto_num',
+                'tripulacion.piloto.nombre',
+                'tripulacion.piloto.apellidos',
+                'tripulacion.navegante.nombre',
+                'tripulacion.navegante.apellidos',
+            ],  
+            ['tripulacion.piloto', 'tripulacion.navegante']
         );
     }
 
