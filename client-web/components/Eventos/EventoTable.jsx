@@ -26,6 +26,9 @@ import {
   MdDeleteForever,
   MdRemoveRedEye,
 } from "react-icons/md";
+import { PiPencilSimpleFill } from "react-icons/pi";
+import { BsTrash2Fill } from "react-icons/bs";
+import { FaEye } from "react-icons/fa6";
 import React, { useMemo, useRef, useState } from "react";
 import EventoService from "@/services/EventoService";
 import { columns } from "./columns";
@@ -205,7 +208,7 @@ function EventoTable() {
       case "foto_url":
         return (
           <div>
-            <Button variant="light" onClick={() => verFoto(row.foto_url)}>
+            <Button variant="light" onPress={() => verFoto(row.foto_url)}>
               <Image
                 radius="md"
                 src={
@@ -225,53 +228,34 @@ function EventoTable() {
       case "acciones":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Editar">
-              <span
-                onClick={() => editar(row)}
-                role="button" // Añadimos rol de botón para accesibilidad
-                tabIndex={0} // Permitimos la navegación con teclado
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    editar(row); // Ejecuta la acción al presionar 'Enter' o 'Espacio'
-                  }
-                }}
-                className="text-lg cursor-pointer text-default-400 active:opacity-50"
-              >
-                <MdEdit size="1.4em" />
-              </span>
-            </Tooltip>
+            <Button
+              onPress={() => editar(row)}
+              size="sm"
+              color="warning"
+              isIconOnly
+              variant="ghost"
+            >
+              <PiPencilSimpleFill size="1.6em" />
+            </Button>
 
-            <Tooltip content="Ver">
-              <span
-                onClick={() => ver(row)}
-                role="button"
-                tabIndex={0}  // Permitir la navegación por teclado
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    ver(row); // Ejecuta la acción al presionar 'Enter' o 'Espacio'
-                  }
-                }}
-                className="text-lg cursor-pointer text-default-400 active:opacity-50"
-              >
-                <MdRemoveRedEye size="1.4em" />
-              </span>
-            </Tooltip>
+            <Button
+              onPress={() => ver(row)}
+              size="sm"
+              color="success"
+              isIconOnly
+              variant="ghost"
+            >
+              <FaEye size="1.6em" />
+            </Button>
 
-            <Tooltip color="danger" content="Eliminar">
-              <span
-                onClick={() => eliminar(row)}
-                role="button" // Añadir el rol de botón
-                tabIndex={0}  // Permitir la navegación por teclado
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    eliminar(row); // Ejecuta la acción al presionar 'Enter' o 'Espacio'
-                  }
-                }}
-                className="text-lg cursor-pointer text-danger active:opacity-50"
-              >
-                <MdDeleteForever size="1.4em" />
-              </span>
-            </Tooltip>
+            <Button
+              onPress={() => eliminar(row)}
+              size="sm"
+              color="danger"
+              isIconOnly
+            >
+              <BsTrash2Fill size="1.6em" />
+            </Button>
           </div>
         );
       default:
