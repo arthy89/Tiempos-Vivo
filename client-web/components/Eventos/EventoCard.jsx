@@ -34,16 +34,18 @@ function EventoCard({ evento }) {
         <h4 className="font-bold text-large text-start">{evento.name}</h4>
       </CardHeader>
       <CardBody className="py-2 overflow-visible">
-        <Image
-          alt="Img del Evento"
-          className="object-cover rounded-xl"
-          src={
-            evento.foto_url != null
-              ? `${url}` + `${evento.foto_url}`
-              : "/img/mono.png"
-          }
-          width={270}
-        />
+        <div className="flex justify-center">
+          <Image
+            alt="Img del Evento"
+            className="object-cover rounded-xl"
+            src={
+              evento.foto_url != null
+                ? `${url}` + `${evento.foto_url}`
+                : "/img/mono.png"
+            }
+            width={270}
+          />
+        </div>
       </CardBody>
     </Card>
   );
