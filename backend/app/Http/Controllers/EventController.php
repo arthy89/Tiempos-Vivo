@@ -94,7 +94,10 @@ class EventController extends Controller
         // Consulta para traer el evento con etapas, especiales, y tiempos
         $query = Event::where('id', $eventId)
             ->without(['org', 'ubigeo', 'tripulaciones'])  // Excluir relaciones no necesarias
-            ->with(['etapas.especiales.tiempos' => function ($query) use ($categoria) {
+            ->with(['etapas.especiales' => function ($query) {
+                // Filtrar solo los especiales donde estado es true
+                $query->where('estado', true);
+            }, 'etapas.especiales.tiempos' => function ($query) use ($categoria) {
                 // Ordenar por hora marcada
                 $query->orderBy('hora_marcado', 'asc');
 
