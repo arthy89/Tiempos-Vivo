@@ -36,6 +36,12 @@ class EspecialController extends Controller
         );
     }
 
+    public function especial_etapa(Request $request)
+    {
+        $especiales = Especial::where('etapa_id', $request->etapa_id)->get();
+        return response()->json($especiales);
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -48,31 +54,40 @@ class EspecialController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Especial $especial, Request $request)
+    // public function show(Especial $especial, Request $request)
+    // {
+    //     $categoria = $request->input('categoria');
+
+    //     // Consulta base con la relación 'tiempos' ordenada
+    //     $query = Especial::where('id', $especial->id)
+    //         ->with(['tiempos' => function($query) use ($categoria) {
+    //             $query->orderBy('hora_marcado', 'asc');
+
+    //             // Aplica el filtro de categoría si se proporciona
+    //             if ($categoria) {
+    //                 $query->whereHas('tripulacion', function($q) use ($categoria) {
+    //                     $q->where('categoria', $categoria);
+    //                 });
+    //             }
+    //         }]);
+
+    //     // Genera la vista o lista con la función personalizada
+    //     return $this->generateViewSetList(
+    //         $request,
+    //         $query,
+    //         [],
+    //         [],  // Sin filtros adicionales en esta parte
+    //         []   // Sin ordenamientos adicionales
+    //     );
+    // }
+    
+    public function show(Especial $especial)
     {
-        $categoria = $request->input('categoria');
-
-        // Consulta base con la relación 'tiempos' ordenada
-        $query = Especial::where('id', $especial->id)
-            ->with(['tiempos' => function($query) use ($categoria) {
-                $query->orderBy('hora_marcado', 'asc');
-
-                // Aplica el filtro de categoría si se proporciona
-                if ($categoria) {
-                    $query->whereHas('tripulacion', function($q) use ($categoria) {
-                        $q->where('categoria', $categoria);
-                    });
-                }
-            }]);
-
-        // Genera la vista o lista con la función personalizada
-        return $this->generateViewSetList(
-            $request,
-            $query,
-            [],
-            [],  // Sin filtros adicionales en esta parte
-            []   // Sin ordenamientos adicionales
-        );
+        if ($especial) {
+            return response()->json($especial);
+        } else {
+            return response()->json(['error' => 'El Especial no existe.'], 404);
+        }
     }
 
     public function show_tiempos(Request $request)

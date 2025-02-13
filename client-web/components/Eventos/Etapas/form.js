@@ -110,9 +110,9 @@ const Form = forwardRef(({ save, isEdit, id, onClose, idEvent }, ref) => {
             errorMessage={form.errors.nombre}
           />
 
-          <Divider className="my-1" />
+          {/* <Divider className="my-1" /> */}
 
-          <EspecialesTable form={form} />
+          {/* <EspecialesTable form={form} /> */}
         </ModalBody>
 
         <ModalFooter>

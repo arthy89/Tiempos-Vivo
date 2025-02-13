@@ -4,9 +4,9 @@ export const formData = {
   event_id: "",
   nombre: "",
 
-  especiales: [
-    // nombre
-    // lugar
-    // distancia
-  ],
+  // especiales: [
+  //   // nombre
+  //   // lugar
+  //   // distancia
+  // ],
 };

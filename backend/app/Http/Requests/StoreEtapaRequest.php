@@ -26,10 +26,10 @@ class StoreEtapaRequest extends FormRequest
             'nombre' => 'required',
 
             // Especiales
-            'especiales' => 'array|nullable',
-            'especiales.*.nombre' => 'nullable',
-            'especiales.*.lugar' => 'nullable',
-            'especiales.*.distancia' => 'nullable',
+            // 'especiales' => 'array|nullable',
+            // 'especiales.*.nombre' => 'nullable',
+            // 'especiales.*.lugar' => 'nullable',
+            // 'especiales.*.distancia' => 'nullable',
         ];
     }
 }

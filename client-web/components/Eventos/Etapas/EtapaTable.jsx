@@ -28,11 +28,13 @@ import {
 } from "react-icons/md";
 import { PiPencilSimpleFill } from "react-icons/pi";
 import { BsTrash2Fill } from "react-icons/bs";
+import { FaRoute } from "react-icons/fa6";
 import React, { useMemo, useRef, useState } from "react";
 import EtapaService from "@/services/EtapaService";
 import { columns } from "./columns";
 import Form from "./form";
 import Eliminar from "@/components/Modals/Eliminar";
+import ModalEspeciales from "../Especiales/ModalEspeciales";
 
 function EtapaTable({ idEvent }) {
   // console.log('IDEVENT', idEvent);
@@ -160,6 +162,14 @@ function EtapaTable({ idEvent }) {
     setDel(false);
   };
 
+  //? Funcion para abrir el Modal <ModalEspeciales>
+  const [isME, setME] = useState(false); // Modal de ModalEspeciales
+  const openEspecial = async (e) => {
+    // console.log('e', e.id);
+    setSelectData(e);
+    setME(true);
+  }
+
   const renderCell = React.useCallback((row, columnKey, index) => {
     const cellValue = row[columnKey];
 
@@ -199,6 +209,15 @@ function EtapaTable({ idEvent }) {
               variant="ghost"
             >
               <PiPencilSimpleFill size="1.6em" />
+            </Button>
+            <Button
+              onPress={() => openEspecial(row)}
+              size="sm"
+              color="success"
+              isIconOnly
+              variant="ghost"
+            >
+              <FaRoute  size="1.6em" />
             </Button>
             <Button
               onPress={() => eliminar(row)}
@@ -272,6 +291,14 @@ function EtapaTable({ idEvent }) {
         onOpenChange={setDel}
         datos={selectData}
         delFicha={delFicha}
+        onClose={onClose}
+      />
+
+      {/* Modal Form de Especiales */}
+      <ModalEspeciales
+        isOpen={isME}
+        onOpenChange={setME}
+        datos={selectData}
         onClose={onClose}
       />
     </>

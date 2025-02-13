@@ -34,9 +34,9 @@ class EtapaController extends Controller
         try {
             $etapa = Etapa::create($request->all());
 
-            if ($request->especiales) {
-                $etapa->especiales()->createMany($request->especiales);
-            }
+            // if ($request->especiales) {
+            //     $etapa->especiales()->createMany($request->especiales);
+            // }
 
             DB::commit();
 
@@ -70,10 +70,10 @@ class EtapaController extends Controller
         try {
             $etapa->update($request->all());
 
-            if ($request->especiales) {
-                $etapa->especiales()->delete();
-                $etapa->especiales()->createMany($request->especiales);
-            }
+            // if ($request->especiales) {
+            //     $etapa->especiales()->delete();
+            //     $etapa->especiales()->createMany($request->especiales);
+            // }
 
             DB::commit();
 

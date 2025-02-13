@@ -18,6 +18,21 @@ class EspecialService {
     });
   }
 
+  static getEspecials(params = {}) {
+    return useSWR(["api/especial_etapa", params], async ([url, params]) => {
+      return (await api.get(url, { params })).data;
+    });
+  }
+
+  static async getId(id) {
+    return await api.get(`api/`);
+    return (await api.get(`api/etapas/${id}`)).data;
+  }
+
+  static async postEspecial(data) {
+    return await api.post("api/especials", data);
+  }
+
   static async delete(id) {
     return await api.delete(`api/especials/${id}`);
   }
