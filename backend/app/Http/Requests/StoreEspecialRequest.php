@@ -26,6 +26,7 @@ class StoreEspecialRequest extends FormRequest
             'nombre' => 'required',
             'lugar' => 'nullable',
             'distancia' => 'nullable',
+            'estado' => 'nullable',
         ];
     }
 }

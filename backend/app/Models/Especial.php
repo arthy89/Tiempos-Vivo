@@ -16,6 +16,7 @@ class Especial extends Model
         'nombre',
         'lugar',
         'distancia',
+        'estado',
     ];
 
     // protected $with = ['tiempos'];

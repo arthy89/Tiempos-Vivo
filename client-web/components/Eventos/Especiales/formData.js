@@ -4,4 +4,5 @@ export const formData = {
   nombre: "",
   lugar: "",
   distancia: "",
+  estado: true,
 };

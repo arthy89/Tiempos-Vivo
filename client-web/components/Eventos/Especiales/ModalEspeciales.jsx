@@ -14,14 +14,17 @@ import {
   TableRow,
   TableCell,
   Input,
-  Tooltip,
   useDisclosure,
+  Switch,
+  Chip,
 } from "@nextui-org/react";
 import { useState } from "react";
 import { MdOutlineAddCircle, MdDeleteForever } from "react-icons/md";
 import { PiPencilSimpleFill } from "react-icons/pi";
 import { BsTrash2Fill } from "react-icons/bs";
 import { FaCheckCircle } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa6";
+import { TbCancel } from "react-icons/tb";
 import { useForm } from "laravel-precognition-react";
 import { formData } from "./formData";
 import Eliminar from "@/components/Modals/Eliminar";
@@ -29,6 +32,7 @@ import Eliminar from "@/components/Modals/Eliminar";
 function ModalEspeciales({isOpen, onOpenChange, datos}) {
   const [edit, setEdit] = useState(false);
   const [id, setId] = useState(0);
+  const [isSelected, setIsSelected] = useState(true);
 
   const { data: especialesList, mutate, isLoading } = EspecialService.getEspecials({
     etapa_id: datos?.id,
@@ -83,6 +87,7 @@ function ModalEspeciales({isOpen, onOpenChange, datos}) {
       nombre: e.nombre ?? "",
       lugar: e.lugar ?? "",
       distancia: e.distancia ?? "",
+      estado: e.estado ?? "",
     };
     
     form.setData(safeData);
@@ -110,7 +115,6 @@ function ModalEspeciales({isOpen, onOpenChange, datos}) {
                       labelPlacement="outside"
                       type="text"
                       variant="bordered"
-                      color={"success"}
                       value={form.data.nombre}
                       onValueChange={(e) => form.setData("nombre", e)}
                     />
@@ -121,7 +125,6 @@ function ModalEspeciales({isOpen, onOpenChange, datos}) {
                       labelPlacement="outside"
                       type="text"
                       variant="bordered"
-                      color={"success"}
                       value={form.data.lugar}
                       onValueChange={(e) => form.setData("lugar", e)}
                     />
@@ -132,10 +135,17 @@ function ModalEspeciales({isOpen, onOpenChange, datos}) {
                       labelPlacement="outside"
                       type="number"
                       variant="bordered"
-                      color={"success"}
                       value={form.data.distancia}
                       onValueChange={(e) => form.setData("distancia", e)}
                     />
+
+                    <Switch
+                      color="success"
+                      isSelected={form.data.estado}
+                      onValueChange={(value) => form.setData('estado', value)}
+                    >
+                      Contar en Acumulado
+                    </Switch>
               
                     <Button
                       onPress={agregar}
@@ -153,9 +163,9 @@ function ModalEspeciales({isOpen, onOpenChange, datos}) {
                     <Table className="" aria-label="Tabla de Especiales">
                       <TableHeader>
                         <TableColumn>Nº</TableColumn>
-                        <TableColumn>Nombre</TableColumn>
-                        <TableColumn>Lugar</TableColumn>
-                        <TableColumn align={"center"}>Distancia (KM)</TableColumn>
+                        <TableColumn>Especial</TableColumn>
+                        {/* <TableColumn>Lugar</TableColumn>
+                        <TableColumn align={"center"}>Distancia (KM)</TableColumn> */}
                         <TableColumn align={"center"}>Acción</TableColumn>
                       </TableHeader>
                       
@@ -163,9 +173,19 @@ function ModalEspeciales({isOpen, onOpenChange, datos}) {
                         {(especialesList || []).map((esp, index) => (
                           <TableRow key={index}>
                             <TableCell>{index + 1}</TableCell>
-                            <TableCell>{esp.nombre}</TableCell>
-                            <TableCell>{esp.lugar}</TableCell>
-                            <TableCell>{esp.distancia}</TableCell>
+                            <TableCell>
+                              <div className="grid">
+                                <span>{esp.nombre}</span>
+                                <span>{esp.lugar}</span>
+                                <span>{esp.distancia ? `${esp.distancia} KM` : ""}</span>
+                                <span>{esp.estado 
+                                        ? <Chip color="success" size="sm"><FaCheck /></Chip> 
+                                        : <Chip color="default" size="sm"><TbCancel  /></Chip>}
+                                </span>
+                              </div>
+                            </TableCell>
+                            {/* <TableCell>{esp.lugar}</TableCell>
+                            <TableCell>{esp.distancia}</TableCell> */}
                             <TableCell>
                               <div className="flex justify-center gap-1">
                                 <Button
