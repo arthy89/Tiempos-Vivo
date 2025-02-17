@@ -57,4 +57,14 @@ class Event extends Model
     {
         return $this->hasOne(Shakedown::class);
     }
+
+    public function parametros(): HasOne
+    {
+        return $this->hasOne(Parametro::class);
+    }
+
+    public function opartidas()
+    {
+        return $this->hasMany(OPartidas::class);
+    }
 }

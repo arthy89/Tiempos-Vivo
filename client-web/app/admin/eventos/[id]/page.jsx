@@ -9,6 +9,7 @@ import CategoriaTable from "@/components/Eventos/Categorias/CategoriaTable";
 import TripulacionTable from "@/components/Eventos/Tripulaciones/TripulacionTable";
 import TiemposTable from "@/components/Eventos/Tiempos/TiemposTable";
 import TAcumuladosTable from "@/components/Eventos/Tiempos/TAcumuladosTable";
+import OrdenPartida from "@/components/Eventos/OrdenPartida/OrdenPartida";
 
 function Page() {
   const router = useRouter();
@@ -39,7 +40,7 @@ function Page() {
         <span className={title({ color: "blue", size: "xs" })}>{evento?.name}</span>
       </div>
       <div className="flex flex-col w-full">
-        <Tabs aria-label="Options" color="success" className="px-2">
+        <Tabs aria-label="Options" color="primary" className="px-2">
           <Tab key="etapas" title="Etapas">
             <EtapaTable idEvent={idEvent} />
           </Tab>
@@ -48,6 +49,9 @@ function Page() {
           </Tab>
           <Tab key="tripulaciones" title="Tripulaciones">
             <TripulacionTable idEvent={idEvent} />
+          </Tab>
+          <Tab key="orden_partida" title="Orden de Partida">
+            <OrdenPartida idEvent={idEvent} />
           </Tab>
           <Tab key="tiempos" title="Tiempos">
             <TiemposTable 

@@ -167,7 +167,7 @@ class Controller extends BaseController
         }
 
         // Paginación
-        $perPage = $request->input('per_page', 10);
+        $perPage = $request->input('per_page', 500);
         return $query->paginate($perPage);
     }
 

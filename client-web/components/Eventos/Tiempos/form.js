@@ -123,7 +123,7 @@ const Form = forwardRef(
               : "Registrar Nuevo Tiempo"}
           </ModalHeader>
 
-          <ModalBody>
+          <ModalBody> 
             <SearchInpTripulacion
               label="Tripulación"
               formKey="tripulacion_id"

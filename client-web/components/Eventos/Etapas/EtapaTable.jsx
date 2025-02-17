@@ -53,8 +53,8 @@ function EtapaTable({ idEvent }) {
     // order_by: '-id',
     event_id: idEvent,
   });
-  console.log(data?.last_page);
-  console.log(data);
+  // console.log(data?.last_page);
+  // console.log(data);
 
   const pages = useMemo(() => {
     return data?.last_page;

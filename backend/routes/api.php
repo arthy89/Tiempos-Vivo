@@ -8,7 +8,9 @@ use App\Http\Controllers\EventController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FolioController;
+use App\Http\Controllers\OPartidaController;
 use App\Http\Controllers\OrgController;
+use App\Http\Controllers\ParametrosController;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
@@ -75,3 +77,9 @@ Route::apiResource('/shakedowns', ShakedownController::class)->middleware([Handl
 
 Route::apiResource('/drivers', DriverController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/tripulacions', TripulacionController::class)->middleware([HandlePrecognitiveRequests::class]);
+// Route::apiResource('/parametros', ParametrosController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::get('/parametro_event', [ParametrosController::class, 'parametro_event'])->middleware([HandlePrecognitiveRequests::class]);
+Route::put('/parametro_update/{parametro}', [ParametrosController::class, 'update'])->middleware([HandlePrecognitiveRequests::class]);
+
+Route::apiResource('/opartidas', OPartidaController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::put('/opartidas_update', [OPartidaController::class, 'update_lista'])->middleware([HandlePrecognitiveRequests::class]);
