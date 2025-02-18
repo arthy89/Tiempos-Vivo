@@ -29,6 +29,7 @@ import { FaFileSignature } from "react-icons/fa6";
 import { PiTimerFill } from "react-icons/pi";
 import { FaChevronUp } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa";
+import { PiFlagCheckeredFill } from "react-icons/pi";
 import TripulacionService from "@/services/TripulacionService";
 import ParametrosService from "@/services/ParametrosService";
 import { columns as allColumns } from "./columns";
@@ -108,10 +109,10 @@ function OrdenPartida({ idEvent, modo }) {
     try {
       const res = await ParametrosService.put(updatedParams);
       ListarPartidasGet();
-      Toast(res, "success")
+      Toast(res, "success");
     } catch (error) {
       console.log("Error al actualizar", error.response.data.error);
-      Toast(error.response.data.error, "error")
+      Toast(error.response.data.error, "error");
     }
   };
 
@@ -343,32 +344,46 @@ function OrdenPartida({ idEvent, modo }) {
               <div className="flex items-end justify-between gap-3">
                 <div className="flex gap-2">
                   {/* Botones */}
-                  <Button
-                    type='submit'
-                    color="primary"
-                    size='sm'
-                    name='action'
-                    value='inscritos'
-                  >
-                    <FaFileSignature size={"1.4em"} style={{ minWidth: "1.4em" }} />
-                    Gen. Inscripción
-                  </Button>
+                  <Tooltip color='primary' content="Por Inscripciones">
+                    <Button
+                      type='submit'
+                      color="primary"
+                      name='action'
+                      value='inscritos'
+                      isIconOnly
+                    >
+                      <FaFileSignature size={"1.4em"} style={{ minWidth: "1.4em" }} />
+                    </Button>
+                  </Tooltip>
 
-                  <Button
-                    type='submit'
-                    color="warning"
-                    size='sm'
-                    name='action'
-                    value='shakedown'
-                  >
-                    <PiTimerFill size={"1.4em"} style={{ minWidth: "1.4em" }} />
-                    Gen. Shakedown
-                  </Button>
+                  <Tooltip color='warning' content="Por Shakedown">
+                    <Button
+                      type='submit'
+                      color="warning"
+                      name='action'
+                      value='shakedown'
+                      isIconOnly
+                    >
+                      <PiFlagCheckeredFill size={"1.4em"} style={{ minWidth: "1.4em" }} />
+                    </Button>
+                  </Tooltip>
+                  
+                  <Tooltip color='danger' content="Por Tiempos Acumulado">
+                    <Button
+                      type='submit'
+                      color="danger"
+                      name='action'
+                      value='acumulado'
+                      isIconOnly
+                    >
+                      <PiTimerFill size={"1.4em"} style={{ minWidth: "1.4em" }} />
+                    </Button>
+                  </Tooltip>
                   
                   <Button
                     onPress={() => pressPdf()}
                     color="success"
-                    size='sm'
+                    // size='sm'
                   >
                     <FaFile size={"1.4em"} style={{ minWidth: "1.4em" }} />
                     PDF

@@ -64,6 +64,63 @@ class ParametrosController extends Controller
         return sprintf("%02d:%02d:%02d", $horas, $minutos, $segundos);
     }
 
+    private function calcularTiemposAcumulados($tiempos)
+    {
+        // Cambioooooooooo
+        // CON MILISEGUNDOOOOOOOOOOOOOOOOOOOS
+        $tiemposAcumulados = [];
+    
+        foreach ($tiempos as $tiempo) {
+            $tripulacionId = $tiempo->tripulacion_id;
+    
+            // Inicializar si no existe
+            if (!isset($tiemposAcumulados[$tripulacionId])) {
+                $tiemposAcumulados[$tripulacionId] = [
+                    'tripulacion' => $tiempo->tripulacion,
+                    'tiempo_acumulado' => Carbon::createFromFormat('H:i:s.u', '00:00:00.000'),
+                    'penalizacion_acumulada' => Carbon::createFromFormat('H:i:s.u', '00:00:00.000'),
+                    'num_especiales' => 0,
+                ];
+            }
+    
+            // Convertir hora_marcado a Carbon (con milisegundos)
+            $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
+    
+            // Convertir penalización a Carbon (sin milisegundos, formato H:i:s)
+            $penalizacion = Carbon::createFromFormat('H:i:s', $tiempo->penalizacion ?? '00:00:00');
+    
+            // Acumular tiempos y penalizaciones usando diffInMilliseconds con true para evitar valores negativos
+            $tiemposAcumulados[$tripulacionId]['tiempo_acumulado']->addMilliseconds($horaMarcado->diffInMilliseconds(Carbon::createFromFormat('H:i:s.u', '00:00:00.000'), true));
+            $tiemposAcumulados[$tripulacionId]['penalizacion_acumulada']->addSeconds($penalizacion->diffInSeconds(Carbon::createFromFormat('H:i:s', '00:00:00'), true));
+            $tiemposAcumulados[$tripulacionId]['num_especiales'] += 1;
+        }
+    
+        // Formatear los tiempos acumulados (en formato HH:MM:SS.0 para mostrar solo 1 dígito en los milisegundos)
+        foreach ($tiemposAcumulados as &$tripulacion) {
+            $totalTiempo = $tripulacion['tiempo_acumulado']->copy();
+            
+            // Obtener los componentes de tiempo
+            $hours = (int) floor($totalTiempo->diffInSeconds(Carbon::createFromFormat('H:i:s.u', '00:00:00.000'), true) / 3600);
+            $minutes = (int) ($totalTiempo->minute + ($hours * 60)) % 60;
+            $seconds = $totalTiempo->second;
+            $milliseconds = (int) floor($totalTiempo->format('u') / 100000); // Solo el primer dígito de los milisegundos
+        
+            // Asignar el formato con horas acumuladas correctamente (sin limitarse a 24 horas)
+            $tripulacion['tiempo_acumulado'] = sprintf('%02d:%02d:%02d.%01d', $hours, $minutes, $seconds, $milliseconds);
+            $tripulacion['penalizacion_acumulada'] = $tripulacion['penalizacion_acumulada']->format('H:i:s');
+        }
+    
+        // Ordenar por num_especiales descendente y luego por tiempo_acumulado ascendente
+        usort($tiemposAcumulados, function ($a, $b) {
+            if ($b['num_especiales'] === $a['num_especiales']) {
+                return $a['tiempo_acumulado'] <=> $b['tiempo_acumulado'];
+            }
+            return $b['num_especiales'] <=> $a['num_especiales'];
+        });
+    
+        return array_map(fn($item) => (object) $item, $tiemposAcumulados);
+    }
+
     /**
      * Update the specified resource in storage.
      */
@@ -79,6 +136,7 @@ class ParametrosController extends Controller
             return response()->json(['error' => 'Ya se generó el Orden de Partida'], 412);
         }
         
+        // Vaciar la lista y generar una nueva
         $evento = Event::where('id', $parametro->event_id)->first();
         $evento->opartidas()->delete(); // Eliminar el Orden de Partida
 
@@ -105,7 +163,11 @@ class ParametrosController extends Controller
 
                 $hora_partida = $this->sumarTiempos($hora_partida, $intervalo);
             }
-        } else if ($request->modo_partida === 'shakedown')
+
+            return response()->json('Orden de Partida Generado correctamente - Inscritos');
+        }
+        
+        if ($request->modo_partida === 'shakedown')
         {
             // Si la consulta viene con 'shakedown' se ordenan los tiempos con los del primer espcial
             $evento_lite = Event::where('id', $parametro->event_id)
@@ -133,9 +195,42 @@ class ParametrosController extends Controller
     
                 $hora_partida = $this->sumarTiempos($hora_partida, $intervalo);
             }
+
+            return response()->json('Orden de Partida Generado correctamente - Shakedown');
         }
 
-        return response()->json('Orden de Partida Generado correctamente');
+        if ($request->modo_partida === 'acumulado')
+        {
+            // Consulta para traer el evento con etapas, especiales, y tiempos
+            $query = Event::where('id', $parametro->event_id)
+                ->without(['org', 'ubigeo', 'tripulaciones'])  // Excluir relaciones no necesarias
+                ->with(['etapas.especiales' => function ($query) {
+                    // Filtrar solo los especiales donde estado es true
+                    $query->where('estado', true);
+                }, 'etapas.especiales.tiempos' => function ($query) {
+                    // Ordenar por hora marcada
+                    $query->orderBy('hora_marcado', 'asc');
+                }]);
+
+            // Obtener los datos del evento
+            $eventData = $query->get();
+
+            // Acumular los tiempos de las tripulaciones
+            $tiemposAcumulados = $this->calcularTiemposAcumulados($eventData->pluck('etapas.*.especiales.*.tiempos')->flatten());
+
+            foreach ($tiemposAcumulados as $tiempo_acum)
+            {
+                OPartidas::create([
+                    'event_id' => $parametro->event_id,
+                    'tripulacion_id' => $tiempo_acum->tripulacion->id,
+                    'hora_salida' => $hora_partida,
+                ]);
+    
+                $hora_partida = $this->sumarTiempos($hora_partida, $intervalo);
+            }
+
+            return response()->json('Orden de Partida Generado correctamente - Acumulado');
+        }
     }
 
     /**
