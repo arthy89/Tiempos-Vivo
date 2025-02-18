@@ -1,5 +1,6 @@
 "use client";
 import { IoCarSport, IoTimeSharp } from "react-icons/io5";
+import { FaList } from "react-icons/fa6";
 import { FaUserAstronaut } from "react-icons/fa";
 import { FaRoute } from "react-icons/fa6";
 import { Image, Button, Chip } from "@nextui-org/react";
@@ -42,6 +43,11 @@ function EventoShow() {
     const slug = `${e.id}-${e.name.replace(/\s+/g, "-").toLowerCase()}`;
     router.push(`/${slug}/tiempos`);
   };
+
+  const ClickOrdenPartida = (e) => {
+    const slug = `${e.id}-${e.name.replace(/\s+/g, "-").toLowerCase()}`;
+    router.push(`/${slug}/orden_partida`);
+  }
 
   const [isRutaModal, SetIsRutaModal] = useState(false);
   const [rutaSel, SetRutaSel] = useState(false);
@@ -90,6 +96,16 @@ function EventoShow() {
               onPress={() => ClickTripulaciones(evento)}
             >
               Tripulaciones Inscritas
+            </Button>
+            
+            <Button
+              color="primary"
+              variant="ghost"
+              startContent={<FaList />}
+              className="font-bold"
+              onPress={() => ClickOrdenPartida(evento)}
+            >
+              Orden de Partida
             </Button>
 
             {evento?.ruta_url != null && (

@@ -51,7 +51,10 @@ function Page() {
             <TripulacionTable idEvent={idEvent} />
           </Tab>
           <Tab key="orden_partida" title="Orden de Partida">
-            <OrdenPartida idEvent={idEvent} />
+            <OrdenPartida 
+              idEvent={idEvent}
+              eventName={evento?.name}
+            />
           </Tab>
           <Tab key="tiempos" title="Tiempos">
             <TiemposTable 

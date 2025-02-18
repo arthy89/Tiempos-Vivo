@@ -7,20 +7,8 @@ import {
   TableRow,
   TableCell,
   Spinner,
-  getKeyValue,
-  Pagination,
-  Input,
   Button,
-  useDisclosure,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   Tooltip,
-  Image,
-  Tabs,
-  Tab,
   TimeInput,
 } from "@nextui-org/react";
 import { FaCheckCircle } from "react-icons/fa";
@@ -41,7 +29,7 @@ import OPartidasService from '@/services/OPartidasService';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-function OrdenPartida({ idEvent, modo }) {
+function OrdenPartida({ idEvent, eventName, modo }) {
   const [listPartida, setListPartida] = useState(null);
   const loadingState = listPartida === null ? "loading" : "idle";
   
@@ -229,7 +217,7 @@ function OrdenPartida({ idEvent, modo }) {
         startY: 25,
       });
   
-      doc.save(`Orden_de_partida.pdf`);
+      doc.save(`Orden_de_Partida_${eventName}.pdf`);
     };
   
     generatePdf();
@@ -395,21 +383,25 @@ function OrdenPartida({ idEvent, modo }) {
         </>        
       )}
 
-      
+      {modo == "client" && (
+        <span className="px-2 text-xl font-bold">Orden de Partida</span>
+      )}
       
       <Table
         isStriped
         aria-label="Tabla de Orden de Partida"
-        bottomContent={
-          <Button
-            onPress={() => guardar_lista()}
-            color="success"
-            // size='sm'
-          >
-            <FaCheckCircle size={"1.4em"} style={{ minWidth: "1.4em" }} />
-            Guardar Cambios
-          </Button>
-        }
+        bottomContent=
+          {modo != "client" && (
+            <Button
+              onPress={() => guardar_lista()}
+              color="success"
+              // size='sm'
+            >
+              <FaCheckCircle size={"1.4em"} style={{ minWidth: "1.4em" }} />
+              Guardar Cambios
+            </Button>
+          )}
+        
       >
         <TableHeader columns={columns}>
           {(column) => (
