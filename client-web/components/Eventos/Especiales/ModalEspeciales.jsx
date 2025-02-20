@@ -28,6 +28,8 @@ import { TbCancel } from "react-icons/tb";
 import { useForm } from "laravel-precognition-react";
 import { formData } from "./formData";
 import Eliminar from "@/components/Modals/Eliminar";
+import Toast from '@/components/Toast/Toast';
+import { Toaster } from "react-hot-toast";
 
 function ModalEspeciales({isOpen, onOpenChange, datos}) {
   const [edit, setEdit] = useState(false);
@@ -55,6 +57,7 @@ function ModalEspeciales({isOpen, onOpenChange, datos}) {
           mutate();
           form.setData({ ...formData });
           setEdit(false);
+          Toast("Especial Guardado", "success");
         })
         .catch((e) => {
           console.log("El error!!!!", e);
@@ -77,6 +80,7 @@ function ModalEspeciales({isOpen, onOpenChange, datos}) {
     await EspecialService.delete(id);
     mutate();
     setDel(false);
+    Toast("Especial Eliminado", "success");
   };
 
   // ? Funciones para Editar
@@ -160,7 +164,7 @@ function ModalEspeciales({isOpen, onOpenChange, datos}) {
                     <p className="text-sm font-medium">Lista de Especiales</p>
 
                     {/* Tabla */}
-                    <Table className="" aria-label="Tabla de Especiales">
+                    <Table className="h-60" aria-label="Tabla de Especiales">
                       <TableHeader>
                         <TableColumn>Nº</TableColumn>
                         <TableColumn>Especial</TableColumn>
@@ -232,6 +236,8 @@ function ModalEspeciales({isOpen, onOpenChange, datos}) {
           )}
         </ModalContent>
       </Modal>
+
+      <Toaster />
       
       <Eliminar
         isOpen={isDel}
