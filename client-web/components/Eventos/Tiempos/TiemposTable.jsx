@@ -549,18 +549,21 @@ function TiemposTable({ idEvent, etapas, categorias, modo, eventName }) {
           </Select>
         </div>
 
-        <div>
-          <Input
-            className="w-full"
-            size="sm"
-            placeholder="Buscar..."
-            isClearable
-            startContent={<CiSearch size="1.4em" />}
-            defaultValue={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            onClear={() => setSearch("")}
-          />
-        </div>
+        {modo != "client" && (
+          <div>
+            <Input
+              className="w-full"
+              size="sm"
+              placeholder="Buscar..."
+              isClearable
+              startContent={<CiSearch size="1.4em" />}
+              defaultValue={search}
+              onChange={(e) => handleSearch(e.target.value)}
+              onClear={() => setSearch("")}
+            />
+          </div>
+        )}
+        
         {/* <div className="flex items-center justify-between">
           <span className="text-default-400 text-small">
             Total {swrData?.total}

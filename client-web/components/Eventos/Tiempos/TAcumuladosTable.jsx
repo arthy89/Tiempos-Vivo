@@ -25,6 +25,7 @@ import { FaUserAstronaut } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 import { IoCarSportOutline } from "react-icons/io5";
 import { FaFile } from "react-icons/fa6";
+import { FaFileLines } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import CategoriaService from "@/services/CategoriaService";
@@ -33,6 +34,20 @@ import { columns as allColumns } from "./columns2";
 import Foto from "@/components/Modals/Foto";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+
+import { spacemonoFun } from "@/public/fonts/spacemono-normal";
+import { typewriterFun } from "@/public/fonts/typewriter-normal";
+import { monoidFun } from "@/public/fonts/monoid-normal";
+import { sfmonoFun } from "@/public/fonts/sfmono-normal";
+import { sfproFun } from "@/public/fonts/sf_pro-normal";
+import { lektonFun } from "@/public/fonts/lekton-normal";
+
+jsPDF.API.events.push(["addFonts", spacemonoFun]);
+jsPDF.API.events.push(["addFonts", typewriterFun]);
+jsPDF.API.events.push(["addFonts", monoidFun]);
+jsPDF.API.events.push(["addFonts", sfmonoFun]);
+jsPDF.API.events.push(["addFonts", sfproFun]);
+jsPDF.API.events.push(["addFonts", lektonFun]);
 
 function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
   // console.log('IDEVENT desde TIEMPOS', idEvent);
@@ -189,6 +204,98 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
     doc.save(`Acumulado-${catRef.current || "GENERAL"}-${evento.name}.pdf`);
   };
 
+  // !! Consulta para Tiempos Consolidados
+  // const [taList, setTaList] = useState(null);
+  const taList = useRef(null);
+  const ListarTiemposConsolidado = async () => {
+    try {
+      const res = await EventoService.getConsolidados({
+        params: { event_id: idEvent }
+      });
+      // setTaList(res);
+      taList.current = res;
+      // console.log('REEEES', res);
+    } catch (e) {
+      console.log("error!!!!!!!", e)
+    }
+  }
+
+  const pressPdfConsolidado = async () => {
+    await ListarTiemposConsolidado();
+
+    const evento = taList.current.evento;
+    const tiempos = taList.current.tiempos_consolidado;
+
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4",
+    });
+
+    // Definir fuente
+    doc.setFont("sfpro");
+    
+    // Título del evento
+    doc.setFontSize(18);
+    doc.text(`${evento[0].name}`, 14, 20);
+
+    // Subtítulo
+    doc.setFontSize(15);
+    doc.text(`Tiempos Consolidados`, 14, 26);
+
+    // Encabezado de la tabla
+    doc.setFontSize(10);
+    doc.text(`S: Salida | L: Llegada | T: Tiempo Marcado | P: Penalización | T.A: Tiempo Acumulado | P.A: Penalzación Acumulada`, 14, 30);
+
+    // Obtener dinámicamente los nombres de los especiales
+    const especialesHeaders = evento[0].etapas[0].especiales.map(e => e.nombre); // PE2, PE3, PE4, etc.
+
+    // Construcción de columnas
+    const columns = ["N", "TRIPULACIÓN", ...especialesHeaders, "ACUMULADO"];
+
+    // Construcción de datos para la tabla
+    const tableData = tiempos.map((tiempo, index) => {
+      const tripulacion = `${tiempo.tripulacion.auto_num} | ${tiempo.tripulacion.categoria}\n` + `${tiempo.tripulacion.piloto.nombre} ${tiempo.tripulacion.piloto.apellidos}\n` + `${tiempo.tripulacion.navegante.nombre} ${tiempo.tripulacion.navegante.apellidos}`;
+      
+      // Extraer los tiempos de cada especial (salida, llegada, marcado)
+      const especialesData = evento[0].etapas[0].especiales.map(especial => {
+        const especialInfo = tiempo.especiales.find(e => e.nombre === especial.nombre);
+        return especialInfo 
+          ? `S: ${especialInfo.hora_salida}\n` + `L: ${especialInfo.hora_llegada}\n` + `T: ${especialInfo.hora_marcado}\n` + `P: ${especialInfo.penalizacion}`
+          : " "; // Si no hay datos
+      });
+
+      return [
+        index + 1,
+        tripulacion,
+        ...especialesData,
+        `T.A: ${tiempo.tiempo_acumulado}\n` + `P.A: ${tiempo.penalizacion_acumulada}\n`,
+      ];
+    });
+
+    // Generar tabla
+    doc.autoTable({
+      head: [columns],
+      body: tableData,
+      startY: 35,
+      styles: { 
+        fontSize: 8,
+        cellPadding: 2,
+        font: "lekton",
+        textColor: [0, 0, 0],
+      },
+      headStyles: { 
+        fillColor: [40, 40, 40],
+        textColor: [255, 255, 255],
+        font: "spacemono",
+      },
+    });
+
+    // Guardar el PDF
+    doc.save(`Consolidado-${evento[0].name}.pdf`);
+  };
+
+  // Estado de Carga
   const loadingState = isLoading || data?.legth === 0 ? "loading" : "idle";
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
@@ -320,7 +427,7 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
         </div>
 
         {/* Filtrar por Categorias */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
           <Select
             label="Categorías"
             size="sm"
@@ -339,13 +446,27 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
           </Select>
 
           {modo != "client" && (
-            <Button
-              onPress={pressPdf}
-              color="success"
-            >
-              <FaFile size={"1.4em"} style={{ minWidth: "1.4em" }} />
-              PDF
-            </Button>
+            <>
+            <Tooltip color='success' content="PDF - Acumulado">
+              <Button
+                onPress={pressPdf}
+                color="success"
+                isIconOnly
+              >
+                <FaFile size={"1.4em"} style={{ minWidth: "1.4em" }} />
+              </Button>
+            </Tooltip>
+              
+            <Tooltip color='danger' content="PDF - Consolidado">
+              <Button
+                onPress={pressPdfConsolidado}
+                color="danger"
+                isIconOnly
+              >
+                <FaFileLines size={"1.4em"} style={{ minWidth: "1.4em" }} />
+              </Button>
+            </Tooltip>
+            </>
           )}
 
         </div>

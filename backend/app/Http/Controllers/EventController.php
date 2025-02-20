@@ -122,6 +122,97 @@ class EventController extends Controller
         ]);
     }
 
+    public function tiemposConsolidados($tiempos)
+    {
+        $tiemposAcumulados = [];
+
+        foreach ($tiempos as $tiempo) {
+            $tripulacionId = $tiempo->tripulacion_id;
+
+            // Inicializar si no existe
+            if (!isset($tiemposAcumulados[$tripulacionId])) {
+                $tiemposAcumulados[$tripulacionId] = [
+                    'tripulacion' => $tiempo->tripulacion,
+                    'tiempo_acumulado' => Carbon::createFromFormat('H:i:s.u', '00:00:00.000'),
+                    'penalizacion_acumulada' => Carbon::createFromFormat('H:i:s.u', '00:00:00.000'),
+                    'num_especiales' => 0,
+                    'especiales' => [] // Aquí guardamos los detalles de cada especial
+                ];
+            }
+
+            // Convertir hora_marcado y penalización
+            $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
+            $penalizacion = Carbon::createFromFormat('H:i:s', $tiempo->penalizacion ?? '00:00:00');
+
+            // Acumular tiempos
+            $tiemposAcumulados[$tripulacionId]['tiempo_acumulado']
+                ->addMilliseconds($horaMarcado->diffInMilliseconds(Carbon::createFromFormat('H:i:s.u', '00:00:00.000'), true));
+            $tiemposAcumulados[$tripulacionId]['penalizacion_acumulada']
+                ->addSeconds($penalizacion->diffInSeconds(Carbon::createFromFormat('H:i:s', '00:00:00'), true));
+
+            $tiemposAcumulados[$tripulacionId]['num_especiales'] += 1;
+
+            // Agregar detalles del especial
+            $tiemposAcumulados[$tripulacionId]['especiales'][] = [
+                'nombre' => $tiempo->especial->nombre,
+                'hora_salida' => $tiempo->hora_salida,
+                'hora_llegada' => $tiempo->hora_llegada,
+                'hora_marcado' => $tiempo->hora_marcado,
+                'penalizacion' => $tiempo->penalizacion ?? '00:00:00'
+            ];
+        }
+
+        // Formatear los tiempos acumulados
+        foreach ($tiemposAcumulados as &$tripulacion) {
+            $totalTiempo = $tripulacion['tiempo_acumulado']->copy();
+            
+            $hours = (int) floor($totalTiempo->diffInSeconds(Carbon::createFromFormat('H:i:s.u', '00:00:00.000'), true) / 3600);
+            $minutes = (int) ($totalTiempo->minute + ($hours * 60)) % 60;
+            $seconds = $totalTiempo->second;
+            $milliseconds = (int) floor($totalTiempo->format('u') / 100000);
+
+            $tripulacion['tiempo_acumulado'] = sprintf('%02d:%02d:%02d.%01d', $hours, $minutes, $seconds, $milliseconds);
+            $tripulacion['penalizacion_acumulada'] = $tripulacion['penalizacion_acumulada']->format('H:i:s');
+        }
+
+        // Ordenar por num_especiales y tiempo_acumulado
+        usort($tiemposAcumulados, function ($a, $b) {
+            if ($b['num_especiales'] === $a['num_especiales']) {
+                return $a['tiempo_acumulado'] <=> $b['tiempo_acumulado'];
+            }
+            return $b['num_especiales'] <=> $a['num_especiales'];
+        });
+
+        return $tiemposAcumulados;
+    }
+
+    public function index_consolidado(Request $request)
+    {
+        $eventId = $request->input('event_id');
+
+        // Consulta para traer el evento con etapas, especiales, y tiempos
+        $query = Event::where('id', $eventId)
+            ->without(['org', 'ubigeo', 'tripulaciones'])  // Excluir relaciones no necesarias
+            ->with(['etapas.especiales' => function ($query) {
+                // Filtrar solo los especiales donde estado es true
+                $query->where('estado', true);
+            }, 'etapas.especiales.tiempos' => function ($query) {
+                // Ordenar por hora marcada
+                $query->orderBy('hora_marcado', 'asc');
+            }]);
+
+        // Obtener los datos del evento
+        $eventData = $query->get();
+
+        // Acumular los tiempos de las tripulaciones
+        $tiemposConsolidados = $this->tiemposConsolidados($eventData->pluck('etapas.*.especiales.*.tiempos')->flatten());
+
+        return response()->json([
+            'evento' => $eventData,
+            'tiempos_consolidado' => $tiemposConsolidados,
+        ]);
+    }
+
 
     /**
      * Store a newly created resource in storage.

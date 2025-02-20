@@ -19,6 +19,10 @@ class EventoService {
     });
   }
 
+  static async getConsolidados(params) {
+    return (await api.get("/api/events_consolidado", params)).data;
+  }
+
   static async get(id) {
     return (await api.get(`api/events/${id}`)).data;
   }
