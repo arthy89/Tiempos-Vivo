@@ -18,6 +18,7 @@ import {
   ModalFooter,
   Tooltip,
   Image,
+  Chip,
 } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import {
@@ -29,25 +30,27 @@ import {
 import { PiPencilSimpleFill } from "react-icons/pi";
 import { BsTrash2Fill } from "react-icons/bs";
 import { FaRoute } from "react-icons/fa6";
+import { FaCirclePlus } from "react-icons/fa6";
+import { FaCheck } from "react-icons/fa6";
+import { TbCancel } from "react-icons/tb";
 import React, { useMemo, useRef, useState } from "react";
-import EtapaService from "@/services/EtapaService";
+import EspecialService from "@/services/EspecialService";
 import { columns } from "./columns";
 import Form from "./form";
 import Eliminar from "@/components/Modals/Eliminar";
-import ModalEspeciales from "../Especiales/ModalEspeciales";
+// import ModalEspeciales from "../Especiales/ModalEspeciales";
+import Toast from '@/components/Toast/Toast';
+import { Toaster } from "react-hot-toast";
 
-function EtapaTable({ idEvent }) {
+function EspecialTable({ idEvent }) {
   // console.log('IDEVENT', idEvent);
-  const router = useRouter();
-
-  const url = process.env.NEXT_PUBLIC_SERVER_URI;
 
   const [page, setPage] = useState(1);
-  const [rowPerPage, setRowPerPage] = useState(100);
+  const [rowPerPage, setRowPerPage] = useState(10);
   const [edit, setEdit] = useState(false);
   const [id, setId] = useState(0);
 
-  const { data, mutate, isLoading } = EtapaService.getData({
+  const { data, mutate, isLoading } = EspecialService.getData({
     page,
     rowsPerPage: rowPerPage,
     // order_by: '-id',
@@ -65,6 +68,7 @@ function EtapaTable({ idEvent }) {
     // console.log(childData);
     mutate();
     onClose();
+    Toast("Especial Guardado", "success");
   };
 
   const loadingState = isLoading || data?.data.legth === 0 ? "loading" : "idle";
@@ -80,7 +84,7 @@ function EtapaTable({ idEvent }) {
             className='w-full sm:max-w-[44%]'
             placeholder='Search by name...'
           /> */}
-          <span className="text-xl font-bold">Lista de Etapas</span>
+          <span className="text-xl font-bold">Lista de Especiales</span>
           <div className="flex gap-3">
             <Button
               onPress={() => {
@@ -88,7 +92,7 @@ function EtapaTable({ idEvent }) {
                 onOpen();
               }}
               color="primary"
-              endContent={<MdAutoFixHigh size="1.4em" />}
+              endContent={<FaCirclePlus size="1.4em" />}
             >
               Añadir
             </Button>
@@ -157,9 +161,10 @@ function EtapaTable({ idEvent }) {
 
   //* Funcion para eliminar el Registro (Depende del archivo Servicios)
   const delFicha = async (id) => {
-    await EtapaService.delete(id);
+    await EspecialService.delete(id);
     mutate();
     setDel(false);
+    Toast("Especial Eliminado", "success");
   };
 
   //? Funcion para abrir el Modal <ModalEspeciales>
@@ -178,25 +183,12 @@ function EtapaTable({ idEvent }) {
         // return <p>{cellValue}</p>;
         return <p>{index !== undefined && index !== null ? index + 1 : "-"}</p>;
 
-      case "especiales":
-        const especiales = row.especiales || [];
+      case "estado":
         return (
-          // <>
-          //   {especiales.length === 0 ? (
-          //     <p>Sin Especiales</p>
-          //   ) : (
-          //     <ul>
-          //       {especiales.map((especial, index) => (
-          //         <li key={especial.id}>
-          //           {especial.nombre} - {especial.lugar} ({especial.distancia} km)
-          //         </li>
-          //       ))}
-          //     </ul>
-          //   )}
-          // </>
-          <p>
-            {especiales.length === 0 ? "Sin especiales" : especiales.length}
-          </p>
+          <span>{row.estado 
+            ? <Chip color="success" size="md"><FaCheck /></Chip> 
+            : <Chip color="danger" size="md"><TbCancel  /></Chip>}
+    </span>
         );
       case "acciones":
         return (
@@ -210,7 +202,7 @@ function EtapaTable({ idEvent }) {
             >
               <PiPencilSimpleFill size="1.6em" />
             </Button>
-            <Button
+            {/* <Button
               onPress={() => openEspecial(row)}
               size="sm"
               color="success"
@@ -218,7 +210,7 @@ function EtapaTable({ idEvent }) {
               variant="ghost"
             >
               <FaRoute  size="1.6em" />
-            </Button>
+            </Button> */}
             <Button
               onPress={() => eliminar(row)}
               size="sm"
@@ -294,15 +286,17 @@ function EtapaTable({ idEvent }) {
         onClose={onClose}
       />
 
+      <Toaster />
+
       {/* Modal Form de Especiales */}
-      <ModalEspeciales
+      {/* <ModalEspeciales
         isOpen={isME}
         onOpenChange={setME}
         datos={selectData}
         onClose={onClose}
-      />
+      /> */}
     </>
   );
 }
 
-export default EtapaTable;
+export default EspecialTable;

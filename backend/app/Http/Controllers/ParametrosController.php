@@ -178,16 +178,13 @@ class ParametrosController extends Controller
             $evento_lite = Event::where('id', $parametro->event_id)
                             ->without(['org', 'ubigeo', 'tripulaciones', 'categorias'])
                             ->with([
-                                'etapas' => function ($query) {
-                                    $query->orderBy('id', 'asc')->limit(1); // Obtener la primera etapa
-                                },
-                                'etapas.especiales' => function ($query) {
-                                    $query->orderBy('id', 'asc')->limit(1); // Obtener el primer especial de la primera etapa
+                                'especiales' => function ($query) {
+                                    $query->orderBy('id', 'asc')->limit(1); // Obtener el primer especial
                                 },
                             ])
                             ->first();
     
-            $especial_skdw = $evento_lite->etapas[0]->especiales[0]->load(['tiempos']);
+            $especial_skdw = $evento_lite->especiales[0]->load(['tiempos']);
             $tiempos_skdw = $especial_skdw->tiempos->sortBy('hora_marcado')->values();
     
             foreach ($tiempos_skdw as $tiempo)
@@ -206,13 +203,13 @@ class ParametrosController extends Controller
 
         if ($request->modo_partida === 'acumulado')
         {
-            // Consulta para traer el evento con etapas, especiales, y tiempos
+            // Consulta para traer el evento con especiales y tiempos
             $query = Event::where('id', $parametro->event_id)
                 ->without(['org', 'ubigeo', 'tripulaciones'])  // Excluir relaciones no necesarias
-                ->with(['etapas.especiales' => function ($query) {
+                ->with(['especiales' => function ($query) {
                     // Filtrar solo los especiales donde estado es true
                     $query->where('estado', true);
-                }, 'etapas.especiales.tiempos' => function ($query) {
+                }, 'especiales.tiempos' => function ($query) {
                     // Ordenar por hora marcada
                     $query->orderBy('hora_marcado', 'asc');
                 }]);
@@ -221,7 +218,7 @@ class ParametrosController extends Controller
             $eventData = $query->get();
 
             // Acumular los tiempos de las tripulaciones
-            $tiemposAcumulados = $this->calcularTiemposAcumulados($eventData->pluck('etapas.*.especiales.*.tiempos')->flatten());
+            $tiemposAcumulados = $this->calcularTiemposAcumulados($eventData->pluck('especiales.*.tiempos')->flatten());
 
             foreach ($tiemposAcumulados as $tiempo_acum)
             {

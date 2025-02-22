@@ -248,7 +248,7 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
     doc.text(`S: Salida | L: Llegada | T: Tiempo Marcado | P: Penalización | T.A: Tiempo Acumulado | P.A: Penalzación Acumulada`, 14, 30);
 
     // Obtener dinámicamente los nombres de los especiales
-    const especialesHeaders = evento[0].etapas[0].especiales.map(e => e.nombre); // PE2, PE3, PE4, etc.
+    const especialesHeaders = evento[0].especiales.map(e => e.nombre); // PE2, PE3, PE4, etc.
 
     // Construcción de columnas
     const columns = ["N", "TRIPULACIÓN", ...especialesHeaders, "ACUMULADO"];
@@ -258,7 +258,7 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
       const tripulacion = `${tiempo.tripulacion.auto_num} | ${tiempo.tripulacion.categoria}\n` + `${tiempo.tripulacion.piloto.nombre} ${tiempo.tripulacion.piloto.apellidos}\n` + `${tiempo.tripulacion.navegante.nombre} ${tiempo.tripulacion.navegante.apellidos}`;
       
       // Extraer los tiempos de cada especial (salida, llegada, marcado)
-      const especialesData = evento[0].etapas[0].especiales.map(especial => {
+      const especialesData = evento[0].especiales.map(especial => {
         const especialInfo = tiempo.especiales.find(e => e.nombre === especial.nombre);
         return especialInfo 
           ? `S: ${especialInfo.hora_salida}\n` + `L: ${especialInfo.hora_llegada}\n` + `T: ${especialInfo.hora_marcado}\n` + `P: ${especialInfo.penalizacion}`

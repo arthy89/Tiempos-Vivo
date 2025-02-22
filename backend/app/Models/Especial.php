@@ -12,7 +12,7 @@ class Especial extends Model
     use HasFactory;
 
     protected $fillable = [
-        'etapa_id',
+        'event_id',
         'nombre',
         'lugar',
         'distancia',
@@ -21,9 +21,9 @@ class Especial extends Model
 
     // protected $with = ['tiempos'];
 
-    public function etapa(): BelongsTo
+    public function evento(): BelongsTo
     {
-        return $this->belongsTo(Etapa::class);
+        return $this->belongsTo(Event::class);
     }
 
     public function tiempos(): HasMany

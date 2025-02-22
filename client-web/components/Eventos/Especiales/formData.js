@@ -1,6 +1,6 @@
 export const formData = {
   id: 0,
-  etapa_id: "",
+  event_id: "",
   nombre: "",
   lugar: "",
   distancia: "",

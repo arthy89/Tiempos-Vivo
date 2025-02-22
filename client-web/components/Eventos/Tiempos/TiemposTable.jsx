@@ -50,37 +50,34 @@ import "jspdf-autotable";
 
 import echo from "@/components/utils/echo";
 
-function TiemposTable({ idEvent, etapas, categorias, modo, eventName }) {
-  // console.log(categorias);
-  // return "xd";
-  // console.log('IDEVENT desde TIEMPOS', idEvent);
-  const router = useRouter();
-
+function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
+  // console.log(especiales);
   const url = process.env.NEXT_PUBLIC_SERVER_URI;
 
   const [selEsp, setSelEsp] = useState("");
+  const [set_selEsp, set_setSelEsp] = useState("");
   const [selCat, setSelCat] = useState("todas");
-
-  const [page, setPage] = useState(1);
   const [rowPerPage, setRowPerPage] = useState(500);
   const [edit, setEdit] = useState(false);
   const [id, setId] = useState(0);
   const [search, setSearch] = useState("");
-
-  const [dataForPdf, setDataForPdf] = useState(null);
-
+  
   const especiales_ = useRef([]);
   const esp_title = useRef("");
 
   useEffect(() => {
-    especiales_.current = etapas?.flatMap(etapa => etapa.especiales || []);
+    especiales_.current = especiales;
     // console.log('ESPECIALES', especiales_.current)
     if(especiales_.current?.length > 0) {
       setSelEsp(especiales_.current[0].id);
+      set_setSelEsp((especiales_.current[0].id).toString());
       esp_title.current = especiales_.current[0];
-    }
-  }, [etapas]);
 
+    }
+  }, [especiales]);
+  
+  // console.log('gaaaaaa', set_selEsp);
+  
   const { data: swrData, mutate: mutarList, isLoading } = EspecialService.get({
     page: 1,
     rowsPerPage: 500,
@@ -521,7 +518,7 @@ function TiemposTable({ idEvent, etapas, categorias, modo, eventName }) {
             label="Especial"
             size="sm"
             className="max-w-xs"
-            defaultSelectedKeys={[selEsp]}
+            defaultSelectedKeys={[set_selEsp]}
             onChange={(e) => handleSelEsp(e)}
           >
             {especiales_.current?.map((esp) => (

@@ -12,7 +12,6 @@ class Tiempo extends Model
 
     protected $fillable = [
         'especial_id',
-        'shakedown_id',
         'tripulacion_id',
         'hora_salida',
         'hora_llegada',

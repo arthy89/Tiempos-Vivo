@@ -22,7 +22,7 @@ class StoreEspecialRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'etapa_id' => 'required',
+            'event_id' => 'required',
             'nombre' => 'required',
             'lugar' => 'nullable',
             'distancia' => 'nullable',

@@ -11,7 +11,7 @@ import {
 } from "@nextui-org/react";
 import ParametrosService from "@/services/ParametrosService";
 
-function ParametrosCard({ idEvent, etapas }) {
+function ParametrosCard({ idEvent, especiales }) {
   const [params, setParams] = useState({
     id: 0,
     event_id: 0,
@@ -33,7 +33,7 @@ function ParametrosCard({ idEvent, etapas }) {
       setParams(paramsData);
     }
   }, [paramsData]);
-  console.log(etapas);
+  console.log(especiales);
   
   return (
     <>

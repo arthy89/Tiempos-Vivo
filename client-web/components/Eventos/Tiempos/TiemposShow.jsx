@@ -36,7 +36,7 @@ function TiemposShow() {
             <TiemposTable 
               idEvent={idEvent}
               modo="client"
-              etapas={evento?.etapas}
+              especiales={evento?.especiales}
               categorias={evento?.categorias}
             />
           </Tab>

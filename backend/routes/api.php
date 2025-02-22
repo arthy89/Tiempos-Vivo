@@ -3,7 +3,6 @@
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\EspecialController;
-use App\Http\Controllers\EtapaController;
 use App\Http\Controllers\EventController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -69,9 +68,7 @@ Route::apiResource('/events', EventController::class)->middleware([HandlePrecogn
 Route::get('/events_lite', [EventController::class, 'index_lite'])->middleware([HandlePrecognitiveRequests::class]);
 Route::get('/events_consolidado', [EventController::class, 'index_consolidado'])->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/categorias', CategoriaController::class)->middleware([HandlePrecognitiveRequests::class]);
-Route::apiResource('/etapas', EtapaController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/especials', EspecialController::class)->middleware([HandlePrecognitiveRequests::class]);
-Route::get('/especial_etapa', [EspecialController::class, 'especial_etapa'])->middleware([HandlePrecognitiveRequests::class]);
 Route::get('/especial_tiempos', [EspecialController::class, 'show_tiempos'])->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/tiempos', TiempoController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/shakedowns', ShakedownController::class)->middleware([HandlePrecognitiveRequests::class]);

@@ -4,13 +4,13 @@ import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import EventoService from "@/services/EventoService";
-import EtapaTable from "@/components/Eventos/Etapas/EtapaTable";
 import CategoriaTable from "@/components/Eventos/Categorias/CategoriaTable";
 import TripulacionTable from "@/components/Eventos/Tripulaciones/TripulacionTable";
 import TiemposTable from "@/components/Eventos/Tiempos/TiemposTable";
 import TAcumuladosTable from "@/components/Eventos/Tiempos/TAcumuladosTable";
 import OrdenPartida from "@/components/Eventos/OrdenPartida/OrdenPartida";
 import ParametrosCard from "@/components/Eventos/Parametros/ParametrosCard";
+import EspecialTable from "@/components/Eventos/Especiales/EspecialTable";
 
 function Page() {
   const router = useRouter();
@@ -47,11 +47,11 @@ function Page() {
           <Tab key="parametros" title="Parámetros">
             <ParametrosCard 
               idEvent={idEvent}
-              etapas={evento?.etapas}
+              especiales={evento?.especiales}
             />
           </Tab>
-          <Tab key="etapas" title="Etapas">
-            <EtapaTable idEvent={idEvent} />
+          <Tab key="especiales" title="Especiales">
+            <EspecialTable idEvent={idEvent} />
           </Tab>
           <Tab key="categorias" title="Categorías">
             <CategoriaTable idEvent={idEvent} />
@@ -68,7 +68,7 @@ function Page() {
           <Tab key="tiempos" title="Tiempos">
             <TiemposTable 
               idEvent={idEvent}
-              etapas={evento?.etapas}
+              especiales={evento?.especiales}
               categorias={evento?.categorias}
               eventName={evento?.name}
             />

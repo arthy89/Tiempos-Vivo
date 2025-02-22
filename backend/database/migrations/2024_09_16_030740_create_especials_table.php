@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('especials', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('etapa_id')->constrained()->onDelete('cascade');
+            $table->foreignId('event_id')->constrained()->onDelete('cascade');
             $table->string('nombre', length: 100);
             $table->string('lugar', length: 100)->nullable();
             $table->decimal('distancia', 10, 2)->nullable();

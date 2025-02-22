@@ -17,15 +17,7 @@ class EspecialController extends Controller
     public function index(Request $request)
     {
         // params = 'event_id'
-        $evento = Event::with('etapas.especiales')
-            ->findOrFail($request->event_id);
-
-        // Obtener los IDs de los especiales
-        $especialIds = $evento->etapas->flatMap->especiales->pluck('id');
-
-        // Crear una consulta con esos IDs
-        $query = Especial::whereIn('id', $especialIds);
-        // return $query;
+        $query = Especial::where('event_id', $request->event_id);
 
         return $this->generateViewSetList(
             $request,
@@ -36,12 +28,6 @@ class EspecialController extends Controller
         );
     }
 
-    public function especial_etapa(Request $request)
-    {
-        $especiales = Especial::where('etapa_id', $request->etapa_id)->get();
-        return response()->json($especiales);
-    }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -50,36 +36,6 @@ class EspecialController extends Controller
         $especial = Especial::create($request->all(), 201);
         return response()->json($especial);
     }
-
-    /**
-     * Display the specified resource.
-     */
-    // public function show(Especial $especial, Request $request)
-    // {
-    //     $categoria = $request->input('categoria');
-
-    //     // Consulta base con la relación 'tiempos' ordenada
-    //     $query = Especial::where('id', $especial->id)
-    //         ->with(['tiempos' => function($query) use ($categoria) {
-    //             $query->orderBy('hora_marcado', 'asc');
-
-    //             // Aplica el filtro de categoría si se proporciona
-    //             if ($categoria) {
-    //                 $query->whereHas('tripulacion', function($q) use ($categoria) {
-    //                     $q->where('categoria', $categoria);
-    //                 });
-    //             }
-    //         }]);
-
-    //     // Genera la vista o lista con la función personalizada
-    //     return $this->generateViewSetList(
-    //         $request,
-    //         $query,
-    //         [],
-    //         [],  // Sin filtros adicionales en esta parte
-    //         []   // Sin ordenamientos adicionales
-    //     );
-    // }
     
     public function show(Especial $especial)
     {

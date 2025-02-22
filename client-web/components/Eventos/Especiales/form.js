@@ -5,18 +5,15 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
-  Divider,
+  Switch,
 } from "@nextui-org/react";
 import "filepond/dist/filepond.min.css";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import "@/styles/editfilepond.css"; // Si tienes tus propios estilos personalizados.
 import { forwardRef, useEffect, useState } from "react";
 import { useForm } from "laravel-precognition-react";
-
 import { formData } from "./formData";
-
-import EtapaService from "@/services/EtapaService";
-import EspecialesTable from "@/components/Eventos/Especiales/EspecialesTable";
+import EspecialService from "@/services/EspecialService";
 
 const Form = forwardRef(({ save, isEdit, id, onClose, idEvent }, ref) => {
   const [datos, setDatos] = useState(null);
@@ -27,12 +24,12 @@ const Form = forwardRef(({ save, isEdit, id, onClose, idEvent }, ref) => {
 
   // ! ENVIAR FORM
   // const form = isEdit
-  //   ? useForm("post", "api/etapas/" + id + "?_method=PUT", formData)
-  //   : useForm("post", "api/etapas", formData);
+  //   ? useForm("post", "api/especials/" + id + "?_method=PUT", formData)
+  //   : useForm("post", "api/especials", formData);
 
   const endpoint = isEdit
-    ? `api/etapas/${id}?_method=PUT`
-    : "api/etapas";
+    ? `api/especials/${id}?_method=PUT`
+    : "api/especials";
     
   // Ahora `useForm` se llama incondicionalmente con el endpoint calculado
   const form = useForm("post", endpoint, formData);
@@ -41,7 +38,7 @@ const Form = forwardRef(({ save, isEdit, id, onClose, idEvent }, ref) => {
     const fetchData = async () => {
       console.log("EDIT", isEdit);
       if (isEdit) {
-        const eventData = await etapa(id);
+        const eventData = await especial(id);
 
         setDatos(eventData); // Este cambio no es inmediato
       }
@@ -50,8 +47,8 @@ const Form = forwardRef(({ save, isEdit, id, onClose, idEvent }, ref) => {
     fetchData();
   }, [isEdit, id]); // Elimina `datos` de las dependencias
 
-  const etapa = async (id) => {
-    const res = await EtapaService.get(id);
+  const especial = async (id) => {
+    const res = await EspecialService.getId(id);
 
     form.setData(res);
   };
@@ -91,28 +88,48 @@ const Form = forwardRef(({ save, isEdit, id, onClose, idEvent }, ref) => {
     <>
       <form ref={ref} onSubmit={onSave} className="flex flex-col gap-2">
         <ModalHeader className="flex flex-col gap-1">
-          {isEdit ? `Editar ${form.data.nombre}` : "Agregar Etapa"}
+          {isEdit ? `Editar ${form.data.nombre}` : "Agregar Especial"}
         </ModalHeader>
 
         <ModalBody>
           <Input
-            label="Etapa"
-            placeholder="Nombre Etapa..."
+            label="Especial"
+            placeholder="Nombre Especial..."
+            labelPlacement="outside"
+            type="text"
             isRequired
+            variant="bordered"
+            value={form.data.nombre}
+            onValueChange={(e) => form.setData("nombre", e)}
+          />
+    
+          <Input
+            label="Lugar"
+            placeholder="Desde - Hasta..."
             labelPlacement="outside"
             type="text"
             variant="bordered"
-            value={form.data.nombre}
-            color={form.invalid("nombre") ? "danger" : "success"}
-            onValueChange={(e) => form.setData("nombre", e)}
-            onBlur={() => form.validate("nombre")}
-            isInvalid={form.invalid("nombre")}
-            errorMessage={form.errors.nombre}
+            value={form.data.lugar}
+            onValueChange={(e) => form.setData("lugar", e)}
+          />
+    
+          <Input
+            label="Distancia"
+            placeholder="KM..."
+            labelPlacement="outside"
+            type="number"
+            variant="bordered"
+            value={form.data.distancia}
+            onValueChange={(e) => form.setData("distancia", e)}
           />
 
-          {/* <Divider className="my-1" /> */}
-
-          {/* <EspecialesTable form={form} /> */}
+          <Switch
+            color="success"
+            isSelected={form.data.estado}
+            onValueChange={(value) => form.setData('estado', value)}
+          >
+            Contar en Acumulado
+          </Switch>
         </ModalBody>
 
         <ModalFooter>
@@ -143,5 +160,5 @@ const Form = forwardRef(({ save, isEdit, id, onClose, idEvent }, ref) => {
     </>
   );
 });
-Form.displayName = "EtapasForm";
+Form.displayName = "EspecialForm";
 export default Form;
