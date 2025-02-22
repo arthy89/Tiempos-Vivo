@@ -23,6 +23,7 @@ services:
     restart: always
     volumes:
       - backend_app:/var/www/apitev/
+      - backend-archivos:/var/www/apisigetec/public/storage/
       # - ./nginx/php/php.ini:/usr/local/etc/php/conf.d/php.ini
     expose:
       - "9000"  # Exponemos PHP-FPM en el puerto 9000
@@ -137,6 +138,8 @@ volumes:
   frontend_app:
     driver: local
   backend_app:
+    driver: local
+  backend-archivos:
     driver: local
 
 
