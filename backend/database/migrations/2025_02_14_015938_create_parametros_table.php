@@ -17,7 +17,10 @@ return new class extends Migration
             $table->integer('set_especial')->nullable();
             $table->time('hora_partida', 1)->nullable();
             $table->time('intervalo', 1)->nullable();
+            $table->time('esp_hora_salida', 1)->nullable();
+            $table->time('esp_intervalo', 1)->nullable();
             $table->string('modo_partida')->nullable();
+            $table->string('estado_evento')->nullable();
             $table->timestamps();
         });
     }

@@ -121,10 +121,15 @@ class ParametrosController extends Controller
         return array_map(fn($item) => (object) $item, $tiemposAcumulados);
     }
 
+    public function update_params(Request $request, Parametro $parametro)
+    {
+        
+    }
+
     /**
      * Update the specified resource in storage.
      */
-    public function update(ParametrosRequest $request, Parametro $parametro)
+    public function opartida_params_update(ParametrosRequest $request, Parametro $parametro)
     {
         // Si los parámetros y el Botón son los mismo ya generados
         if (

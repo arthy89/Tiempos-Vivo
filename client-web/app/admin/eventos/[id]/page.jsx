@@ -10,6 +10,7 @@ import TripulacionTable from "@/components/Eventos/Tripulaciones/TripulacionTabl
 import TiemposTable from "@/components/Eventos/Tiempos/TiemposTable";
 import TAcumuladosTable from "@/components/Eventos/Tiempos/TAcumuladosTable";
 import OrdenPartida from "@/components/Eventos/OrdenPartida/OrdenPartida";
+import ParametrosCard from "@/components/Eventos/Parametros/ParametrosCard";
 
 function Page() {
   const router = useRouter();
@@ -34,6 +35,8 @@ function Page() {
     fetchData();
   }, []);
 
+  console.log(evento);
+
   return (
     <>
       <div className="px-4">
@@ -41,6 +44,12 @@ function Page() {
       </div>
       <div className="flex flex-col w-full">
         <Tabs aria-label="Options" color="primary" className="px-2">
+          <Tab key="parametros" title="Parámetros">
+            <ParametrosCard 
+              idEvent={idEvent}
+              etapas={evento?.etapas}
+            />
+          </Tab>
           <Tab key="etapas" title="Etapas">
             <EtapaTable idEvent={idEvent} />
           </Tab>

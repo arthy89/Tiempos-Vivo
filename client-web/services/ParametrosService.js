@@ -9,7 +9,7 @@ class ParametrosService {
   }
 
   static async put(reg) {
-    return (await api.put(`api/parametro_update/${reg.id}`, reg)).data;
+    return (await api.put(`api/opartida_params_update/${reg.id}`, reg)).data;
   }
 }
 

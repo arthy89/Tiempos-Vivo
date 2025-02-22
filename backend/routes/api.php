@@ -80,7 +80,8 @@ Route::apiResource('/drivers', DriverController::class)->middleware([HandlePreco
 Route::apiResource('/tripulacions', TripulacionController::class)->middleware([HandlePrecognitiveRequests::class]);
 // Route::apiResource('/parametros', ParametrosController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::get('/parametro_event', [ParametrosController::class, 'parametro_event'])->middleware([HandlePrecognitiveRequests::class]);
-Route::put('/parametro_update/{parametro}', [ParametrosController::class, 'update'])->middleware([HandlePrecognitiveRequests::class]);
+Route::put('/update_params/{parametro}', [ParametrosController::class, 'update_params'])->middleware([HandlePrecognitiveRequests::class]);
+Route::put('/opartida_params_update/{parametro}', [ParametrosController::class, 'opartida_params_update'])->middleware([HandlePrecognitiveRequests::class]);
 
 Route::apiResource('/opartidas', OPartidaController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::put('/opartidas_update', [OPartidaController::class, 'update_lista'])->middleware([HandlePrecognitiveRequests::class]);

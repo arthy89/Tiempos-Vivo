@@ -15,7 +15,10 @@ class Parametro extends Model
         'set_especial',
         'hora_partida',
         'intervalo',
+        'esp_hora_salida',
+        'esp_intervalo',
         'modo_partida',
+        'estado_evento',
     ];
 
     public function evento(): BelongsTo
