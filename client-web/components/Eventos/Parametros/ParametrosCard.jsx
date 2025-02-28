@@ -47,17 +47,21 @@ function ParametrosCard({ idEvent, especiales }) {
         <CardBody>
           <div>
             <Select
+              label="Especial"
+              labelPlacement='outside'
+              placeholder='Set Especial'
               className='mb-2'
-              label="Seleccionar Especial"
               size='sm'
             >
-              
+              { especiales?.map((especial) => (
+                <SelectItem key={especial.id}>{especial.nombre}</SelectItem>
+              )) }
             </Select>
 
             <Switch
               color="danger"
-              isSelected={params.set_especial}
-              // onValueChange={(value) => form.setData('estado', value)}
+              isSelected={params.estado_evento}
+              onValueChange={(value) => form.setData('estado', value)}
             >
               Finalizar
             </Switch>
