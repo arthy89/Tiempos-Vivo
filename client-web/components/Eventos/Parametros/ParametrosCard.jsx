@@ -8,6 +8,7 @@ import {
   Switch,
   Select,
   SelectItem,
+  Button,
 } from "@nextui-org/react";
 import ParametrosService from "@/services/ParametrosService";
 
@@ -34,46 +35,68 @@ function ParametrosCard({ idEvent, especiales }) {
     }
   }, [paramsData]);
   console.log(especiales);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    console.log(params);
+  }
   
   return (
     <>
-      <Card>
-        <CardHeader>
-          <p className="text-lg font-bold">Configurar Parámetros</p>
-        </CardHeader>
+      <form onSubmit={handleSubmit}>
+        <Card>
+          <CardHeader>
+            <p className="text-lg font-bold">Configurar Parámetros</p>
+          </CardHeader>
 
-        <Divider />
+          <Divider />
 
-        <CardBody>
-          <div>
-            <Select
-              label="Especial"
-              labelPlacement='outside'
-              placeholder='Set Especial'
-              className='mb-2'
-              size='sm'
+          <CardBody>
+            <div>
+              <Select
+                label="Especial"
+                labelPlacement='outside'
+                placeholder='Set Especial'
+                className='mb-2'
+                size='sm'
+                onChange={(e) => setParams(prevState => ({
+                  ...prevState,
+                  set_especial: parseInt(e.target.value), //probar
+                }))}
+              >
+                { especiales?.map((especial) => (
+                  <SelectItem key={especial.id}>{especial.nombre}</SelectItem>
+                )) }
+              </Select>
+
+              <Switch
+                color="danger"
+                isSelected={params.estado_evento}
+                // onValueChange={(value) => form.setData('estado', value)}
+                onValueChange={(value) => setParams(prevState => ({
+                  ...prevState,
+                  estado_evento: value,
+                }))}
+              >
+                Finalizar
+              </Switch>
+            </div>
+          </CardBody>
+
+          <Divider />
+
+          <CardFooter>
+            <Button
+              type='submit'
+              size='md'
+              color='success'
             >
-              { especiales?.map((especial) => (
-                <SelectItem key={especial.id}>{especial.nombre}</SelectItem>
-              )) }
-            </Select>
-
-            <Switch
-              color="danger"
-              isSelected={params.estado_evento}
-              onValueChange={(value) => form.setData('estado', value)}
-            >
-              Finalizar
-            </Switch>
-          </div>
-        </CardBody>
-
-        <Divider />
-
-        <CardFooter>
-
-        </CardFooter>
-      </Card>
+              Guardar
+            </Button>
+          </CardFooter>
+        </Card>
+      </form>
     </>
   )
 }
