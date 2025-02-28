@@ -53,7 +53,8 @@ class EventController extends Controller
             $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
     
             // Convertir penalización a Carbon (sin milisegundos, formato H:i:s)
-            $penalizacion = Carbon::createFromFormat('H:i:s', $tiempo->penalizacion ?? '00:00:00');
+            $penalizacionString = explode('.', $tiempo->penalizacion ?? '00:00:00')[0];
+            $penalizacion = Carbon::createFromFormat('H:i:s', $penalizacionString);
     
             // Acumular tiempos y penalizaciones usando diffInMilliseconds con true para evitar valores negativos
             $tiemposAcumulados[$tripulacionId]['tiempo_acumulado']->addMilliseconds($horaMarcado->diffInMilliseconds(Carbon::createFromFormat('H:i:s.u', '00:00:00.000'), true));
@@ -142,7 +143,9 @@ class EventController extends Controller
 
             // Convertir hora_marcado y penalización
             $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
-            $penalizacion = Carbon::createFromFormat('H:i:s', $tiempo->penalizacion ?? '00:00:00');
+
+            $penalizacionString = explode('.', $tiempo->penalizacion ?? '00:00:00')[0];
+            $penalizacion = Carbon::createFromFormat('H:i:s', $penalizacionString);
 
             // Acumular tiempos
             $tiemposAcumulados[$tripulacionId]['tiempo_acumulado']

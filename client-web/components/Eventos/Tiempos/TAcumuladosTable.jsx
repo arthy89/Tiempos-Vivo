@@ -220,6 +220,81 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
     }
   }
 
+  // const pressPdfConsolidado = async () => {
+  //   await ListarTiemposConsolidado();
+
+  //   const evento = taList.current.evento;
+  //   const tiempos = taList.current.tiempos_consolidado;
+
+  //   const doc = new jsPDF({
+  //     orientation: "landscape",
+  //     unit: "mm",
+  //     format: "a4",
+  //   });
+
+  //   // Definir fuente
+  //   doc.setFont("sfpro");
+    
+  //   // Título del evento
+  //   doc.setFontSize(18);
+  //   doc.text(`${evento[0].name}`, 14, 20);
+
+  //   // Subtítulo
+  //   doc.setFontSize(15);
+  //   doc.text(`Tiempos Consolidados`, 14, 26);
+
+  //   // Encabezado de la tabla
+  //   doc.setFontSize(10);
+  //   doc.text(`S: Salida | L: Llegada | T: Tiempo Marcado | P: Penalización | T.A: Tiempo Acumulado | P.A: Penalzación Acumulada`, 14, 30);
+
+  //   // Obtener dinámicamente los nombres de los especiales
+  //   const especialesHeaders = evento[0].especiales.map(e => e.nombre); // PE2, PE3, PE4, etc.
+
+  //   // Construcción de columnas
+  //   const columns = ["N", "TRIPULACIÓN", ...especialesHeaders, "ACUMULADO"];
+
+  //   // Construcción de datos para la tabla
+  //   const tableData = tiempos.map((tiempo, index) => {
+  //     const tripulacion = `${tiempo.tripulacion.auto_num} | ${tiempo.tripulacion.categoria}\n` + `${tiempo.tripulacion.piloto.nombre} ${tiempo.tripulacion.piloto.apellidos}\n` + `${tiempo.tripulacion.navegante.nombre} ${tiempo.tripulacion.navegante.apellidos}`;
+      
+  //     // Extraer los tiempos de cada especial (salida, llegada, marcado)
+  //     const especialesData = evento[0].especiales.map(especial => {
+  //       const especialInfo = tiempo.especiales.find(e => e.nombre === especial.nombre);
+  //       return especialInfo 
+  //         ? `S: ${especialInfo.hora_salida}\n` + `L: ${especialInfo.hora_llegada}\n` + `T: ${especialInfo.hora_marcado}\n` + `P: ${especialInfo.penalizacion}`
+  //         : " "; // Si no hay datos
+  //     });
+
+  //     return [
+  //       index + 1,
+  //       tripulacion,
+  //       ...especialesData,
+  //       `T.A: ${tiempo.tiempo_acumulado}\n` + `P.A: ${tiempo.penalizacion_acumulada}\n`,
+  //     ];
+  //   });
+
+  //   // Generar tabla
+  //   doc.autoTable({
+  //     head: [columns],
+  //     body: tableData,
+  //     startY: 35,
+  //     styles: { 
+  //       fontSize: 8,
+  //       cellPadding: 2,
+  //       font: "lekton",
+  //       textColor: [0, 0, 0],
+  //     },
+  //     headStyles: { 
+  //       fillColor: [40, 40, 40],
+  //       textColor: [255, 255, 255],
+  //       font: "spacemono",
+  //     },
+  //   });
+
+  //   // Guardar el PDF
+  //   doc.save(`Consolidado-${evento[0].name}.pdf`);
+  // };
+
   const pressPdfConsolidado = async () => {
     await ListarTiemposConsolidado();
 
@@ -227,67 +302,137 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
     const tiempos = taList.current.tiempos_consolidado;
 
     const doc = new jsPDF({
-      orientation: "landscape",
-      unit: "mm",
-      format: "a4",
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4",
     });
 
-    // Definir fuente
     doc.setFont("sfpro");
-    
+
     // Título del evento
-    doc.setFontSize(18);
-    doc.text(`${evento[0].name}`, 14, 20);
+    doc.setFontSize(15);
+    doc.text(`${evento[0].name}`, 14, 15);
 
     // Subtítulo
-    doc.setFontSize(15);
-    doc.text(`Tiempos Consolidados`, 14, 26);
-
-    // Encabezado de la tabla
-    doc.setFontSize(10);
-    doc.text(`S: Salida | L: Llegada | T: Tiempo Marcado | P: Penalización | T.A: Tiempo Acumulado | P.A: Penalzación Acumulada`, 14, 30);
+    doc.setFontSize(12);
+    doc.text(`Tiempos Consolidados`, 14, 20);
+    
+    doc.setFontSize(8);
+    doc.text(`P: Penalizacion | P.A: Penalización Acumulada`, 14, 23);
 
     // Obtener dinámicamente los nombres de los especiales
-    const especialesHeaders = evento[0].especiales.map(e => e.nombre); // PE2, PE3, PE4, etc.
+    const especialesHeaders = evento[0].especiales.map((e) => e.nombre); // PE1, PE2, PE3, etc.
 
-    // Construcción de columnas
-    const columns = ["N", "TRIPULACIÓN", ...especialesHeaders, "ACUMULADO"];
+    // Definir cabecera con combinaciones correctas
+    const headRows = [
+        [
+            { content: "N", rowSpan: 2, styles: { halign: "center" } },
+            { content: "TRIPULACIÓN", rowSpan: 2, styles: { halign: "center" } },
+            ...especialesHeaders.map((especial) => ({
+                content: especial,
+                colSpan: 3,
+                styles: { halign: "center" },
+            })),
+            { content: "T. ACUMULADO", rowSpan: 2, styles: { halign: "center" } },
+        ],
+        [
+            ...Array(0).fill(""), // Espacio para N y TRIPULACIÓN
+            ...especialesHeaders.flatMap(() => [
+                { content: "Salida", styles: { halign: "center" } },
+                { content: "Llegada", styles: { halign: "center" } },
+                { content: "Tiempo", styles: { halign: "center" } },
+            ]),
+            "", // Espacio para ACUMULADO
+        ],
+    ];
 
-    // Construcción de datos para la tabla
+    // Construcción de datos correctamente alineados
     const tableData = tiempos.map((tiempo, index) => {
-      const tripulacion = `${tiempo.tripulacion.auto_num} | ${tiempo.tripulacion.categoria}\n` + `${tiempo.tripulacion.piloto.nombre} ${tiempo.tripulacion.piloto.apellidos}\n` + `${tiempo.tripulacion.navegante.nombre} ${tiempo.tripulacion.navegante.apellidos}`;
-      
-      // Extraer los tiempos de cada especial (salida, llegada, marcado)
-      const especialesData = evento[0].especiales.map(especial => {
-        const especialInfo = tiempo.especiales.find(e => e.nombre === especial.nombre);
-        return especialInfo 
-          ? `S: ${especialInfo.hora_salida}\n` + `L: ${especialInfo.hora_llegada}\n` + `T: ${especialInfo.hora_marcado}\n` + `P: ${especialInfo.penalizacion}`
-          : " "; // Si no hay datos
-      });
+        const tripulacion = `${tiempo.tripulacion.auto_num} | ${tiempo.tripulacion.categoria}\n`;
 
-      return [
-        index + 1,
-        tripulacion,
-        ...especialesData,
-        `T.A: ${tiempo.tiempo_acumulado}\n` + `P.A: ${tiempo.penalizacion_acumulada}\n`,
-      ];
+        const especialesData = evento[0].especiales.map((especial) => {
+            const especialInfo = tiempo.especiales.find((e) => e.nombre === especial.nombre);
+            return especialInfo
+                ? [
+                    `${especialInfo.hora_salida || "--:--:--"}`,
+                    `${especialInfo.hora_llegada || "--:--:--"}`,
+                    especialInfo.penalizacion !== "00:00:00"
+                      ? `${especialInfo.hora_marcado || "--:--:--"}\n${especialInfo.penalizacion}`
+                      : `${especialInfo.hora_marcado || "--:--:--"}`,
+                ]
+                : ["-", "-", "-"];
+        }).flat();
+
+        return [
+            index + 1,
+            tripulacion,
+            ...especialesData,
+            `${tiempo.tiempo_acumulado || "--:--:--"}${tiempo.penalizacion_acumulada !== "00:00:00" ? `\n${tiempo.penalizacion_acumulada}` : ""}`,
+        ];
     });
 
-    // Generar tabla
+    // Generar tabla con cabecera corregida
     doc.autoTable({
-      head: [columns],
+      startY: 25,
+      head: headRows,
       body: tableData,
-      startY: 35,
-      styles: { 
-        fontSize: 8,
-        cellPadding: 2,
-        font: "lekton",
-        textColor: [0, 0, 0],
+      styles: {
+          fontSize: 5,
+          cellPadding: 2,
+          // font: "lekton",
+          textColor: [0, 0, 0],
       },
-      headStyles: { 
-        fillColor: [40, 40, 40],
-        textColor: [255, 255, 255],
-        font: "spacemono",
+      headStyles: {
+          fillColor: [40, 40, 40],
+          textColor: [255, 255, 255],
+          // font: "spacemono",
+          halign: "center",
+      },
+      alternateRowStyles: {
+          fillColor: [245, 245, 245], // Alternar colores de filas
+      },
+      didDrawCell: function (data) {
+        // Verificar si es una celda de datos (no cabecera)
+        if (data.section === "body") {
+            let doc = data.doc;
+            let cell = data.cell;
+            
+            // Definir color de la línea (negro)
+            doc.setDrawColor(0, 0, 0); 
+            doc.setLineWidth(0.3);
+            
+            // Dibujar línea derecha de cada celda (columna)
+            doc.line(cell.x + cell.width, cell.y, cell.x + cell.width, cell.y + cell.height);
+        }
+      },
+      didParseCell: function (data) {
+        if (data.section === "body") {
+          const cellValue = data.cell.raw || "";
+
+          // Aplicar negrita a la última columna (T. Acumulado)
+          if (data.column.index === tableData[0].length - 1) {
+            data.cell.styles.fontStyle = "bold";
+          }
+
+          // Verificar si la celda pertenece a la columna de 'hora_marcado'
+          if (evento[0].especiales.some((especial, index) => {
+            // Calcular la posición de 'hora_marcado' en la fila
+            const columnPosition = 2 + (index * 3) + 2; // [ Salida, Llegada, Marcado ]
+            return data.column.index === columnPosition && /^\d{2}:\d{2}:\d{2}/.test(cellValue);
+          })) {
+            data.cell.styles.fontStyle = "bold"; // Aplicar negrita SOLO a 'hora_marcado'
+          }
+
+          // Aplicar color rojo a penalizaciones
+          if (/\d{2}:\d{2}:\d{2}/.test(cellValue) && cellValue.includes("\n")) {
+            const lines = cellValue.split("\n");
+            const lastLine = lines[lines.length - 1]; // Última línea (puede ser penalización)
+
+            if (lastLine !== "00:00:00") {
+              data.cell.styles.textColor = [255, 0, 0]; // Rojo
+            }
+          }
+        }
       },
     });
 
