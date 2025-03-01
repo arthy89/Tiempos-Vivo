@@ -6,39 +6,25 @@ import {
   TableRow,
   TableCell,
   Spinner,
-  getKeyValue,
-  Pagination,
   Input,
   Button,
   useDisclosure,
   Modal,
   ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Tooltip,
   Image,
   Select,
   SelectItem,
 } from "@nextui-org/react";
 import toast, { Toaster } from "react-hot-toast";
-import { FaUserAstronaut } from "react-icons/fa";
 import { IoCarSportOutline } from "react-icons/io5";
 import { FaCirclePlus } from "react-icons/fa6";
 import { FaFile } from "react-icons/fa6";
-import { useRouter } from "next/navigation";
-import {
-  MdAutoFixHigh,
-  MdEdit,
-  MdDeleteForever,
-  MdRemoveRedEye,
-} from "react-icons/md";
 import { CiSearch } from "react-icons/ci";
 import { PiPencilSimpleFill } from "react-icons/pi";
 import { BsTrash2Fill } from "react-icons/bs";
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import EspecialService from "@/services/EspecialService";
-import CategoriaService from "@/services/CategoriaService";
+import ParametrosService from "@/services/ParametrosService";
 import TIemposService from "@/services/TIemposService";
 import { columns as allColumns } from "./columns";
 import Form from "./form";
@@ -51,32 +37,37 @@ import "jspdf-autotable";
 import echo from "@/components/utils/echo";
 
 function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
-  // console.log(especiales);
   const url = process.env.NEXT_PUBLIC_SERVER_URI;
 
-  const [selEsp, setSelEsp] = useState("");
+  const { data: paramsData, mutate: paramsMutate, isLoading: paramsIsLoading } = ParametrosService.get({
+    event_id: idEvent,
+  });
+
+  // Para el Select de Especiales
+  const [key, setKey] = useState(0); // Para controlar el Select
+  const [selEsp, setSelEsp] = useState(null);
   const [set_selEsp, set_setSelEsp] = useState("");
+  // const [esp_title, setEsp_title] = useState("");
+  
+  // Select de Categoria
   const [selCat, setSelCat] = useState("todas");
+  
+  // Data de Tiempos
   const [rowPerPage, setRowPerPage] = useState(500);
   const [edit, setEdit] = useState(false);
   const [id, setId] = useState(0);
   const [search, setSearch] = useState("");
-  
-  const especiales_ = useRef([]);
-  const esp_title = useRef("");
+
 
   useEffect(() => {
-    especiales_.current = especiales;
-    // console.log('ESPECIALES', especiales_.current)
-    if(especiales_.current?.length > 0) {
-      setSelEsp(especiales_.current[0].id);
-      set_setSelEsp((especiales_.current[0].id).toString());
-      esp_title.current = especiales_.current[0];
+    if (paramsData) {
+      setSelEsp(paramsData.set_especial ?? especiales[0]?.id);
+      set_setSelEsp(paramsData.set_especial?.toString() ?? especiales[0]?.id.toString());
+      setKey((prevKey) => prevKey + 1); // Forzar el re-renderizado del Select
 
+      // setEsp_title(especiales.find((esp) => esp.id === parseInt(paramsData.set_especial, 10)))
     }
-  }, [especiales]);
-  
-  // console.log('gaaaaaa', set_selEsp);
+  }, [paramsData]);
   
   const { data: swrData, mutate: mutarList, isLoading } = EspecialService.get({
     page: 1,
@@ -176,7 +167,7 @@ function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
 
   const handleSelEsp = (e) => {
     setSelEsp(e.target.value);
-    esp_title.current = especiales_.current.find((esp) => esp.id === parseInt(e.target.value, 10));
+    // setEsp_title(especiales.find((esp) => esp.id === parseInt(e.target.value, 10)));
   };
 
   const handleSelCategoria = (e) => {
@@ -462,7 +453,7 @@ function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
     <>
       <div className="flex flex-col gap-2 pb-2">
         <div className="flex items-end justify-between gap-3">
-          <span className="px-2 text-xl font-bold">{esp_title.current?.nombre}</span>
+          {/* <span className="px-2 text-xl font-bold">{esp_title?.nombre}</span> */}
           {modo != "client" && (
             <div className="flex gap-3">
               <Button
@@ -518,10 +509,11 @@ function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
             label="Especial"
             size="sm"
             className="max-w-xs"
+            key={key} // Para re-renderizarlo de nuevo
             defaultSelectedKeys={[set_selEsp]}
             onChange={(e) => handleSelEsp(e)}
           >
-            {especiales_.current?.map((esp) => (
+            {especiales?.map((esp) => (
               <SelectItem key={esp.id} value={esp.nombre}>
               {esp.nombre}
             </SelectItem>

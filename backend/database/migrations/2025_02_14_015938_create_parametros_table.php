@@ -20,7 +20,7 @@ return new class extends Migration
             $table->time('esp_hora_salida', 1)->nullable();
             $table->time('esp_intervalo', 1)->nullable();
             $table->string('modo_partida')->nullable();
-            $table->string('estado_evento')->nullable();
+            $table->boolean('estado_evento')->nullable();
             $table->timestamps();
         });
     }

@@ -123,7 +123,14 @@ class ParametrosController extends Controller
 
     public function update_params(Request $request, Parametro $parametro)
     {
-        
+        $parametro->update($request->only(['set_especial', 'estado_evento']));
+
+        return response()->json('Parámetros Actualizados');
+
+        // return response()->json([
+        //     'request' => $request->all(),
+        //     'parametro' => $parametro,
+        // ]);
     }
 
     /**

@@ -11,6 +11,10 @@ class ParametrosService {
   static async put(reg) {
     return (await api.put(`api/opartida_params_update/${reg.id}`, reg)).data;
   }
+
+  static async putParams(reg) {
+    return (await api.put(`api/update_params/${reg.id}`, reg)).data;
+  }
 }
 
 export default ParametrosService;
