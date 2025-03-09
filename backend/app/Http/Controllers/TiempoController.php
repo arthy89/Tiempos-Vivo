@@ -185,6 +185,23 @@ class TiempoController extends Controller
         return response()->json($tiempo);
     }
 
+    private function sumarTiempos($hora1, $hora2) {
+        // Convertir las horas en arrays de enteros [horas, minutos, segundos]
+        list($h1, $m1, $s1) = explode(":", $hora1);
+        list($h2, $m2, $s2) = explode(":", $hora2);
+    
+        // Convertir todo a segundos
+        $segundosTotales = ($h1 * 3600 + $m1 * 60 + $s1) + ($h2 * 3600 + $m2 * 60 + $s2);
+    
+        // Calcular la nueva hora
+        $horas = floor($segundosTotales / 3600);
+        $minutos = floor(($segundosTotales % 3600) / 60);
+        $segundos = $segundosTotales % 60;
+    
+        // Formatear la salida con dos dígitos (ej: "01:02:03")
+        return sprintf("%02d:%02d:%02d", $horas, $minutos, $segundos);
+    }
+
     public function generar_salidas(Request $request)
     {
         $especial = Especial::find($request->especial);
@@ -192,7 +209,28 @@ class TiempoController extends Controller
         $parametros = $evento->parametros;
         $o_partida = $evento->opartidas;
 
-        return $request->all();
+        // Eliminar tiempos generados
+        $especial->tiempos()->delete();
+
+        // Variables para calcular las 'horas de partida'
+        $intervalo = $parametros->intervalo;
+        $hora_partida = $parametros->hora_partida;
+
+        if (count($o_partida) === 0) return response()->json(['error' => 'No hay Orden de Partida'], 412);
+
+        foreach ($o_partida as $item)
+        {
+            Tiempo::create([
+                'especial_id' => $especial->id,
+                'tripulacion_id' => $item->tripulacion_id,
+                'hora_salida' => $hora_partida,
+                'hora_marcado' => '00:00:00.0',
+            ]);
+
+            $hora_partida = $this->sumarTiempos($hora_partida, $intervalo);
+        }
+
+        return response()->json('Salidas Generadas');
     }
 
     /**

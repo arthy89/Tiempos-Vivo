@@ -160,10 +160,13 @@ class ParametrosController extends Controller
         $intervalo = $request->intervalo;
         $hora_partida = $request->hora_partida;
 
+        
         // Si el boton presionado fue 'Gen. Inscripcion'
         if ($request->modo_partida === 'inscritos')
         {
             $tripulaciones = Tripulacion::where('event_id', $parametro->event_id)->get();
+
+            if (count($tripulaciones->all()) === 0) return response()->json(['error' => 'No hay Tripulaciones Inscritas'], 412);
 
             foreach ($tripulaciones as $tripulacion)
             {

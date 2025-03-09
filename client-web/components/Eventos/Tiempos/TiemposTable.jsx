@@ -36,6 +36,7 @@ import "jspdf-autotable";
 // import Gen_Pdf from "@/components/PDF/Gen_Pdf";
 
 import echo from "@/components/utils/echo";
+import ModalConfirm from "./ModalConfirm";
 
 function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
   const url = process.env.NEXT_PUBLIC_SERVER_URI;
@@ -193,13 +194,25 @@ function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
     return `+ ${hours > 0 ? hours + ":" : ""}${minutes < 10 && hours > 0 ? "0" + minutes : minutes}:${seconds < 10 ? "0" : ""}${seconds}.${milliseconds}`;
   };
 
+
+  // ? GENERAR SALIDAS
+  //* Funcion para abrir el Modal <ModalConfirm />
+  const [isConf, setConf] = useState(false); // Modal de foto
+  const abrirConf = async () => {
+    setConf(true);
+  };
+  
   const gen_salida = async () => {
     try {
       const res = await TIemposService.post({
         especial: selEsp
       });
-      console.log('ressss', res);
+      setConf(false);
+      mutarList()
+      showToast(res, "success");
     } catch (error) {
+      showToast(error.response.data.error, "error");
+      setConf(false);
       console.log('error', error);
     }
   };
@@ -480,7 +493,7 @@ function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
               </Button>
 
               <Button
-                onPress={() => gen_salida()}
+                onPress={() => abrirConf()}
                 color="success"
                 isIconOnly
               >
@@ -658,6 +671,12 @@ function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
         datos={selectData}
         delFicha={delFicha}
         onClose={onClose}
+      />
+
+      <ModalConfirm
+        isOpen={isConf}
+        onOpenChange={setConf}
+        gen_salida={gen_salida}
       />
 
       {/* PDF */}
