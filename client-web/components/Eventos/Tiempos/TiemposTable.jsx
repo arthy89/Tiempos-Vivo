@@ -22,6 +22,7 @@ import { FaFile } from "react-icons/fa6";
 import { CiSearch } from "react-icons/ci";
 import { PiPencilSimpleFill } from "react-icons/pi";
 import { BsTrash2Fill } from "react-icons/bs";
+import { RxLapTimer } from "react-icons/rx";
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import EspecialService from "@/services/EspecialService";
 import ParametrosService from "@/services/ParametrosService";
@@ -190,6 +191,17 @@ function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
   
     // Return format: HH:MM:SS.m or MM:SS.m when no hours involved
     return `+ ${hours > 0 ? hours + ":" : ""}${minutes < 10 && hours > 0 ? "0" + minutes : minutes}:${seconds < 10 ? "0" : ""}${seconds}.${milliseconds}`;
+  };
+
+  const gen_salida = async () => {
+    try {
+      const res = await TIemposService.post({
+        especial: selEsp
+      });
+      console.log('ressss', res);
+    } catch (error) {
+      console.log('error', error);
+    }
   };
   
   const catRef = useRef('todas');
@@ -468,12 +480,19 @@ function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
               </Button>
 
               <Button
-                onPress={() => pressPdf()}
+                onPress={() => gen_salida()}
                 color="success"
-                // endContent={<MdAutoFixHigh size="1.4em" />}
+                isIconOnly
+              >
+                <RxLapTimer size={"1.4em"} style={{ minWidth: "1.4em" }} />
+              </Button>
+              
+              <Button
+                onPress={() => pressPdf()}
+                // color="success"
+                isIconOnly
               >
                 <FaFile size={"1.4em"} style={{ minWidth: "1.4em" }} />
-                PDF
               </Button>
               
               <Modal

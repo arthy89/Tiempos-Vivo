@@ -595,7 +595,7 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
             <Tooltip color='success' content="PDF - Acumulado">
               <Button
                 onPress={pressPdf}
-                color="success"
+                // color="success"
                 isIconOnly
               >
                 <FaFile size={"1.4em"} style={{ minWidth: "1.4em" }} />

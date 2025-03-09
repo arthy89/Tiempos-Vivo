@@ -6,6 +6,7 @@ use App\Events\TiempoCreado;
 use App\Events\TiempoEditado;
 use App\Models\Tiempo;
 use App\Http\Requests\StoreTiempoRequest;
+use App\Models\Especial;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -182,6 +183,16 @@ class TiempoController extends Controller
         broadcast(new TiempoEditado($tiempo))->toOthers();
 
         return response()->json($tiempo);
+    }
+
+    public function generar_salidas(Request $request)
+    {
+        $especial = Especial::find($request->especial);
+        $evento = $especial->evento;
+        $parametros = $evento->parametros;
+        $o_partida = $evento->opartidas;
+
+        return $request->all();
     }
 
     /**

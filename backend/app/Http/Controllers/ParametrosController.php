@@ -139,14 +139,14 @@ class ParametrosController extends Controller
     public function opartida_params_update(ParametrosRequest $request, Parametro $parametro)
     {
         // Si los parámetros y el Botón son los mismo ya generados
-        // if (
-        //     $request->hora_partida === $parametro->hora_partida && 
-        //     $request->intervalo === $parametro->intervalo &&
-        //     $request->modo_partida === $parametro->modo_partida
-        //     )
-        // {
-        //     return response()->json(['error' => 'Ya se generó el Orden de Partida'], 412);
-        // }
+        if (
+            $request->hora_partida === $parametro->hora_partida && 
+            $request->intervalo === $parametro->intervalo &&
+            $request->modo_partida === $parametro->modo_partida
+            )
+        {
+            return response()->json(['error' => 'Ya se generó el Orden de Partida'], 412);
+        }
         
         // Vaciar la lista y generar una nueva
         $evento = Event::where('id', $parametro->event_id)->first();
