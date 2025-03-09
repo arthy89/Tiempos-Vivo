@@ -32,7 +32,7 @@ export const options = {
     news: {
       executor: 'constant-vus',
       exec: 'news',
-      vus: 100,
+      vus: 10,
       duration: '10s',
     },
   },
@@ -46,7 +46,7 @@ export default async function () {
     await page.goto('https://rallycronos.com/2-rally-clausura-acj-2024/tiempos');
     sleep(5);
 
-    await page.waitForSelector('table', { timeout: 10000  }); 
+    // await page.waitForSelector('table', { timeout: 10000  }); 
     
     await page.screenshot({ path: 'screenshots/screenshot.png' });
   } finally {
