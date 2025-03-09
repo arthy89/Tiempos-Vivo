@@ -139,14 +139,14 @@ class ParametrosController extends Controller
     public function opartida_params_update(ParametrosRequest $request, Parametro $parametro)
     {
         // Si los parámetros y el Botón son los mismo ya generados
-        if (
-            $request->hora_partida === $parametro->hora_partida && 
-            $request->intervalo === $parametro->intervalo &&
-            $request->modo_partida === $parametro->modo_partida
-            )
-        {
-            return response()->json(['error' => 'Ya se generó el Orden de Partida'], 412);
-        }
+        // if (
+        //     $request->hora_partida === $parametro->hora_partida && 
+        //     $request->intervalo === $parametro->intervalo &&
+        //     $request->modo_partida === $parametro->modo_partida
+        //     )
+        // {
+        //     return response()->json(['error' => 'Ya se generó el Orden de Partida'], 412);
+        // }
         
         // Vaciar la lista y generar una nueva
         $evento = Event::where('id', $parametro->event_id)->first();
@@ -193,6 +193,8 @@ class ParametrosController extends Controller
     
             $especial_skdw = $evento_lite->especiales[0]->load(['tiempos']);
             $tiempos_skdw = $especial_skdw->tiempos->sortBy('hora_marcado')->values();
+
+            if (count($tiempos_skdw) === 0) return response()->json(['error' => 'No hay Shakedown'], 412);
     
             foreach ($tiempos_skdw as $tiempo)
             {
@@ -212,20 +214,22 @@ class ParametrosController extends Controller
         {
             // Consulta para traer el evento con especiales y tiempos
             $query = Event::where('id', $parametro->event_id)
-                ->without(['org', 'ubigeo', 'tripulaciones'])  // Excluir relaciones no necesarias
-                ->with(['especiales' => function ($query) {
-                    // Filtrar solo los especiales donde estado es true
-                    $query->where('estado', true);
-                }, 'especiales.tiempos' => function ($query) {
-                    // Ordenar por hora marcada
-                    $query->orderBy('hora_marcado', 'asc');
-                }]);
+                    ->without(['org', 'ubigeo', 'tripulaciones'])  // Excluir relaciones no necesarias
+                    ->with(['especiales' => function ($query) {
+                        // Filtrar solo los especiales donde estado es true
+                        $query->where('estado', true);
+                    }, 'especiales.tiempos' => function ($query) {
+                        // Ordenar por hora marcada
+                        $query->orderBy('hora_marcado', 'asc');
+                    }]);
 
             // Obtener los datos del evento
             $eventData = $query->get();
 
             // Acumular los tiempos de las tripulaciones
             $tiemposAcumulados = $this->calcularTiemposAcumulados($eventData->pluck('especiales.*.tiempos')->flatten());
+
+            if (count($tiemposAcumulados) === 0) return response()->json(['error' => 'No hay Tiempos'], 412);
 
             foreach ($tiemposAcumulados as $tiempo_acum)
             {
