@@ -224,6 +224,10 @@ class ParametrosController extends Controller
                     }, 'especiales.tiempos' => function ($query) {
                         // Ordenar por hora marcada
                         $query->orderBy('hora_marcado', 'asc');
+
+                        // Filtrar tiempos inválidos (hora_llegada no nula y hora_marcado distinto de 00:00:00.0)
+                        $query->whereNotNull('hora_llegada')
+                            ->where('hora_marcado', '!=', '00:00:00.0');
                     }]);
 
             // Obtener los datos del evento
