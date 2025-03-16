@@ -10,6 +10,7 @@ import {
   Button,
   Tooltip,
   TimeInput,
+  Chip,
 } from "@nextui-org/react";
 import { FaCheckCircle } from "react-icons/fa";
 import { FaFile } from "react-icons/fa6";
@@ -97,6 +98,7 @@ function OrdenPartida({ idEvent, eventName, modo }) {
     try {
       const res = await ParametrosService.put(updatedParams);
       ListarPartidasGet();
+      paramsMutate()
       Toast(res, "success");
     } catch (error) {
       console.log("Error al actualizar", error.response.data.error);
@@ -183,6 +185,19 @@ function OrdenPartida({ idEvent, eventName, modo }) {
       Toast("Error al Actualizar el Orden de Partida", "error")
     }
   }
+
+  // Renderizar el CHIP
+  function ModoPartida(props) {
+    const modo_partida = props.modo
+    if (modo_partida == 'inscritos')
+      return (<Chip color="primary">Modo: Inscritos</Chip>);
+    
+    if (modo_partida == 'shakedown')
+      return (<Chip color="warning">Modo: Shakedown</Chip>);
+    
+    if (modo_partida == 'acumulado')
+      return (<Chip color="danger">Modo: Acumulado</Chip>);
+  };
 
   // * Para el PDF
   const pressPdf = () => {
@@ -323,9 +338,13 @@ function OrdenPartida({ idEvent, eventName, modo }) {
                     onChange={(time) => {
                       handleChange("intervalo", formatTime(time));
                     }}
-                  />
+                  />                  
                 </div>
               </div>
+            </div>
+
+            <div className='my-2'>
+              <ModoPartida modo={params?.modo_partida} />
             </div>
 
             <div className="flex flex-col gap-2 pb-2">

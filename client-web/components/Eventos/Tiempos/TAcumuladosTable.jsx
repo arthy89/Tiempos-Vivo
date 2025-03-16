@@ -317,8 +317,8 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
     doc.setFontSize(12);
     doc.text(`Tiempos Consolidados`, 14, 20);
     
-    doc.setFontSize(8);
-    doc.text(`P: Penalizacion | P.A: Penalización Acumulada`, 14, 23);
+    // doc.setFontSize(8);
+    // doc.text(`P: Penalizacion | P.A: Penalización Acumulada`, 14, 23);
 
     // Obtener dinámicamente los nombres de los especiales
     const especialesHeaders = evento[0].especiales.map((e) => e.nombre); // PE1, PE2, PE3, etc.
@@ -373,7 +373,7 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
 
     // Generar tabla con cabecera corregida
     doc.autoTable({
-      startY: 25,
+      startY: 23,
       head: headRows,
       body: tableData,
       styles: {
@@ -595,7 +595,7 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
             <Tooltip color='success' content="PDF - Acumulado">
               <Button
                 onPress={pressPdf}
-                color="success"
+                // color="success"
                 isIconOnly
               >
                 <FaFile size={"1.4em"} style={{ minWidth: "1.4em" }} />

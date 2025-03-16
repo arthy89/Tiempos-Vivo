@@ -93,14 +93,30 @@ class EventController extends Controller
         $categoria = $request->input('categoria');
         $eventId = $request->input('event_id');
 
-        // Consulta para traer el evento con especiales y tiempos
+        // // Consulta para traer el evento con especiales y tiempos
+        // $query = Event::where('id', $eventId)
+        //     ->without(['org', 'ubigeo', 'tripulaciones'])  // Excluir relaciones no necesarias
+        //     ->with(['especiales' => function ($query) {
+        //         // Filtrar solo los especiales donde estado es true
+        //         $query->where('estado', true);
+        //     }, 'especiales.tiempos' => function ($query) use ($categoria) {
+        //         // Ordenar por hora marcada
+        //         $query->orderBy('hora_marcado', 'asc');
+
+        //         // Filtrar por categoría si se proporciona
+        //         if ($categoria && $categoria != 'todas') {
+        //             $query->whereHas('tripulacion', function ($q) use ($categoria) {
+        //                 $q->where('categoria', $categoria);
+        //             });
+        //         }
+        //     }]);
+
+        // Consulta para traer el evento con especiales y tiempos válidos
         $query = Event::where('id', $eventId)
-            ->without(['org', 'ubigeo', 'tripulaciones'])  // Excluir relaciones no necesarias
+            ->without(['org', 'ubigeo', 'tripulaciones'])
             ->with(['especiales' => function ($query) {
-                // Filtrar solo los especiales donde estado es true
                 $query->where('estado', true);
             }, 'especiales.tiempos' => function ($query) use ($categoria) {
-                // Ordenar por hora marcada
                 $query->orderBy('hora_marcado', 'asc');
 
                 // Filtrar por categoría si se proporciona
@@ -109,6 +125,10 @@ class EventController extends Controller
                         $q->where('categoria', $categoria);
                     });
                 }
+
+                // Filtrar tiempos inválidos (hora_llegada no nula y hora_marcado distinto de 00:00:00.0)
+                $query->whereNotNull('hora_llegada')
+                    ->where('hora_marcado', '!=', '00:00:00.0');
             }]);
 
         // Obtener los datos del evento
@@ -202,6 +222,10 @@ class EventController extends Controller
             }, 'especiales.tiempos' => function ($query) {
                 // Ordenar por hora marcada
                 $query->orderBy('hora_marcado', 'asc');
+
+                // Filtrar tiempos inválidos (hora_llegada no nula y hora_marcado distinto de 00:00:00.0)
+                $query->whereNotNull('hora_llegada')
+                    ->where('hora_marcado', '!=', '00:00:00.0');
             }]);
 
         // Obtener los datos del evento

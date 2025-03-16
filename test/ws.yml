@@ -1,0 +1,22 @@
+config:
+  target: "wss://ws.rallycronos.com/app/tigddxftr8t7ck8rypbw?protocol=7&client=js&version=8.4.0&flash=false"
+  phases:
+    - duration: 60  # Duración de la prueba
+      arrivalRate: 10  # 10 usuarios por segundo
+      rampTo: 50  # Aumenta gradualmente hasta 50 usuarios por segundo
+  processor: "./wss.js" # Script personalizado
+
+scenarios:
+  - engine: ws
+    flow:
+      - send: 
+          text: "Hola desde Artillery" # Mensaje de prueba
+      - think: 2  # Espera 2 segundos
+      - send: 
+          text: "Otro mensaje de prueba"
+      - think: 2
+      - loop:
+          - send:
+              text: "Mensaje en bucle"
+          - think: 1
+        count: 5

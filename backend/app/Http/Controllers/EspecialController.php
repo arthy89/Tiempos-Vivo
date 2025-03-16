@@ -54,6 +54,12 @@ class EspecialController extends Controller
         // Modifica la consulta para trabajar sobre el modelo Tiempo
         $query = Tiempo::where('especial_id', $especial)
             ->with(['tripulacion.piloto', 'tripulacion.navegante'])
+            ->orderByRaw("
+                CASE 
+                    WHEN hora_marcado = '00:00:00.0' AND hora_llegada IS NULL THEN 1
+                    ELSE 0
+                END
+            ")
             ->orderBy('hora_marcado', 'asc');
 
         // Aplica el filtro de categoría si se proporciona
@@ -62,6 +68,8 @@ class EspecialController extends Controller
                 $q->where('categoria', $categoria);
             });
         }
+
+        // return $query->get();
 
         // Genera la vista o lista con la función personalizada
         return $this->BestGenerateViewSetList(

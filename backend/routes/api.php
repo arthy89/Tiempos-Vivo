@@ -71,6 +71,7 @@ Route::apiResource('/categorias', CategoriaController::class)->middleware([Handl
 Route::apiResource('/especials', EspecialController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::get('/especial_tiempos', [EspecialController::class, 'show_tiempos'])->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/tiempos', TiempoController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::post('/generar_salidas', [TiempoController::class, 'generar_salidas']);
 Route::apiResource('/shakedowns', ShakedownController::class)->middleware([HandlePrecognitiveRequests::class]);
 
 Route::apiResource('/drivers', DriverController::class)->middleware([HandlePrecognitiveRequests::class]);

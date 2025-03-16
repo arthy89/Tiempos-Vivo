@@ -23,7 +23,7 @@ class Especial extends Model
 
     public function evento(): BelongsTo
     {
-        return $this->belongsTo(Event::class);
+        return $this->belongsTo(Event::class, 'event_id');
     }
 
     public function tiempos(): HasMany

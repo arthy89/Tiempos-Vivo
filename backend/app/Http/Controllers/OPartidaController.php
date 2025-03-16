@@ -45,6 +45,8 @@ class OPartidaController extends Controller
     {
         // $list_partida_old = OPartidas::where('event_id', $request[0]['event_id'])->get();
 
+        if (count($request->all()) === 0) return response()->json(['error' => 'No hay Orden de Partida'], 412);
+
         // Recorrer la nueva lista y actualizar en la base de datos
         foreach ($request->all() as $item) {
             OPartidas::where('id', $item['id'])->update([

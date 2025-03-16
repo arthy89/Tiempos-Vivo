@@ -16,6 +16,10 @@ class TIemposService {
   static async delete(id) {
     return await api.delete(`api/tiempos/${id}`);
   }
+
+  static async post(reg) {
+    return (await api.post('api/generar_salidas', reg)).data;
+  }
 }
 
 export default TIemposService;
