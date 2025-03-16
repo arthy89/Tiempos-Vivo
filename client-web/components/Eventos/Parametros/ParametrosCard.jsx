@@ -92,7 +92,7 @@ function ParametrosCard({ idEvent, especiales }) {
 
               <Switch
                 color="danger"
-                isSelected={params.estado_evento}
+                isSelected={parseInt(params.estado_evento)}
                 // onValueChange={(value) => form.setData('estado', value)}
                 onValueChange={(value) => setParams(prevState => ({
                   ...prevState,

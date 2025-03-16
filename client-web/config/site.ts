@@ -3,6 +3,16 @@ export type SiteConfig = typeof siteConfig;
 export const siteConfig = {
   name: "Rally Cronos Perú",
   description: "Tiempos en Vivo de competencias de Rally del Perú.",
+  keywords: [
+    "rally",
+    "rally en vivo",
+    "tiempos en vivo",
+    "rally Perú",
+    "competencias automovilísticas",
+    "cronometraje rally",
+    "Rally Cronos Perú",
+    "rallycronos",
+  ],
   navItems: [
     {
       label: "Inicio",
