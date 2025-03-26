@@ -313,7 +313,7 @@ function OrdenPartida({ idEvent, eventName, modo }) {
               <div className="flex items-end justify-between gap-3">
                 <div className="flex gap-2">
                   <TimeInput 
-                    label="Hora de Partida"
+                    label="H. Partida"
                     labelPlacement="outside"
                     variant="bordered"
                     hourCycle="24"
@@ -324,6 +324,7 @@ function OrdenPartida({ idEvent, eventName, modo }) {
                       const pad = (num) => String(num).padStart(2, "0");
                       handleChange("hora_partida", `${pad(time.hour)}:${pad(time.minute)}:00`);
                     }}
+                    className="no-zoom"
                   />
                   
                   <TimeInput 
@@ -338,6 +339,7 @@ function OrdenPartida({ idEvent, eventName, modo }) {
                     onChange={(time) => {
                       handleChange("intervalo", formatTime(time));
                     }}
+                    className="no-zoom"
                   />                  
                 </div>
               </div>

@@ -6,3 +6,17 @@
   font-size: 10px;
   padding: 3px;
 } */
+
+input, textarea, select {
+  font-size: 16px !important;
+  touch-action: manipulation;
+}
+
+.no-zoom {
+  font-size: 16px !important;
+  touch-action: manipulation;
+}
+
+.no-zoom * {
+  font-size: 16px !important;
+}

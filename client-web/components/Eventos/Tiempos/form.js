@@ -153,6 +153,9 @@ const Form = forwardRef(
                 isInvalid={form.invalid("hora_salida")}
                 errorMessage={form.errors.hora_salida}
                 isRequired
+                className="no-zoom"
+                // style={{ fontSize: "16px" }}
+                // size="lg"
               />
 
               <Input
@@ -166,6 +169,7 @@ const Form = forwardRef(
                 max="9"
                 maxLength="1"
                 placeholder="0"
+                // size="lg"
                 value={form.data.hora_salida?.split('.')[1]}
                 onChange={(e) => handleMilisecondChange(e, "hora_salida")} // Pasar el campo dinámicamente
               />
@@ -187,6 +191,7 @@ const Form = forwardRef(
                 isInvalid={form.invalid("hora_llegada")}
                 errorMessage={form.errors.hora_llegada}
                 isRequired
+                className="no-zoom"
               />
 
               <Input
@@ -219,6 +224,7 @@ const Form = forwardRef(
               onBlur={() => form.validate("penalizacion")}
               isInvalid={form.invalid("penalizacion")}
               errorMessage={form.errors.penalizacion}
+              className="no-zoom"
             />
 
             <Divider className="my-1" />
@@ -239,6 +245,7 @@ const Form = forwardRef(
                 isInvalid={form.invalid("hora_marcado")}
                 errorMessage={form.errors.hora_marcado}
                 isRequired
+                className="no-zoom"
               />
 
               <Input

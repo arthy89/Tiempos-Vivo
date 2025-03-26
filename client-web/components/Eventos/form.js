@@ -260,6 +260,7 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
             isInvalid={form.invalid("fecha")}
             errorMessage={form.errors.fecha}
             isRequired
+            className="no-zoom"
           />
 
           <p className="text-sm text-default-500">
@@ -288,6 +289,7 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
             isInvalid={form.invalid("hora")}
             errorMessage={form.errors.hora}
             isRequired
+            className="no-zoom"
           />
 
           <p className="text-sm text-default-500">
