@@ -411,5 +411,5 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
     </>
   );
 });
-Form.displayName = "TripulacionForm";
+Form.displayName = "EventoForm";
 export default Form;
