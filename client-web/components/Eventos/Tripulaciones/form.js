@@ -1,6 +1,9 @@
 import {
   Button,
   Input,
+  Modal,
+  ModalContent,
+  ModalHeader,
   ModalBody,
   ModalFooter,
   Select,
@@ -20,7 +23,7 @@ import SearchInput from "@/components/utils/SearchInput";
 import CategoriaService from "@/services/CategoriaService";
 
 const Form = forwardRef(
-  ({ save, isEdit, id, onClose, idEvent, onSelectConductor }, ref) => {
+  ({ isOpen, onOpenChange, save, isEdit, id, idEvent }, ref) => {
     const [datos, setDatos] = useState(null);
 
     const endpoint = isEdit
@@ -112,6 +115,9 @@ const Form = forwardRef(
     });
 
     const onSave = async (event) => {
+      event.preventDefault();
+      console.log("onSave ha sido llamado"); // <- Esto debería aparecer
+      
       // console.log('EVENTTTTTTT', idEvent);
       form.setData("event_id", idEvent);
 
@@ -125,7 +131,6 @@ const Form = forwardRef(
         form.setData("navegante", form.data.navegante.id);
       }
 
-      event.preventDefault();
 
       form
         .submit()
@@ -134,149 +139,151 @@ const Form = forwardRef(
         })
         .catch((e) => {
           console.log("El error!!!!", e);
-          // setAlertMessage("Error en el formulario");
-          // setAlertVisible(true);
-
-          // alert(e);
-          // <NextuiAlert
-          //     severity="warning"
-          //     title="Reward Received"
-          //     startContent={<IoCloseCircle />}
-          //     endContent={
-          //         <Button size="sm" variant="bordered" color="warning">
-          //             Eat Now
-          //         </Button>
-          //     }>
-          //     You've got a Pizza!
-          // </NextuiAlert>
         });
     };
 
     return (
       <>
-        <form ref={ref} onSubmit={onSave} className="flex flex-col gap-2">
-          <ModalBody>
-            <SearchInput
-              label="Piloto"
-              formKey="piloto"
-              form={form}
-              placeholder="Buscar Piloto..."
-              initialValue={
-                form.data.piloto?.nombre
-                  ? `${form.data.piloto.nombre} ${form.data.piloto.apellidos}`
-                  : ""
-              }
-            />
+        <Modal
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+          placement="center"
+          scrollBehavior="outside"
+        >
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1">
+                  {isEdit ? "Editar Tripulación" : "Agregar Tripulación"}
+                </ModalHeader>
 
-            <SearchInput
-              label="Navegante"
-              formKey="navegante"
-              form={form}
-              placeholder="Buscar Navegante..."
-              initialValue={
-                form.data.navegante?.nombre
-                  ? `${form.data.navegante.nombre} ${form.data.navegante.apellidos}`
-                  : ""
-              }
-            />
+                <form ref={ref} onSubmit={onSave} className="flex flex-col gap-2">
+                  <ModalBody>
+                    <SearchInput
+                      label="Piloto"
+                      formKey="piloto"
+                      form={form}
+                      placeholder="Buscar Piloto..."
+                      initialValue={
+                        form.data.piloto?.nombre
+                          ? `${form.data.piloto.nombre} ${form.data.piloto.apellidos}`
+                          : ""
+                      }
+                    />
 
-            <Select
-              variant="bordered"
-              label="Categoría"
-              labelPlacement="outside"
-              placeholder="Categoría..."
-              value={form.data.categoria}
-              selectedKeys={[form.data.categoria]}
-              color={form.invalid("categoria") ? "danger" : "success"}
-              onChange={(e) => {
-                form.setData("categoria", e.target.value);
-              }}
-              onBlur={() => form.validate("categoria")}
-              isInvalid={form.invalid("categoria")}
-              errorMessage={form.errors.categoria}
-              isRequired
-            >
-              {categorias?.data.map((cat) => (
-                <SelectItem key={cat.name} value={cat.name}>
-                  {cat.name}
-                </SelectItem>
-              ))}
-            </Select>
+                    <SearchInput
+                      label="Navegante"
+                      formKey="navegante"
+                      form={form}
+                      placeholder="Buscar Navegante..."
+                      initialValue={
+                        form.data.navegante?.nombre
+                          ? `${form.data.navegante.nombre} ${form.data.navegante.apellidos}`
+                          : ""
+                      }
+                    />
 
-            <Input
-              label="Vehículo"
-              placeholder="Marca - Modelo"
-              isRequired
-              labelPlacement="outside"
-              type="text"
-              variant="bordered"
-              value={form.data.auto}
-              color={form.invalid("auto") ? "danger" : "success"}
-              onValueChange={(e) => form.setData("auto", e)}
-              onBlur={() => form.validate("auto")}
-              isInvalid={form.invalid("auto")}
-              errorMessage={form.errors.auto}
-            />
+                    <Select
+                      variant="bordered"
+                      label="Categoría"
+                      labelPlacement="outside"
+                      placeholder="Categoría..."
+                      value={form.data.categoria}
+                      selectedKeys={[form.data.categoria]}
+                      color={form.invalid("categoria") ? "danger" : "success"}
+                      onChange={(e) => {
+                        form.setData("categoria", e.target.value);
+                      }}
+                      onBlur={() => form.validate("categoria")}
+                      isInvalid={form.invalid("categoria")}
+                      errorMessage={form.errors.categoria}
+                      isRequired
+                    >
+                      {categorias?.data.map((cat) => (
+                        <SelectItem key={cat.name} value={cat.name}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </Select>
 
-            <Input
-              label="Número"
-              placeholder="Num del Vehículo..."
-              isRequired
-              labelPlacement="outside"
-              type="number"
-              variant="bordered"
-              value={form.data.auto_num}
-              color={form.invalid("auto_num") ? "danger" : "success"}
-              onValueChange={(e) => form.setData("auto_num", e)}
-              onBlur={() => form.validate("auto_num")}
-              isInvalid={form.invalid("auto_num")}
-              errorMessage={form.errors.auto_num}
-            />
+                    <Input
+                      label="Vehículo"
+                      placeholder="Marca - Modelo"
+                      isRequired
+                      labelPlacement="outside"
+                      type="text"
+                      variant="bordered"
+                      value={form.data.auto}
+                      color={form.invalid("auto") ? "danger" : "success"}
+                      onValueChange={(e) => form.setData("auto", e)}
+                      onBlur={() => form.validate("auto")}
+                      isInvalid={form.invalid("auto")}
+                      errorMessage={form.errors.auto}
+                    />
 
-            <Divider className="my-1" />
+                    <Input
+                      label="Número"
+                      placeholder="Num del Vehículo..."
+                      isRequired
+                      labelPlacement="outside"
+                      type="number"
+                      variant="bordered"
+                      value={form.data.auto_num}
+                      color={form.invalid("auto_num") ? "danger" : "success"}
+                      onValueChange={(e) => form.setData("auto_num", e)}
+                      onBlur={() => form.validate("auto_num")}
+                      isInvalid={form.invalid("auto_num")}
+                      errorMessage={form.errors.auto_num}
+                    />
 
-            <p className="text-sm text-success">
-              {isEdit
-                ? "Cambiar Foto (Opcional)"
-                : "Foto del Vehiculo (Opcional)"}
-            </p>
+                    <Divider className="my-1" />
 
-            <div className="px-4 py-2">
-              <div
-                {...getRootProps()}
-                className="px-4 py-2 border-2 border-green-300 rounded-lg cursor-pointer hover:border-green-500 hover:bg-zinc-50 dark:border-green-500 dark:hover:border-green-700 dark:hover:bg-zinc-800"
-              >
-                <input {...getInputProps()} />
-                {isDragActive ? (
-                  <p className="text-sm text-center">
-                    Suelta la imagen aquí...
-                  </p>
-                ) : (
-                  <p className="text-sm text-center">Seleccionar imagen</p>
-                )}
-              </div>
+                    <p className="text-sm text-success">
+                      {isEdit
+                        ? "Cambiar Foto (Opcional)"
+                        : "Foto del Vehiculo (Opcional)"}
+                    </p>
 
-              {preview && (
-                <div className="flex justify-center mt-4">
-                  <img
-                    src={preview}
-                    alt="Vista previa"
-                    className="object-cover rounded-md w-50"
-                  />
-                </div>
-              )}
-            </div>
-          </ModalBody>
+                    <div className="px-4 py-2">
+                      <div
+                        {...getRootProps()}
+                        className="px-4 py-2 border-2 border-green-300 rounded-lg cursor-pointer hover:border-green-500 hover:bg-zinc-50 dark:border-green-500 dark:hover:border-green-700 dark:hover:bg-zinc-800"
+                      >
+                        <input {...getInputProps()} />
+                        {isDragActive ? (
+                          <p className="text-sm text-center">
+                            Suelta la imagen aquí...
+                          </p>
+                        ) : (
+                          <p className="text-sm text-center">Seleccionar imagen</p>
+                        )}
+                      </div>
 
-          <ModalFooter>
-            <Button color="danger" variant="flat" onPress={onClose}>
-              Cerrar
-            </Button>
-            <Button color="primary" type="submit">
-              Guardar
-            </Button>
-          </ModalFooter>
-        </form>
+                      {preview && (
+                        <div className="flex justify-center mt-4">
+                          <img
+                            src={preview}
+                            alt="Vista previa"
+                            className="object-cover rounded-md w-50"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </ModalBody>
+
+                  <ModalFooter>
+                    <Button color="danger" variant="flat" onPress={onClose}>
+                      Cerrar
+                    </Button>
+                    <Button color="primary" type="submit">
+                      Guardar
+                    </Button>
+                  </ModalFooter>
+                </form>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
       </>
     );
   },

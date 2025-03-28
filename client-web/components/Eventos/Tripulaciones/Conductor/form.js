@@ -1,5 +1,13 @@
 import React from "react";
-import { Button, Input, ModalBody, ModalFooter } from "@nextui-org/react";
+import { 
+  Button, 
+  Input,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody, 
+  ModalFooter 
+} from "@nextui-org/react";
 import "filepond/dist/filepond.min.css";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import "@/styles/editfilepond.css"; // Si tienes tus propios estilos personalizados.
@@ -10,12 +18,8 @@ import { formData } from "./formData";
 
 import TripulacionService from "@/services/TripulacionService";
 
-const Form = forwardRef(({ save, isEdit, id, onClose, idEvent }, ref) => {
+const Form = forwardRef(({ isOpen, onOpenChange, save, isEdit, id }, ref) => {
   const [datos, setDatos] = useState(null);
-
-  // Estados para la alerta
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
 
   // ! ENVIAR FORM
   // const form = isEdit
@@ -55,74 +59,75 @@ const Form = forwardRef(({ save, isEdit, id, onClose, idEvent }, ref) => {
       .submit()
       .then(() => {
         save();
+        form.setData("nombre", "");
+        form.setData("apellidos", "");
       })
       .catch((e) => {
         console.log("El error!!!!", e);
-        // setAlertMessage("Error en el formulario");
-        // setAlertVisible(true);
-
-        // alert(e);
-        // <NextuiAlert
-        //     severity="warning"
-        //     title="Reward Received"
-        //     startContent={<IoCloseCircle />}
-        //     endContent={
-        //         <Button size="sm" variant="bordered" color="warning">
-        //             Eat Now
-        //         </Button>
-        //     }>
-        //     You've got a Pizza!
-        // </NextuiAlert>
       });
-
-    form.setData("nombre", "");
-    form.setData("apellidos", "");
   };
 
   return (
     <>
-      <form ref={ref} onSubmit={onSave} className="flex flex-col gap-2">
-        <ModalBody>
-          <Input
-            label="Nombre"
-            placeholder="Nombre..."
-            isRequired
-            labelPlacement="outside"
-            type="text"
-            variant="bordered"
-            value={form.data.nombre}
-            color={form.invalid("nombre") ? "danger" : "success"}
-            onValueChange={(e) => form.setData("nombre", e)}
-            onBlur={() => form.validate("nombre")}
-            isInvalid={form.invalid("nombre")}
-            errorMessage={form.errors.nombre}
-          />
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        placement="center"
+        scrollBehavior="outside"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Crear Nuevo Piloto/Copiloto
+              </ModalHeader>
 
-          <Input
-            label="Apellidos"
-            placeholder="Apellidos..."
-            isRequired
-            labelPlacement="outside"
-            type="text"
-            variant="bordered"
-            value={form.data.apellidos}
-            color={form.invalid("apellidos") ? "danger" : "success"}
-            onValueChange={(e) => form.setData("apellidos", e)}
-            onBlur={() => form.validate("apellidos")}
-            isInvalid={form.invalid("apellidos")}
-            errorMessage={form.errors.apellidos}
-          />
-        </ModalBody>
+              <form ref={ref} onSubmit={onSave} className="flex flex-col gap-2">
+                <ModalBody>
+                  <Input
+                    label="Nombre"
+                    placeholder="Nombre..."
+                    isRequired
+                    labelPlacement="outside"
+                    type="text"
+                    variant="bordered"
+                    value={form.data.nombre}
+                    color={form.invalid("nombre") ? "danger" : "success"}
+                    onValueChange={(e) => form.setData("nombre", e)}
+                    onBlur={() => form.validate("nombre")}
+                    isInvalid={form.invalid("nombre")}
+                    errorMessage={form.errors.nombre}
+                  />
 
-        <ModalFooter>
-          {/* <Button color='danger' variant='flat' onPress={onClose}>
-            Cerrar
-          </Button> */}
-          <Button color="primary" type="submit">
-            Agregar Conductor
-          </Button>
-        </ModalFooter>
-      </form>
+                  <Input
+                    label="Apellidos"
+                    placeholder="Apellidos..."
+                    isRequired
+                    labelPlacement="outside"
+                    type="text"
+                    variant="bordered"
+                    value={form.data.apellidos}
+                    color={form.invalid("apellidos") ? "danger" : "success"}
+                    onValueChange={(e) => form.setData("apellidos", e)}
+                    onBlur={() => form.validate("apellidos")}
+                    isInvalid={form.invalid("apellidos")}
+                    errorMessage={form.errors.apellidos}
+                  />
+                </ModalBody>
+
+                <ModalFooter>
+                  <Button color='danger' variant='flat' onPress={onClose}>
+                    Cerrar
+                  </Button>
+                  <Button color="primary" type="submit">
+                    Guardar Piloto
+                  </Button>
+                </ModalFooter>
+              </form>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </>
   );
 });
