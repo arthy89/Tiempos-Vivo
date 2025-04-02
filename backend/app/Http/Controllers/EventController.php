@@ -93,24 +93,6 @@ class EventController extends Controller
         $categoria = $request->input('categoria');
         $eventId = $request->input('event_id');
 
-        // // Consulta para traer el evento con especiales y tiempos
-        // $query = Event::where('id', $eventId)
-        //     ->without(['org', 'ubigeo', 'tripulaciones'])  // Excluir relaciones no necesarias
-        //     ->with(['especiales' => function ($query) {
-        //         // Filtrar solo los especiales donde estado es true
-        //         $query->where('estado', true);
-        //     }, 'especiales.tiempos' => function ($query) use ($categoria) {
-        //         // Ordenar por hora marcada
-        //         $query->orderBy('hora_marcado', 'asc');
-
-        //         // Filtrar por categoría si se proporciona
-        //         if ($categoria && $categoria != 'todas') {
-        //             $query->whereHas('tripulacion', function ($q) use ($categoria) {
-        //                 $q->where('categoria', $categoria);
-        //             });
-        //         }
-        //     }]);
-
         // Consulta para traer el evento con especiales y tiempos válidos
         $query = Event::where('id', $eventId)
             ->without(['org', 'ubigeo', 'tripulaciones'])

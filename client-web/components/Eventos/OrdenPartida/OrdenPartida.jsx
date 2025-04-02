@@ -11,6 +11,7 @@ import {
   Tooltip,
   TimeInput,
   Chip,
+  Divider,
 } from "@nextui-org/react";
 import { FaCheckCircle } from "react-icons/fa";
 import { FaFile } from "react-icons/fa6";
@@ -19,6 +20,8 @@ import { PiTimerFill } from "react-icons/pi";
 import { FaChevronUp } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa";
 import { PiFlagCheckeredFill } from "react-icons/pi";
+import { BsTrash2Fill } from "react-icons/bs";
+import { RxDividerVertical } from "react-icons/rx";
 import TripulacionService from "@/services/TripulacionService";
 import ParametrosService from "@/services/ParametrosService";
 import { columns as allColumns } from "./columns";
@@ -172,11 +175,18 @@ function OrdenPartida({ idEvent, eventName, modo }) {
     });
   };
 
+  // todo | Guardar la nueva lista
   const guardar_lista = async () => {
     // console.log(listPartida);
+    const nueva_lista = {
+      parametros: params,
+      lista: listPartida,
+    };
+
+    
     try {
-      const res = await OPartidasService.put(listPartida);
-      // console.log("Lista actualizada", res);
+      const res = await OPartidasService.put(nueva_lista);
+      console.log("Lista actualizada", res);
       // opdMutate();
       ListarPartidasGet();
       Toast(res, "success")
@@ -388,6 +398,19 @@ function OrdenPartida({ idEvent, eventName, modo }) {
                       <PiTimerFill size={"1.4em"} style={{ minWidth: "1.4em" }} />
                     </Button>
                   </Tooltip>
+
+                  <Tooltip color='danger' content="Eliminar Lista">
+                    <Button
+                      type='submit'
+                      color="danger"
+                      variant="ghost"
+                      name='action'
+                      value='eliminar'
+                      isIconOnly
+                    >
+                      <BsTrash2Fill size={"1.4em"} style={{ minWidth: "1.4em" }} />
+                    </Button>
+                  </Tooltip>
                   
                   <Button
                     onPress={() => pressPdf()}
@@ -412,7 +435,8 @@ function OrdenPartida({ idEvent, eventName, modo }) {
         isStriped
         aria-label="Tabla de Orden de Partida"
         bottomContent=
-          {modo != "client" && (
+          {modo != "client" && listPartida?.length > 0 && (
+            // listPartida
             <Button
               onPress={() => guardar_lista()}
               color="success"

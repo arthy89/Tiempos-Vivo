@@ -87,7 +87,8 @@ class ParametrosController extends Controller
             $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
     
             // Convertir penalización a Carbon (sin milisegundos, formato H:i:s)
-            $penalizacion = Carbon::createFromFormat('H:i:s', $tiempo->penalizacion ?? '00:00:00');
+            $penalizacionString = explode('.', $tiempo->penalizacion ?? '00:00:00')[0];
+            $penalizacion = Carbon::createFromFormat('H:i:s', $penalizacionString);
     
             // Acumular tiempos y penalizaciones usando diffInMilliseconds con true para evitar valores negativos
             $tiemposAcumulados[$tripulacionId]['tiempo_acumulado']->addMilliseconds($horaMarcado->diffInMilliseconds(Carbon::createFromFormat('H:i:s.u', '00:00:00.000'), true));
@@ -159,7 +160,6 @@ class ParametrosController extends Controller
         // Variables para calcular las 'horas de partida'
         $intervalo = $request->intervalo;
         $hora_partida = $request->hora_partida;
-
         
         // Si el boton presionado fue 'Gen. Inscripcion'
         if ($request->modo_partida === 'inscritos')
@@ -250,6 +250,18 @@ class ParametrosController extends Controller
             }
 
             return response()->json('Orden de Partida Generado correctamente - Acumulado');
+        }
+
+        // todo Eliminar lista
+        if ($request->modo_partida === 'eliminar')
+        {
+            $parametro->update([
+                'hora_partida' => null,
+                'intervalo' => null,
+                'modo_partida' => null,
+            ]);
+
+            return response()->json('Orden de Partida Eliminado');
         }
     }
 
