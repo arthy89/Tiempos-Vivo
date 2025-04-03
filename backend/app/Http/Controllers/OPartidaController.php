@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use App\Models\OPartidas;
 use App\Models\Parametro;
 use Illuminate\Http\Request;
@@ -65,18 +66,35 @@ class OPartidaController extends Controller
         $parametros = $request->parametros;
         $parametro = Parametro::find($parametros['id']);
         $parametro->update($parametros); // Actualizar valores de los Parametros
+        
+        $lista = $request->lista; // Lista Actualizada
 
-        $lista = $request->lista;
+        if (count($lista) === 0) return response()->json(['error' => 'No hay Orden de Partida'], 412);
+
+        // Obtener la Lista Actual del Evento
+        $evento = Event::find($parametro['event_id'])->makeHidden(['org', 'ubigeo', 'tripulaciones', 'categorias', 'especiales']);
+        $evento->opartidas()->delete(); // Eliminar Lista de Partida completa
 
         // Variables para calcular las 'horas de partida'
         $intervalo = $parametros['intervalo'];
         $hora_partida = $parametros['hora_partida'];
 
-        if (count($lista) === 0) return response()->json(['error' => 'No hay Orden de Partida'], 412);
-
         // Recorrer la nueva lista y actualizar en la base de datos
-        foreach ($lista as $item) {
-            OPartidas::where('id', $item['id'])->update([
+        // Funcion donde se actualizaba registro por registro
+        // foreach ($lista as $item) {
+        //     OPartidas::where('id', $item['id'])->update([
+        //         'hora_salida' => $hora_partida,
+        //     ]);
+
+        //     $hora_partida = $this->sumarTiempos($hora_partida, $intervalo);
+        // }
+
+        // Crear nuevos registros para la Lista de Partida
+        foreach ($lista as $item)
+        {
+            OPartidas::create([
+                'event_id' => $parametro['event_id'],
+                'tripulacion_id' => $item['tripulacion_id'],
                 'hora_salida' => $hora_partida,
             ]);
 

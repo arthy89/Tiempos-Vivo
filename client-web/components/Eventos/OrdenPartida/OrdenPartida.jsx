@@ -175,6 +175,10 @@ function OrdenPartida({ idEvent, eventName, modo }) {
     });
   };
 
+  const borrar = (elemento) => {
+    setListPartida((prevList) => prevList.filter((item) => item.id !== elemento.id));
+  };
+
   // todo | Guardar la nueva lista
   const guardar_lista = async () => {
     // console.log(listPartida);
@@ -290,6 +294,7 @@ function OrdenPartida({ idEvent, eventName, modo }) {
                 color="success"
                 isIconOnly
                 radius="full"
+                variant='ghost'
               >
                 <FaChevronUp size="1.6em" />
               </Button>
@@ -303,10 +308,21 @@ function OrdenPartida({ idEvent, eventName, modo }) {
                 color="danger"
                 isIconOnly
                 radius="full"
+                variant='ghost'
               >
                 <FaChevronDown size="1.6em" />
               </Button>
             )}
+
+            {/* Eliminar Tripulacion de la Lista */}
+            <Button
+              onPress={() => borrar(row)}
+              size="sm"
+              color="danger"
+              isIconOnly
+            >
+              <BsTrash2Fill size="1.6em" />
+            </Button>
           </div>
         );
       default:
