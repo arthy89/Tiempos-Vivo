@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('tiempos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('especial_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('tripulacion_id')->constrained();
+            $table->foreignId('tripulacion_id')->constrained()->onDelete('cascade');
             $table->time('hora_salida', 1)->nullable();
             $table->time('hora_llegada', 1)->nullable();
             $table->time('hora_marcado', 1)->nullable(); // Para subir el tiempo directamente
