@@ -44,6 +44,15 @@ class TiempoController extends Controller
     public function store(StoreTiempoRequest $request)
     {
         // return $request;
+        // Validar si la tripulación ya está registrada para este especial
+        $existing = Tiempo::where('especial_id', $request->especial_id)
+                            ->where('tripulacion_id', $request->tripulacion_id)
+                            ->exists();
+
+        if ($existing) {
+            return response()->json(['error' => 'La Tripulación ya tiene Tiempo'], 400);
+        }
+
         // * Crear Tiempo cuando se ingresa directamente el Resultado
         if ($request->hora_marcado) {
             $time_R = $request->except(['hora_salida', 'hora_llegada']);

@@ -107,10 +107,11 @@ const Form = forwardRef(
           showToast("Tiempo guardado", "success");
         })
         .catch((e) => {
-          toast.error("Error, llenar al menos la SALIDA", {
+          toast.error("¡Ocurrio un Error!", {
             position: "top-right",
           });
-          console.log("El error!!!!", e);
+          // Toast(error.response.data.error, "error");
+          console.log("El error!!!!", e.response.data.error);
         });
     };
 
