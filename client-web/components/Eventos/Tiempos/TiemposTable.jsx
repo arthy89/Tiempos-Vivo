@@ -118,16 +118,25 @@ function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
         // Agregar el nuevo tiempo a la lista
         const nuevosTiempos = [...prevTiempos, data.tiempo];
 
-        // Ordenar los tiempos por hora_marcado (ascendente)
+        // Ordenar los tiempos con una sola operación sort que combine ambas condiciones
         nuevosTiempos.sort((a, b) => {
-          const tiempoA = a.hora_marcado; // Obtener hora_marcado del tiempo A
-          const tiempoB = b.hora_marcado; // Obtener hora_marcado del tiempo B
+          // Primero, verificar si tienen hora_llegada inválida (estos van al final)
+          const esHoraLlegadaInvalidaA = a.hora_llegada === null || a.hora_llegada === '00:00:00.0';
+          const esHoraLlegadaInvalidaB = b.hora_llegada === null || b.hora_llegada === '00:00:00.0';
 
-          // Convertir las horas a segundos para compararlas
-          const segundosA = convertirHoraASegundos(tiempoA);
-          const segundosB = convertirHoraASegundos(tiempoB);
+          if (esHoraLlegadaInvalidaA && !esHoraLlegadaInvalidaB) return 1;
+          if (!esHoraLlegadaInvalidaA && esHoraLlegadaInvalidaB) return -1;
 
-          return segundosA - segundosB; // Orden ascendente
+          // Si ambos tienen hora_llegada válida o ambos inválida, ordenar por hora_marcado y hora_salida
+          const segundosA = convertirHoraASegundos(a.hora_marcado);
+          const segundosB = convertirHoraASegundos(b.hora_marcado);
+
+          if (segundosA !== segundosB) {
+            return segundosA - segundosB;
+          }
+
+          // Si las horas marcadas son iguales, desempatar por hora_salida
+          return convertirHoraASegundos(a.hora_salida) - convertirHoraASegundos(b.hora_salida);
         });
 
         return nuevosTiempos;
