@@ -21,13 +21,11 @@ import {
   Tabs,
   Tab,
 } from "@nextui-org/react";
+import toast, { Toaster } from "react-hot-toast";
+import Toast from '@/components/Toast/Toast';
 import { useRouter } from "next/navigation";
-import {
-  MdAutoFixHigh,
-  MdEdit,
-  MdDeleteForever,
-  MdRemoveRedEye,
-} from "react-icons/md";
+import { GiFullMotorcycleHelmet } from "react-icons/gi";
+import { FaCirclePlus } from "react-icons/fa6";
 import { PiPencilSimpleFill } from "react-icons/pi";
 import { BsTrash2Fill } from "react-icons/bs";
 import React, { useMemo, useRef, useState } from "react";
@@ -73,7 +71,13 @@ function TripulacionTable({ idEvent, modo }) {
 
   const onSave = () => {
     mutate();
-    onClose();
+    onCloseTrip();
+    Toast("Tripulación Guardada", "success")
+  };
+
+  const onSavePilot = () => {
+    onClosePilot();
+    Toast("Piloto Guardado", "success")
   };
 
   //* Funcion para abrir el Modal <Foto />
@@ -89,92 +93,14 @@ function TripulacionTable({ idEvent, modo }) {
   };
 
   const loadingState = isLoading || data?.data.legth === 0 ? "loading" : "idle";
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const { isOpen: isOpenTrip, onOpen: onOpenTrip, onOpenChange: onOpenChangeTrip, onClose: onCloseTrip } = useDisclosure();
+  const { isOpen: isOpenPilot, onOpen: onOpenPilot, onOpenChange: onOpenChangePilot, onClose: onClosePilot } = useDisclosure();
+  
   const refForm = useRef(null);
-
-  const topContent = React.useMemo(() => {
-    return (
-      <div className="flex flex-col gap-4 px-4">
-        <div className="flex items-end justify-between gap-3">
-          <span className="text-xl font-bold">Lista de Tripulaciones</span>
-          {modo != "client" && (
-            <div className="flex gap-3">
-              <Button
-                onPress={() => {
-                  setEdit(false);
-                  onOpen();
-                }}
-                color="primary"
-                endContent={<MdAutoFixHigh size="1.4em" />}
-              >
-                Añadir
-              </Button>
-              <Modal
-                isOpen={isOpen}
-                onOpenChange={onOpenChange}
-                placement="center"
-                scrollBehavior="outside"
-              >
-                <ModalContent>
-                  {(onClose) => (
-                    <>
-                      <ModalHeader className="flex flex-col gap-1">
-                        {edit ? "Editar Tripulación" : "Agregar Tripulación"}
-                      </ModalHeader>
-
-                      <div className="flex flex-col justify-center w-full">
-                        <Tabs
-                          aria-label="Options"
-                          className="flex justify-center"
-                        >
-                          <Tab key="tripulacion" title="Tripulación">
-                            <TripulacionForm
-                              save={onSave}
-                              isEdit={edit}
-                              id={id}
-                              onClose={onClose}
-                              ref={refForm}
-                              idEvent={idEvent}
-                            />
-                          </Tab>
-                          <Tab key="conductor" title="Nuevo Conductor">
-                            <ConductorForm />
-                          </Tab>
-                        </Tabs>
-                      </div>
-                    </>
-                  )}
-                </ModalContent>
-              </Modal>
-            </div>
-          )}
-        </div>
-        {/* <div className="flex items-center justify-between">
-          <span className="text-default-400 text-small">
-            Total {data?.total}
-          </span>
-          <label className="flex items-center text-default-400 text-small">
-            Filas por página
-            <select
-              className="bg-transparent outline-none text-default-400 text-small"
-              onChange={(e) => {
-                setRowPerPage(e.target.value);
-              }}
-            >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
-              <option value="20">20</option>
-            </select>
-          </label>
-        </div> */}
-      </div>
-    );
-  }, [rowPerPage, data?.total, isOpen]);
 
   const editar = (e) => {
     console.log(e);
-    onOpen();
+    onOpenTrip();
     setEdit(true);
     setId(e.id);
   };
@@ -277,26 +203,37 @@ function TripulacionTable({ idEvent, modo }) {
 
   return (
     <>
+      <div className="flex flex-col gap-2 pb-2">
+          <span className="px-3 text-xl font-bold">Lista de Tripulaciones</span>
+          {modo != "client" && (
+            <div className="flex gap-2 px-2">
+              <Button
+                onPress={() => {
+                  setEdit(false);
+                  onOpenTrip();
+                }}
+                color="primary"
+              >
+                <FaCirclePlus  size={"1.4em"} style={{ minWidth: "1.4em" }} />
+                Añadir Tripulación
+              </Button>
+              <Button
+                onPress={onOpenPilot}
+                color="danger"
+                variant="flat"
+              >
+                <GiFullMotorcycleHelmet  size={"1.4em"} style={{ minWidth: "1.4em" }} />
+                Nuevo Piloto
+              </Button>
+            </div>
+          )}
+      </div>
+    
       <Table
         className="px-2"
         isStriped
         aria-label="Tabla de tripulaciones"
-        topContent={topContent}
-        // bottomContent={
-        //   pages > 0 ? (
-        //     <div className="flex justify-center w-full">
-        //       <Pagination
-        //         isCompact
-        //         showControls
-        //         showShadow
-        //         color="primary"
-        //         page={page}
-        //         total={pages}
-        //         onChange={(page) => setPage(page)}
-        //       />
-        //     </div>
-        //   ) : null
-        // }
+        // topContent={topContent}
       >
         <TableHeader columns={columns}>
           {(column) => (
@@ -339,6 +276,29 @@ function TripulacionTable({ idEvent, modo }) {
       </Table>
       {/* <pre>{JSON.stringify(data?.data)}</pre> */}
 
+      <Toaster />
+
+      {/* Modales */}
+      
+      {/* Form Tripulacion */}
+      <TripulacionForm
+        isOpen={isOpenTrip}
+        onOpenChange={onOpenChangeTrip}
+        // onClose={onClose}
+        save={onSave}
+        isEdit={edit}
+        id={id}
+        ref={refForm}
+        idEvent={idEvent}
+      />
+
+      {/* Form Piloto */}
+      <ConductorForm 
+        isOpen={isOpenPilot}
+        onOpenChange={onOpenChangePilot}
+        save={onSavePilot}
+      />
+
       {/* Modal para Ver Foto */}
       <Foto
         isOpen={isFotoModalOpen}
@@ -352,7 +312,7 @@ function TripulacionTable({ idEvent, modo }) {
         onOpenChange={setDel}
         datos={selectData}
         delFicha={delFicha}
-        onClose={onClose}
+        // onClose={onClose}
       />
     </>
   );

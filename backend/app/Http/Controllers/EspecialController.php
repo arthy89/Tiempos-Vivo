@@ -56,11 +56,12 @@ class EspecialController extends Controller
             ->with(['tripulacion.piloto', 'tripulacion.navegante'])
             ->orderByRaw("
                 CASE 
-                    WHEN hora_marcado = '00:00:00.0' AND hora_llegada IS NULL THEN 1
+                    WHEN hora_marcado = '00:00:00.0' AND (hora_llegada IS NULL OR hora_llegada = '00:00:00.0') THEN 1
                     ELSE 0
                 END
             ")
-            ->orderBy('hora_marcado', 'asc');
+            ->orderBy('hora_marcado', 'asc')
+            ->orderBy('hora_salida', 'asc');
 
         // Aplica el filtro de categoría si se proporciona
         if ($categoria && $categoria != 'todas') {

@@ -11,6 +11,7 @@ import {
   Tooltip,
   TimeInput,
   Chip,
+  Divider,
 } from "@nextui-org/react";
 import { FaCheckCircle } from "react-icons/fa";
 import { FaFile } from "react-icons/fa6";
@@ -19,6 +20,8 @@ import { PiTimerFill } from "react-icons/pi";
 import { FaChevronUp } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa";
 import { PiFlagCheckeredFill } from "react-icons/pi";
+import { BsTrash2Fill } from "react-icons/bs";
+import { RxDividerVertical } from "react-icons/rx";
 import TripulacionService from "@/services/TripulacionService";
 import ParametrosService from "@/services/ParametrosService";
 import { columns as allColumns } from "./columns";
@@ -172,11 +175,22 @@ function OrdenPartida({ idEvent, eventName, modo }) {
     });
   };
 
+  const borrar = (elemento) => {
+    setListPartida((prevList) => prevList.filter((item) => item.id !== elemento.id));
+  };
+
+  // todo | Guardar la nueva lista
   const guardar_lista = async () => {
     // console.log(listPartida);
+    const nueva_lista = {
+      parametros: params,
+      lista: listPartida,
+    };
+
+    
     try {
-      const res = await OPartidasService.put(listPartida);
-      // console.log("Lista actualizada", res);
+      const res = await OPartidasService.put(nueva_lista);
+      console.log("Lista actualizada", res);
       // opdMutate();
       ListarPartidasGet();
       Toast(res, "success")
@@ -280,6 +294,7 @@ function OrdenPartida({ idEvent, eventName, modo }) {
                 color="success"
                 isIconOnly
                 radius="full"
+                variant='ghost'
               >
                 <FaChevronUp size="1.6em" />
               </Button>
@@ -293,10 +308,21 @@ function OrdenPartida({ idEvent, eventName, modo }) {
                 color="danger"
                 isIconOnly
                 radius="full"
+                variant='ghost'
               >
                 <FaChevronDown size="1.6em" />
               </Button>
             )}
+
+            {/* Eliminar Tripulacion de la Lista */}
+            <Button
+              onPress={() => borrar(row)}
+              size="sm"
+              color="danger"
+              isIconOnly
+            >
+              <BsTrash2Fill size="1.6em" />
+            </Button>
           </div>
         );
       default:
@@ -313,7 +339,7 @@ function OrdenPartida({ idEvent, eventName, modo }) {
               <div className="flex items-end justify-between gap-3">
                 <div className="flex gap-2">
                   <TimeInput 
-                    label="Hora de Partida"
+                    label="H. Partida"
                     labelPlacement="outside"
                     variant="bordered"
                     hourCycle="24"
@@ -324,6 +350,7 @@ function OrdenPartida({ idEvent, eventName, modo }) {
                       const pad = (num) => String(num).padStart(2, "0");
                       handleChange("hora_partida", `${pad(time.hour)}:${pad(time.minute)}:00`);
                     }}
+                    className="no-zoom"
                   />
                   
                   <TimeInput 
@@ -338,6 +365,7 @@ function OrdenPartida({ idEvent, eventName, modo }) {
                     onChange={(time) => {
                       handleChange("intervalo", formatTime(time));
                     }}
+                    className="no-zoom"
                   />                  
                 </div>
               </div>
@@ -386,6 +414,19 @@ function OrdenPartida({ idEvent, eventName, modo }) {
                       <PiTimerFill size={"1.4em"} style={{ minWidth: "1.4em" }} />
                     </Button>
                   </Tooltip>
+
+                  <Tooltip color='danger' content="Eliminar Lista">
+                    <Button
+                      type='submit'
+                      color="danger"
+                      variant="ghost"
+                      name='action'
+                      value='eliminar'
+                      isIconOnly
+                    >
+                      <BsTrash2Fill size={"1.4em"} style={{ minWidth: "1.4em" }} />
+                    </Button>
+                  </Tooltip>
                   
                   <Button
                     onPress={() => pressPdf()}
@@ -410,7 +451,8 @@ function OrdenPartida({ idEvent, eventName, modo }) {
         isStriped
         aria-label="Tabla de Orden de Partida"
         bottomContent=
-          {modo != "client" && (
+          {modo != "client" && listPartida?.length > 0 && (
+            // listPartida
             <Button
               onPress={() => guardar_lista()}
               color="success"
