@@ -27,4 +27,9 @@ class Org extends Model
     {
         return $this->hasMany(Event::class);
     }
+
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
 }

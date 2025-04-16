@@ -25,6 +25,7 @@ class Event extends Model
     ];
 
     // Relaciones principales
+    // protected $with = ['org', 'ubigeo', 'categorias', 'tripulaciones', 'especiales'];
     protected $with = ['org', 'ubigeo', 'categorias', 'tripulaciones', 'especiales'];
     // protected $appends = ['org', 'ubigeo', 'categorias'];
 

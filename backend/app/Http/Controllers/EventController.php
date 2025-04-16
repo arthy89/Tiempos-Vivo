@@ -22,11 +22,22 @@ class EventController extends Controller
         return $this->generateViewSetList(
             $request,
             Event::query(),
-            [],
+            ['org_id'],
             ['id', 'name'],
             ['id', 'name']
-            // ['id', 'nombre'],
-            // ['id', 'nombre', 'codigo']
+        );
+    }
+
+    public function index_less(Request $request)
+    {
+        $query = Event::without(['org', 'ubigeo', 'categorias', 'tripulaciones', 'especiales']);
+
+        return $this->generateViewSetList(
+            $request,
+            $query,
+            ['org_id'],
+            ['id', 'name'],
+            ['id', 'name']
         );
     }
 

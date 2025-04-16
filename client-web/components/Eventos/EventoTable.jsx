@@ -28,6 +28,8 @@ import {
 } from "react-icons/md";
 import { PiPencilSimpleFill } from "react-icons/pi";
 import { BsTrash2Fill } from "react-icons/bs";
+import { FaCirclePlus } from "react-icons/fa6";
+import { IoSearchOutline } from "react-icons/io5";
 import { FaEye } from "react-icons/fa6";
 import React, { useMemo, useRef, useState } from "react";
 import EventoService from "@/services/EventoService";
@@ -35,8 +37,13 @@ import { columns } from "./columns";
 import Form from "./form";
 import Foto from "@/components/Modals/Foto";
 import Eliminar from "@/components/Modals/Eliminar";
+import { useSelector } from "react-redux";
 
 function EventoTable() {
+  // Obtener el usuario autenticado
+  const user = useSelector((state) => state.auth.user);
+  // console.log("Usuario desde EventoTable:", user);
+  
   const router = useRouter();
 
   const url = process.env.NEXT_PUBLIC_SERVER_URI;
@@ -45,11 +52,18 @@ function EventoTable() {
   const [rowPerPage, setRowPerPage] = useState(5);
   const [edit, setEdit] = useState(false);
   const [id, setId] = useState(0);
+  
+  const [search, setSearch] = useState("");
+  const handleSearch = (value) => {
+    setSearch(value);
+  };
 
-  const { data, mutate, isLoading } = EventoService.getData({
+  const { data, mutate, isLoading } = EventoService.getDataLess({
     page,
     rowsPerPage: rowPerPage,
     order_by: "-id",
+    org_id: user.org_id === 1 ? null : user.org_id, // valida si la Org es 1 para no filtrar nada
+    search,
   });
   console.log(data?.last_page);
   console.log(data);
@@ -88,19 +102,24 @@ function EventoTable() {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Search by name..."
+            placeholder="Buscar evento..."
+            defaultValue={search}
+            onChange={(e) => handleSearch(e.target.value)}
+            onClear={() => setSearch("")}
           />
           <div className="flex gap-3">
-            <Button
-              onPress={() => {
-                setEdit(false);
-                onOpen();
-              }}
-              color="primary"
-              endContent={<MdAutoFixHigh size="1.4em" />}
-            >
-              Añadir
-            </Button>
+            {(user.roles[0].name == 'GOD' || user.roles[0].name == 'Administrador') && (
+              <Button
+                onPress={() => {
+                  setEdit(false);
+                  onOpen();
+                }}
+                color="primary"
+                endContent={<FaCirclePlus size="1.4em" />}
+              >
+                Añadir
+              </Button>
+            )}
             <Modal
               isOpen={isOpen}
               onOpenChange={onOpenChange}
@@ -125,10 +144,10 @@ function EventoTable() {
         </div>
         <div className="flex items-center justify-between">
           <span className="text-default-400 text-small">
-            Total {data?.total} users
+            Total {data?.total} eventos
           </span>
           <label className="flex items-center text-default-400 text-small">
-            Rows per page:
+            Filas por página:
             <select
               className="bg-transparent outline-none text-default-400 text-small"
               onChange={(e) => {
@@ -228,15 +247,17 @@ function EventoTable() {
       case "acciones":
         return (
           <div className="relative flex items-center gap-2">
-            <Button
-              onPress={() => editar(row)}
-              size="sm"
-              color="warning"
-              isIconOnly
-              variant="ghost"
-            >
-              <PiPencilSimpleFill size="1.6em" />
-            </Button>
+            {(user.roles[0].name == 'GOD' || user.roles[0].name == 'Administrador') && (
+              <Button
+                onPress={() => editar(row)}
+                size="sm"
+                color="warning"
+                isIconOnly
+                variant="ghost"
+              >
+                <PiPencilSimpleFill size="1.6em" />
+              </Button>
+            )}
 
             <Button
               onPress={() => ver(row)}
@@ -248,14 +269,16 @@ function EventoTable() {
               <FaEye size="1.6em" />
             </Button>
 
-            <Button
-              onPress={() => eliminar(row)}
-              size="sm"
-              color="danger"
-              isIconOnly
-            >
-              <BsTrash2Fill size="1.6em" />
-            </Button>
+            {(user.roles[0].name == 'GOD' || user.roles[0].name == 'Administrador') && (
+              <Button
+                onPress={() => eliminar(row)}
+                size="sm"
+                color="danger"
+                isIconOnly
+              >
+                <BsTrash2Fill size="1.6em" />
+              </Button>
+            )}
           </div>
         );
       default:

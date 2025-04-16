@@ -35,6 +35,7 @@ use App\Http\Controllers\UbigeoController;
 // });
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     $roles = $request->user()->roles;
+    $org = $request->user()->org;
     $permisos = [];
     foreach ($roles as $rol) {
 
@@ -50,6 +51,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
         // 'rolesSelected' => $request->user()->roles,
         'permisos' => $permisos,
         'roles' => $request->user()->roles->pluck('name'),
+        'org' => $org,
     ]);
 });
 
@@ -66,6 +68,7 @@ Route::apiResource('/permisos', PermisoController::class)->middleware([HandlePre
 Route::apiResource('/orgs', OrgController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/events', EventController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::get('/events_lite', [EventController::class, 'index_lite'])->middleware([HandlePrecognitiveRequests::class]);
+Route::get('/events_less', [EventController::class, 'index_less'])->middleware([HandlePrecognitiveRequests::class]);
 Route::get('/events_consolidado', [EventController::class, 'index_consolidado'])->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/categorias', CategoriaController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/especials', EspecialController::class)->middleware([HandlePrecognitiveRequests::class]);
