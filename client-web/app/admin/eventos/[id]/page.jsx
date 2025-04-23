@@ -51,7 +51,15 @@ function Page() {
   console.log(evento);
 
   if (!evento || !isAuthorized) {
-    return <Spinner />; // o un spinner si prefieres
+    return (
+      <div className="flex justify-center">
+        <Spinner
+          size="lg"
+          // labelColor="primary"
+          label="Cargando..."
+        />
+      </div>
+    ); // o un spinner si prefieres
   }
 
   return (
