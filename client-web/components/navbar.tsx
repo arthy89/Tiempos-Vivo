@@ -1,3 +1,4 @@
+"use client"
 import {
   Navbar as NextUINavbar,
   NavbarContent,
@@ -16,6 +17,10 @@ import { link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
 
+// import { useNavbarContext } from "@nextui-org/react";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import {
@@ -28,6 +33,11 @@ import {
 } from "@/components/icons";
 
 export const Navbar = () => {
+  const user = useSelector((state: RootState) => state.auth.user);
+  const navItems = siteConfig.navItems(user);
+  // const { setIsMenuOpen } = useNavbarContext();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const searchInput = (
     <Input
       aria-label="Search"
@@ -50,28 +60,27 @@ export const Navbar = () => {
   );
 
   return (
-    <NextUINavbar maxWidth="xl" position="sticky">
+    <NextUINavbar maxWidth="xl" position="sticky" isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex items-center justify-start gap-1" href="/">
-            {/* <Logo /> */}
             <Image
               width={50}
               isBlurred
               radius="full"
-              alt="NextUI hero Image"
+              alt="Logo Rally"
               src="/img/llanta1.png"
             />
             <p className="font-bold text-inherit">Rally Cronos Perú</p>
           </NextLink>
         </NavbarBrand>
         <ul className="justify-start hidden gap-4 ml-2 lg:flex">
-          {siteConfig.navItems.map((item) => (
+          {navItems.map((item) => (
             <NavbarItem key={item.href}>
               <NextLink
                 className={clsx(
                   linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
+                  "data-[active=true]:text-primary data-[active=true]:font-medium"
                 )}
                 color="foreground"
                 href={item.href}
@@ -84,60 +93,32 @@ export const Navbar = () => {
       </NavbarContent>
 
       <NavbarContent className="sm:flex basis-1/5 sm:basis-full" justify="end">
-        <NavbarItem className="gap-2 sm:flex">
-          {/* <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
-            <TwitterIcon className="text-default-500" />
-          </Link>
-          <Link isExternal aria-label="Discord" href={siteConfig.links.discord}>
-            <DiscordIcon className="text-default-500" />
-          </Link>
-          <Link isExternal aria-label="Github" href={siteConfig.links.github}>
-            <GithubIcon className="text-default-500" />
-          </Link> */}
+        <NavbarItem className="hidden gap-2 sm:flex">
           <ThemeSwitch />
         </NavbarItem>
-        {/* <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem> */}
-        {/* <NavbarItem className="hidden md:flex">
-          <Button
-            isExternal
-            as={Link}
-            className="text-sm font-normal text-default-600 bg-default-100"
-            href={siteConfig.links.sponsor}
-            startContent={<HeartFilledIcon className="text-danger" />}
-            variant="flat"
-          >
-            Sponsor
-          </Button>
-        </NavbarItem> */}
       </NavbarContent>
 
-      {/* NAAAAAAAAA  MOVIL */}
-      {/* <NavbarContent className="pl-4 sm:hidden basis-1" justify="end">
-        <Link isExternal aria-label="Github" href={siteConfig.links.github}>
-          <GithubIcon className="text-default-500" />
-        </Link>
+      {/* Ícono de menú para móvil */}
+      <NavbarContent className="sm:hidden basis-1" justify="end">
         <ThemeSwitch />
-        <NavbarMenuToggle />
-      </NavbarContent> */}
+        <NavbarMenuToggle onClick={() => setIsMenuOpen(!isMenuOpen)} />
+      </NavbarContent>
 
+      {/* Menú para móvil */}
       <NavbarMenu>
-        {searchInput}
-        <div className="flex flex-col gap-2 mx-4 mt-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <Link
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
-                }
-                href="#"
-                size="lg"
+        <div className="flex flex-col gap-2 mx-4 mt-2">          
+          {navItems.map((item) => (
+            <NavbarMenuItem key={item.href}>
+              <NextLink
+                onClick={() => setIsMenuOpen(false)}
+                className={clsx(
+                  linkStyles({ color: "foreground" }),
+                  "text-lg font-medium"
+                )}
+                href={item.href}
               >
                 {item.label}
-              </Link>
+              </NextLink>
             </NavbarMenuItem>
           ))}
         </div>
