@@ -60,10 +60,13 @@ class User extends Authenticatable
     }
 }
 
+// TODO para asignar Roles a Usuarios desde Tinker
+// php artisan tinker
+
 // use App\Models\User;
 
-// $admin = User::where('email', 'aca_admin@info.com')->first();
-// $oficial = User::where('email', 'aca_ofi@info.com')->first();
+// $admin = User::where('email', 'aca_admin@gmail.com')->first();
+// $oficial = User::where('email', 'aca_ofi@gmail.com')->first();
 
 // $admin->assignRole('Administrador');
 // $oficial->assignRole('Oficial');
