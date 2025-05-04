@@ -61,7 +61,15 @@ class EventController extends Controller
             }
     
             // Convertir hora_marcado a Carbon (con milisegundos)
-            $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
+            $horaMarcado = null;
+
+            try {
+                // Intenta primero con milisegundos
+                $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
+            } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+                // Si falla, intenta sin milisegundos
+                $horaMarcado = Carbon::createFromFormat('H:i:s', $tiempo->hora_marcado);
+            }
     
             // Convertir penalización a Carbon (sin milisegundos, formato H:i:s)
             $penalizacionString = explode('.', $tiempo->penalizacion ?? '00:00:00')[0];
@@ -154,8 +162,15 @@ class EventController extends Controller
                 ];
             }
 
-            // Convertir hora_marcado y penalización
-            $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
+            $horaMarcado = null;
+
+            try {
+                // Intenta primero con milisegundos
+                $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
+            } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+                // Si falla, intenta sin milisegundos
+                $horaMarcado = Carbon::createFromFormat('H:i:s', $tiempo->hora_marcado);
+            }
 
             $penalizacionString = explode('.', $tiempo->penalizacion ?? '00:00:00')[0];
             $penalizacion = Carbon::createFromFormat('H:i:s', $penalizacionString);
