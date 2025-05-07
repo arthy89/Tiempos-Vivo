@@ -27,10 +27,15 @@ import { formData } from "./formData";
 import EventoService from "@/services/EventoService";
 import UbigeoService from "@/services/UbigeoService";
 
+import { useSelector } from "react-redux";
+
 // Register the plugins
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 
 const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
+  // USUARIO LOGEADO
+  const user = useSelector((state) => state.auth.user);
+  
   const [datos, setDatos] = useState(null);
 
   const [selectDep, setDep] = useState(null);
@@ -158,6 +163,9 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
 
     // console.log("formmm", form.data);
     form.setData("ubigeo_id", selectDep + selectProv + selectDist);
+
+    // set Org por usuario
+    form.setData("org_id", user?.org_id);
 
     event.preventDefault();
     // const res = await UbigeoService.save(form);
