@@ -8,6 +8,7 @@ export const formData = {
   // nombre: '',
 
   org_id: "",
+  nf: false,
   name: "",
   descripcion: "",
   tipo: "",

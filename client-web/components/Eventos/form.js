@@ -8,6 +8,7 @@ import {
   Textarea,
   DatePicker,
   TimeInput,
+  Switch,
 } from "@nextui-org/react";
 // FilePond
 import { FilePond, registerPlugin } from "react-filepond";
@@ -26,6 +27,7 @@ import { formData } from "./formData";
 
 import EventoService from "@/services/EventoService";
 import UbigeoService from "@/services/UbigeoService";
+import OrgsService from "@/services/OrgsService";
 
 import { useSelector } from "react-redux";
 
@@ -50,7 +52,9 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
     cod_dep: selectDep,
     cod_prov: selectProv,
   });
-  // console.log('gaaa',departamentos);
+
+  // Orgs para setear
+  const { data: orgs } = OrgsService.get({});
 
   const handleDep = (e) => {
     setDep(e);
@@ -164,8 +168,11 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
     // console.log("formmm", form.data);
     form.setData("ubigeo_id", selectDep + selectProv + selectDist);
 
-    // set Org por usuario
-    form.setData("org_id", user?.org_id);
+    if (user?.org_id !== 1)
+    {
+      // set Org por usuario
+      form.setData("org_id", user?.org_id);
+    }
 
     event.preventDefault();
     // const res = await UbigeoService.save(form);
@@ -232,6 +239,41 @@ const Form = forwardRef(({ save, isEdit, id, onClose }, ref) => {
             errorMessage={form.errors.descripcion}
           />
 
+          {/* Seleccionar a la Org que pertenece el evento, solo ADMIN GOD */}
+          {(user.roles[0].name == 'GOD') && (
+            <>
+              <Select
+                variant="bordered"
+                label="Seleccione el Club"
+                labelPlacement="outside"
+                // className='max-w-xs'
+                value={form.data.org_id}
+                selectedKeys={[form.data.org_id.toString()]}
+                color={form.invalid("org_id") ? "danger" : "success"}
+                onChange={(e) => {
+                  form.setData("org_id", e.target.value);
+                }}
+                onBlur={() => form.validate("org_id")}
+                isInvalid={form.invalid("org_id")}
+                errorMessage={form.errors.org_id}
+                isRequired
+              >
+                {orgs?.data?.map((org) => (
+                  <SelectItem key={org.id}>{org.name}</SelectItem>
+                ))}
+              </Select>
+
+              {/* No Federado */}
+              <Switch
+                color="success"
+                isSelected={form.data.nf}
+                onValueChange={(value) => form.setData('nf', value)}
+              >
+                ¿No Federado?
+              </Switch>
+            </>
+          )}
+          
           <Select
             variant="bordered"
             label="Seleccione el Tipo"
