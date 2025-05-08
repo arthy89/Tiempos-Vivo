@@ -31,11 +31,26 @@ class EventController extends Controller
     public function index_less(Request $request)
     {
         $query = Event::without(['org', 'ubigeo', 'categorias', 'tripulaciones', 'especiales']);
+        // $query = $query->where('nf', null); // Solo eventos sin clase
 
         return $this->generateViewSetList(
             $request,
             $query,
-            ['org_id'],
+            ['org_id', 'nf'],
+            ['id', 'name'],
+            ['id', 'name']
+        );
+    }
+
+    public function index_less_nf(Request $request)
+    {
+        $query = Event::without(['org', 'ubigeo', 'categorias', 'tripulaciones', 'especiales']);
+        // $query = $query->where('nf', !null); // Solo eventos con clase
+
+        return $this->generateViewSetList(
+            $request,
+            $query,
+            ['org_id', 'nf'],
             ['id', 'name'],
             ['id', 'name']
         );

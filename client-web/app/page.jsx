@@ -42,6 +42,7 @@ export default function Home() {
     page,
     rowsPerPage: rowPerPage,
     order_by: "-id",
+    nf: false,
     search,
   });
   // console.log(data?.last_page);

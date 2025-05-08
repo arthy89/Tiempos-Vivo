@@ -22,6 +22,7 @@ class Event extends Model
         'hora',
         'foto_url',
         'ruta_url',
+        'nf',
     ];
 
     // Relaciones principales
