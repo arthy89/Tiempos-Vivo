@@ -1,7 +1,9 @@
 export const formatDate = (dateString) => {
   if (!dateString) return "Fecha no disponible";
 
-  const fecha = new Date(dateString);
+  const [year, month, day] = dateString.split("-").map(Number);
+  const fecha = new Date(year, month - 1, day); // mes en JS empieza en 0
+
   const formattedDate = fecha.toLocaleDateString("es-ES", {
     day: "2-digit",
     month: "short",
