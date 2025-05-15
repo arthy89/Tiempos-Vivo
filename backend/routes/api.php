@@ -80,6 +80,7 @@ Route::apiResource('/shakedowns', ShakedownController::class)->middleware([Handl
 
 Route::apiResource('/drivers', DriverController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/tripulacions', TripulacionController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::get('/tripulaciones_buscador', [TripulacionController::class, 'index_buscador'])->middleware([HandlePrecognitiveRequests::class]);
 // Route::apiResource('/parametros', ParametrosController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::get('/parametro_event', [ParametrosController::class, 'parametro_event'])->middleware([HandlePrecognitiveRequests::class]);
 Route::put('/update_params/{parametro}', [ParametrosController::class, 'update_params'])->middleware([HandlePrecognitiveRequests::class]);

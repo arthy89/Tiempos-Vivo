@@ -18,6 +18,7 @@ class Tiempo extends Model
         'hora_marcado',
         'penalizacion',
         'registrador',
+        'estado',
     ];
 
     protected $with = ['tripulacion', 'especial'];

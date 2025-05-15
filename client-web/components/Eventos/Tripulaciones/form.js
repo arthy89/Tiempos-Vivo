@@ -44,6 +44,13 @@ const Form = forwardRef(
     console.log(categorias?.last_page);
     console.log(categorias);
 
+    // * Estados para las Tripulaciones
+    const estados = [
+      {key: "EN_CARRERA", label: "En Carrera"},
+      {key: "ABANDONO", label: "Abandono"},
+      {key: "DESCALIFICADO", label: "Descalificado"},
+    ];
+
     useEffect(() => {
       const fetchData = async () => {
         console.log("EDIT", isEdit);
@@ -235,6 +242,27 @@ const Form = forwardRef(
                       isInvalid={form.invalid("auto_num")}
                       errorMessage={form.errors.auto_num}
                     />
+                    
+                    <Select
+                      variant="bordered"
+                      label="Estado de la Tripulación"
+                      labelPlacement="outside"
+                      placeholder="Estado de la Tripulación..."
+                      value={form.data.estado}
+                      selectedKeys={[form.data.estado ? form.data.estado : "EN_CARRERA"]}
+                      color={form.invalid("estado") ? "danger" : "success"}
+                      onChange={(e) => {
+                        form.setData("estado", e.target.value);
+                      }}
+                      onBlur={() => form.validate("estado")}
+                      isInvalid={form.invalid("estado")}
+                      errorMessage={form.errors.estado}
+                      isRequired
+                    >
+                      {estados.map((estado) => (
+                        <SelectItem key={estado.key}>{estado.label}</SelectItem>
+                      ))}
+                    </Select>
 
                     <Divider className="my-1" />
 

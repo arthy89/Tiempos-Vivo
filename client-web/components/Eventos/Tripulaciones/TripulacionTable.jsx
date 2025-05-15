@@ -20,6 +20,7 @@ import {
   Image,
   Tabs,
   Tab,
+  Chip,
 } from "@nextui-org/react";
 import toast, { Toaster } from "react-hot-toast";
 import Toast from '@/components/Toast/Toast';
@@ -159,6 +160,22 @@ function TripulacionTable({ idEvent, modo }) {
             {row.auto_num}
           </p>
         );
+      case "estado":
+          if (row.estado === 'EN_CARRERA') {
+            return (<Chip variant="flat" size="sm" color="primary">En Carrera</Chip>);
+          }
+          
+          if (row.estado === 'ABANDONO') {
+            return (<Chip variant="flat" size="sm" color="danger">Abandono</Chip>);
+          }
+          
+          if (row.estado === 'DESCALIFICADO') {
+            return (<Chip variant="flat" size="sm" color="default">Descalificado</Chip>);
+          }
+
+          if (row.estado === null) {
+            return ("");
+          }
       case "foto_url":
         return (
           <div>

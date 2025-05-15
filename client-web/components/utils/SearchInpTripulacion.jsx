@@ -36,7 +36,7 @@ const SearchInpTripulacion = ({
     // setLoading(true);
     try {
       const response = await fetch(
-        `${url}api/tripulacions?event_id=${idEvent}&search=${searchText}`,
+        `${url}api/tripulaciones_buscador?event_id=${idEvent}&search=${searchText}`,
       );
       const data = await response.json();
       setItems(data?.data || []);

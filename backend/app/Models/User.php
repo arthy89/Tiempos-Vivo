@@ -25,6 +25,7 @@ class User extends Authenticatable
         'email',
         'org_id',
         'password',
+        'estado',
     ];
     protected $guard_name = 'api';
 

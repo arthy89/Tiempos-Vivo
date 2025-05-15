@@ -9,4 +9,5 @@ export const formData = {
   auto: "",
   auto_num: "",
   foto_url: "",
+  estado: "EN_CARRERA",
 };

@@ -18,6 +18,7 @@ class Tripulacion extends Model
         'auto',
         'auto_num',
         'foto_url',
+        'estado',
     ];
 
     protected $with = ['piloto', 'navegante'];
