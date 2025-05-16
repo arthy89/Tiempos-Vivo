@@ -239,30 +239,31 @@ function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
   
       const columns = [
         "Nº",
-        "COCHE",
-        "PILOTO",
-        "CAT",
-        "H. SALIDA",
-        "H. LLEGADA",
-        "PENA",
+        "COCHE/CAT",
+        "PILOTO/NAVEGANTE",
+        "SALIDA",
+        "LLEGADA",
         "TIEMPO",
       ];
   
       const tableData = tiempos.map((tiempo, index) => [
         index + 1,
-        tiempo.tripulacion.auto_num,
-        `${tiempo.tripulacion.piloto.nombre} ${tiempo.tripulacion.piloto.apellidos}`,
-        tiempo.tripulacion.categoria,
+        `${tiempo.tripulacion.auto_num} | ${tiempo.tripulacion.categoria}`,
+        `${tiempo.tripulacion.piloto.nombre} ${tiempo.tripulacion.piloto.apellidos}\n${tiempo.tripulacion.navegante.nombre} ${tiempo.tripulacion.navegante.apellidos}`,
         tiempo.hora_salida,
         tiempo.hora_llegada,
-        tiempo.penalizacion,
-        tiempo.hora_marcado,
+        tiempo.penalizacion !== null
+          ? `${tiempo.hora_marcado}\n${tiempo.penalizacion}` // Evalua si existe una Penalizacion, sino solo muestra el tiempo acumulado
+          : `${tiempo.hora_marcado}`,
       ]);
   
       doc.autoTable({
         head: [columns],
         body: tableData,
         startY: 25,
+        styles: {
+          valign: 'middle',
+        },
       });
 
       if (catRef.current == 'todas') {

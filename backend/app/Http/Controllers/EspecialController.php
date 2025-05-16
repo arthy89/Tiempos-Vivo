@@ -51,7 +51,6 @@ class EspecialController extends Controller
         $categoria = $request->input('categoria');
         $especial = $request->input('especial');
 
-        // Modifica la consulta para trabajar sobre el modelo Tiempo
         $query = Tiempo::where('especial_id', $especial)
             ->with(['tripulacion.piloto', 'tripulacion.navegante'])
             ->orderByRaw("
@@ -63,10 +62,15 @@ class EspecialController extends Controller
             ->orderBy('hora_marcado', 'asc')
             ->orderBy('hora_salida', 'asc');
 
-        // Aplica el filtro de categoría si se proporciona
+        // Filtro por categoría y estado
         if ($categoria && $categoria != 'todas') {
             $query->whereHas('tripulacion', function($q) use ($categoria) {
-                $q->where('categoria', $categoria);
+                $q->where('categoria', $categoria)
+                ->where('estado', 'EN_CARRERA');
+            });
+        } else {
+            $query->whereHas('tripulacion', function($q) {
+                $q->where('estado', 'EN_CARRERA');
             });
         }
 

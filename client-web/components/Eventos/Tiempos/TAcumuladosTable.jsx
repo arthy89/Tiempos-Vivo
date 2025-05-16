@@ -20,6 +20,7 @@ import {
   Image,
   Select,
   SelectItem,
+  Chip,
 } from "@nextui-org/react";
 import { FaUserAstronaut } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
@@ -179,22 +180,30 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
     doc.setFontSize(10); // Tamaño del título principal
     doc.text(`EC: Especiales Completados`, 14, 30);
 
-    const columns = ["Nº", "COCHE", "PILOTO", "CAT", "EC", "PENA", "TIEMPO"];
+    const columns = ["Nº", "COCHE/CAT", "PILOTO/NAVEGANTE", "EC", "TIEMPO", "ESTADO"];
 
     const tableData = tiempos.map((tiempo, index) => [
       index + 1,
-      tiempo.tripulacion.auto_num,
-      `${tiempo.tripulacion.piloto.nombre} ${tiempo.tripulacion.piloto.apellidos}`,
-      tiempo.tripulacion.categoria,
+      `${tiempo.tripulacion.auto_num} | ${tiempo.tripulacion.categoria}`,
+      `${tiempo.tripulacion.piloto.nombre} ${tiempo.tripulacion.piloto.apellidos}\n${tiempo.tripulacion.navegante.nombre} ${tiempo.tripulacion.navegante.apellidos}`,
       tiempo.num_especiales,
-      tiempo.penalizacion_acumulada,
-      tiempo.tiempo_acumulado,
+      tiempo.penalizacion_acumulada !== "00:00:00"
+        ? `${tiempo.tiempo_acumulado}\n${tiempo.penalizacion_acumulada}` // Evalua si existe una Penalizacion, sino solo muestra el tiempo acumulado
+        : `${tiempo.tiempo_acumulado}`,
+      tiempo.tripulacion.estado == 'EN_CARRERA' 
+        ? 'Finalizó'
+        : tiempo.tripulacion.estado === "ABANDONO"
+        ? "Abandono"
+        : "Descalificado",
     ]);
 
     doc.autoTable({
       head: [columns],
       body: tableData,
       startY: 35,
+      styles: {
+        valign: 'middle',
+      },
     });
 
     if (catRef.current == 'todas') {
@@ -220,87 +229,13 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
     }
   }
 
-  // const pressPdfConsolidado = async () => {
-  //   await ListarTiemposConsolidado();
-
-  //   const evento = taList.current.evento;
-  //   const tiempos = taList.current.tiempos_consolidado;
-
-  //   const doc = new jsPDF({
-  //     orientation: "landscape",
-  //     unit: "mm",
-  //     format: "a4",
-  //   });
-
-  //   // Definir fuente
-  //   doc.setFont("sfpro");
-    
-  //   // Título del evento
-  //   doc.setFontSize(18);
-  //   doc.text(`${evento[0].name}`, 14, 20);
-
-  //   // Subtítulo
-  //   doc.setFontSize(15);
-  //   doc.text(`Tiempos Consolidados`, 14, 26);
-
-  //   // Encabezado de la tabla
-  //   doc.setFontSize(10);
-  //   doc.text(`S: Salida | L: Llegada | T: Tiempo Marcado | P: Penalización | T.A: Tiempo Acumulado | P.A: Penalzación Acumulada`, 14, 30);
-
-  //   // Obtener dinámicamente los nombres de los especiales
-  //   const especialesHeaders = evento[0].especiales.map(e => e.nombre); // PE2, PE3, PE4, etc.
-
-  //   // Construcción de columnas
-  //   const columns = ["N", "TRIPULACIÓN", ...especialesHeaders, "ACUMULADO"];
-
-  //   // Construcción de datos para la tabla
-  //   const tableData = tiempos.map((tiempo, index) => {
-  //     const tripulacion = `${tiempo.tripulacion.auto_num} | ${tiempo.tripulacion.categoria}\n` + `${tiempo.tripulacion.piloto.nombre} ${tiempo.tripulacion.piloto.apellidos}\n` + `${tiempo.tripulacion.navegante.nombre} ${tiempo.tripulacion.navegante.apellidos}`;
-      
-  //     // Extraer los tiempos de cada especial (salida, llegada, marcado)
-  //     const especialesData = evento[0].especiales.map(especial => {
-  //       const especialInfo = tiempo.especiales.find(e => e.nombre === especial.nombre);
-  //       return especialInfo 
-  //         ? `S: ${especialInfo.hora_salida}\n` + `L: ${especialInfo.hora_llegada}\n` + `T: ${especialInfo.hora_marcado}\n` + `P: ${especialInfo.penalizacion}`
-  //         : " "; // Si no hay datos
-  //     });
-
-  //     return [
-  //       index + 1,
-  //       tripulacion,
-  //       ...especialesData,
-  //       `T.A: ${tiempo.tiempo_acumulado}\n` + `P.A: ${tiempo.penalizacion_acumulada}\n`,
-  //     ];
-  //   });
-
-  //   // Generar tabla
-  //   doc.autoTable({
-  //     head: [columns],
-  //     body: tableData,
-  //     startY: 35,
-  //     styles: { 
-  //       fontSize: 8,
-  //       cellPadding: 2,
-  //       font: "lekton",
-  //       textColor: [0, 0, 0],
-  //     },
-  //     headStyles: { 
-  //       fillColor: [40, 40, 40],
-  //       textColor: [255, 255, 255],
-  //       font: "spacemono",
-  //     },
-  //   });
-
-  //   // Guardar el PDF
-  //   doc.save(`Consolidado-${evento[0].name}.pdf`);
-  // };
-
   const pressPdfConsolidado = async () => {
     await ListarTiemposConsolidado();
 
     const evento = taList.current.evento;
     const tiempos = taList.current.tiempos_consolidado;
 
+    
     const doc = new jsPDF({
         orientation: "landscape",
         unit: "mm",
@@ -334,6 +269,7 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
                 styles: { halign: "center" },
             })),
             { content: "T. ACUMULADO", rowSpan: 2, styles: { halign: "center" } },
+            { content: "ESTADO", rowSpan: 2, styles: { halign: "center" } },
         ],
         [
             ...Array(0).fill(""), // Espacio para N y TRIPULACIÓN
@@ -343,6 +279,7 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
                 { content: "Tiempo", styles: { halign: "center" } },
             ]),
             "", // Espacio para ACUMULADO
+            "", // Espacio para ESTADO
         ],
     ];
 
@@ -363,11 +300,23 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
                 : ["-", "-", "-"];
         }).flat();
 
+        const tiempoAcumulado = `${tiempo.tiempo_acumulado || "--:--:--"}${
+            tiempo.penalizacion_acumulada !== "00:00:00"
+              ? `\n${tiempo.penalizacion_acumulada}`
+              : ""
+        }`;
+
+        const estado =
+          tiempo.tripulacion.estado === "EN_CARRERA"
+            ? "FINALIZÓ"
+            : tiempo.tripulacion.estado;
+
         return [
             index + 1,
             tripulacion,
             ...especialesData,
-            `${tiempo.tiempo_acumulado || "--:--:--"}${tiempo.penalizacion_acumulada !== "00:00:00" ? `\n${tiempo.penalizacion_acumulada}` : ""}`,
+            tiempoAcumulado,
+            estado, // NUEVA COLUMNA
         ];
     });
 
@@ -377,6 +326,7 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
       head: headRows,
       body: tableData,
       styles: {
+          valign: 'middle',
           fontSize: 5,
           cellPadding: 2,
           // font: "lekton",
@@ -410,7 +360,7 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
           const cellValue = data.cell.raw || "";
 
           // Aplicar negrita a la última columna (T. Acumulado)
-          if (data.column.index === tableData[0].length - 1) {
+          if (data.column.index === tableData[0].length - 2) {
             data.cell.styles.fontStyle = "bold";
           }
 
@@ -528,14 +478,24 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
           ? calculateTimeDifference(prevTime, row.tiempo_acumulado)
           : null;
 
-        return (
-          <>
-            <div className="text-blue-500">{diffWithFirst}</div>
-            {diffWithPrev && (
-              <div className="text-purple-500">{diffWithPrev}</div>
-            )}
-          </>
-        );
+        if (row.tripulacion.estado === 'ABANDONO') {
+          return (<Chip variant="flat" size="sm" color="danger">Abandono</Chip>);
+        }
+        
+        if (row.tripulacion.estado === 'DESCALIFICADO') {
+          return (<Chip variant="flat" size="sm" color="default">Descalificado</Chip>);
+        }
+
+        if (row.tripulacion.estado === 'EN_CARRERA') {
+          return (
+            <>
+              <div className="text-blue-500">{diffWithFirst}</div>
+              {diffWithPrev && (
+                <div className="text-purple-500">{diffWithPrev}</div>
+              )}
+            </>
+          );
+        }
 
       // * Foto
       case "foto":
@@ -543,7 +503,7 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
           <div>
             <Button
               variant="light"
-              onClick={() => verFoto(row.tripulacion.foto_url)}
+              onPress={() => verFoto(row.tripulacion.foto_url)}
             >
               <Image
                 radius="md"

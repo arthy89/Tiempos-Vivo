@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class EventController extends Controller
 {
@@ -135,27 +136,40 @@ class EventController extends Controller
             }, 'especiales.tiempos' => function ($query) use ($categoria) {
                 $query->orderBy('hora_marcado', 'asc');
 
-                // Filtrar por categoría si se proporciona
                 if ($categoria && $categoria != 'todas') {
                     $query->whereHas('tripulacion', function ($q) use ($categoria) {
                         $q->where('categoria', $categoria);
                     });
                 }
 
-                // Filtrar tiempos inválidos (hora_llegada no nula y hora_marcado distinto de 00:00:00.0)
                 $query->whereNotNull('hora_llegada')
                     ->where('hora_marcado', '!=', '00:00:00.0');
             }]);
 
-        // Obtener los datos del evento
         $eventData = $query->get();
 
-        // Acumular los tiempos de las tripulaciones
-        $tiemposAcumulados = $this->calcularTiemposAcumulados($eventData->pluck('especiales.*.tiempos')->flatten());
+        // Acumular los tiempos
+        $tiemposAcumuladosArray = $this->calcularTiemposAcumulados(
+            $eventData->pluck('especiales.*.tiempos')->flatten()
+        );
+
+        // Convertir a colección para poder usar sortBy
+        $tiemposAcumulados = collect($tiemposAcumuladosArray);
+
+        // Ordenar los tiempos según estado de la tripulación
+        $tiemposAcumuladosOrdenados = $tiemposAcumulados->sortBy(function ($tiempo) {
+            $estado = $tiempo['tripulacion']['estado'] ?? 'EN_CARRERA';
+            return match ($estado) {
+                'EN_CARRERA' => 0,
+                'ABANDONO' => 1,
+                'DESCALIFICADO' => 2,
+                default => 3,
+            };
+        })->values(); // Reindexa la colección
 
         return response()->json([
             'event' => $eventData,
-            'tiempos_acumulados' => $tiemposAcumulados,
+            'tiempos_acumulados' => $tiemposAcumuladosOrdenados,
         ]);
     }
 
@@ -236,30 +250,40 @@ class EventController extends Controller
     {
         $eventId = $request->input('event_id');
 
-        // Consulta para traer el evento con especiales y tiempos
         $query = Event::where('id', $eventId)
             ->without(['org', 'ubigeo', 'tripulaciones'])  // Excluir relaciones no necesarias
             ->with(['especiales' => function ($query) {
-                // Filtrar solo los especiales donde estado es true
                 $query->where('estado', true);
             }, 'especiales.tiempos' => function ($query) {
-                // Ordenar por hora marcada
                 $query->orderBy('hora_marcado', 'asc');
-
-                // Filtrar tiempos inválidos (hora_llegada no nula y hora_marcado distinto de 00:00:00.0)
                 $query->whereNotNull('hora_llegada')
                     ->where('hora_marcado', '!=', '00:00:00.0');
             }]);
 
-        // Obtener los datos del evento
         $eventData = $query->get();
 
-        // Acumular los tiempos de las tripulaciones
-        $tiemposConsolidados = $this->tiemposConsolidados($eventData->pluck('especiales.*.tiempos')->flatten());
+        // Acumular los tiempos
+        $tiemposConsolidadosArray = $this->tiemposConsolidados(
+            $eventData->pluck('especiales.*.tiempos')->flatten()
+        );
+
+        // Convertir a colección para poder ordenar
+        $tiemposConsolidados = collect($tiemposConsolidadosArray);
+
+        // Ordenar por estado de la tripulación
+        $tiemposConsolidadosOrdenados = $tiemposConsolidados->sortBy(function ($tiempo) {
+            $estado = $tiempo['tripulacion']['estado'] ?? 'EN_CARRERA';
+            return match ($estado) {
+                'EN_CARRERA' => 0,
+                'ABANDONO' => 1,
+                'DESCALIFICADO' => 2,
+                default => 3,
+            };
+        })->values();
 
         return response()->json([
             'evento' => $eventData,
-            'tiempos_consolidado' => $tiemposConsolidados,
+            'tiempos_consolidado' => $tiemposConsolidadosOrdenados,
         ]);
     }
 
