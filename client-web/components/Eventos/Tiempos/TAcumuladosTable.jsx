@@ -130,6 +130,21 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
         return { hours, minutes, seconds, milliseconds };
     };
 
+    // Si alguno es nulo o '00:00:00', retorna vacío
+    if (
+      !startTime ||
+      !endTime ||
+      startTime === "00:00:00" ||
+      endTime === "00:00:00"
+    ) {
+      return "";
+    }
+
+    // Si son iguales, es el primer puesto, retorna vacío
+    if (startTime === endTime) {
+      return "";
+    }
+
     const start = parseTime(startTime);
     const end = parseTime(endTime);
 
@@ -146,9 +161,9 @@ function TAcumuladosTable({ idEvent, categorias, modo, evento }) {
         (end.seconds * 1000) + 
         end.milliseconds;
 
-    // Si el tiempo final es menor que el inicial, retornar "-"
+    // Si el tiempo final es menor que el inicial, retornar vacío
     if (endInMillis < startInMillis) {
-        return '-';
+        return '';
     }
 
     const diffInMillis = endInMillis - startInMillis;

@@ -141,9 +141,6 @@ class EventController extends Controller
                         $q->where('categoria', $categoria);
                     });
                 }
-
-                $query->whereNotNull('hora_llegada')
-                    ->where('hora_marcado', '!=', '00:00:00.0');
             }]);
 
         $eventData = $query->get();
@@ -256,8 +253,6 @@ class EventController extends Controller
                 $query->where('estado', true);
             }, 'especiales.tiempos' => function ($query) {
                 $query->orderBy('hora_marcado', 'asc');
-                $query->whereNotNull('hora_llegada')
-                    ->where('hora_marcado', '!=', '00:00:00.0');
             }]);
 
         $eventData = $query->get();

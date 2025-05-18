@@ -7,6 +7,8 @@ import {
   Divider,
   TimeInput,
   Input,
+  Select,
+  SelectItem,
 } from "@nextui-org/react";
 import toast, { Toaster } from "react-hot-toast";
 import { Time } from "@internationalized/date";
@@ -61,6 +63,14 @@ const Form = forwardRef(
 
       form.setData(res);
     };
+
+    // * Estados para las Tripulaciones
+    const estados = [
+      {key: "PARTIO", label: "Partió"},
+      {key: "LLEGO", label: "Llegó"},
+      {key: "NO_LLEGO", label: "No Llegó"},
+      {key: "ABANDONO", label: "Abandono"},
+    ];
 
     // * Para el Time Input's
     const parseTime = (timeString) => {
@@ -227,6 +237,27 @@ const Form = forwardRef(
               errorMessage={form.errors.penalizacion}
               className="no-zoom"
             />
+
+            <Select
+              variant="bordered"
+              label="Estado"
+              labelPlacement="outside"
+              placeholder="Estado..."
+              value={form.data.estado}
+              selectedKeys={[form.data.estado ? form.data.estado : "PARTIO"]}
+              color={form.invalid("estado") ? "danger" : "success"}
+              onChange={(e) => {
+                form.setData("estado", e.target.value);
+              }}
+              onBlur={() => form.validate("estado")}
+              isInvalid={form.invalid("estado")}
+              errorMessage={form.errors.estado}
+              isRequired
+            >
+              {estados.map((estado) => (
+                <SelectItem key={estado.key}>{estado.label}</SelectItem>
+              ))}
+            </Select>
 
             <Divider className="my-1" />
 
