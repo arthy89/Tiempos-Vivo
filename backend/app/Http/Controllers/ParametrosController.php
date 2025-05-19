@@ -84,7 +84,15 @@ class ParametrosController extends Controller
             }
     
             // Convertir hora_marcado a Carbon (con milisegundos)
-            $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
+            $horaMarcado = null;
+
+            try {
+                // Intenta primero con milisegundos
+                $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
+            } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+                // Si falla, intenta sin milisegundos
+                $horaMarcado = Carbon::createFromFormat('H:i:s', $tiempo->hora_marcado);
+            }
     
             // Convertir penalización a Carbon (sin milisegundos, formato H:i:s)
             $penalizacionString = explode('.', $tiempo->penalizacion ?? '00:00:00')[0];
@@ -164,7 +172,9 @@ class ParametrosController extends Controller
         // Si el boton presionado fue 'Gen. Inscripcion'
         if ($request->modo_partida === 'inscritos')
         {
-            $tripulaciones = Tripulacion::where('event_id', $parametro->event_id)->get();
+            $tripulaciones = Tripulacion::where('event_id', $parametro->event_id)
+                                        ->where('estado', 'EN_CARRERA')
+                                        ->get();
 
             if (count($tripulaciones->all()) === 0) return response()->json(['error' => 'No hay Tripulaciones Inscritas'], 412);
 
@@ -217,18 +227,20 @@ class ParametrosController extends Controller
         {
             // Consulta para traer el evento con especiales y tiempos
             $query = Event::where('id', $parametro->event_id)
-                    ->without(['org', 'ubigeo', 'tripulaciones'])  // Excluir relaciones no necesarias
-                    ->with(['especiales' => function ($query) {
-                        // Filtrar solo los especiales donde estado es true
-                        $query->where('estado', true);
-                    }, 'especiales.tiempos' => function ($query) {
-                        // Ordenar por hora marcada
-                        $query->orderBy('hora_marcado', 'asc');
-
-                        // Filtrar tiempos inválidos (hora_llegada no nula y hora_marcado distinto de 00:00:00.0)
-                        $query->whereNotNull('hora_llegada')
-                            ->where('hora_marcado', '!=', '00:00:00.0');
-                    }]);
+                    ->without(['org', 'ubigeo', 'tripulaciones'])
+                    ->with([
+                        'especiales' => function ($query) {
+                            $query->where('estado', true);
+                        },
+                        'especiales.tiempos' => function ($query) {
+                            $query->orderBy('hora_marcado', 'asc')
+                                ->whereNotNull('hora_llegada')
+                                ->where('hora_marcado', '!=', '00:00:00.0')
+                                ->whereHas('tripulacion', function ($q) {
+                                    $q->where('estado', 'EN_CARRERA');
+                                });
+                        }
+                    ]);
 
             // Obtener los datos del evento
             $eventData = $query->get();

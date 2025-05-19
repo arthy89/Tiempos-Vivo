@@ -5,6 +5,7 @@ export const columns = [
   // { name: "Categoría", uid: "categoria" },
   { name: "Vehiculo", uid: "auto" },
   { name: "Num", uid: "auto_num" },
+  { name: "Estado", uid: "estado" },
   { name: "Foto", uid: "foto_url" },
   { name: "Acciones", uid: "acciones" },
 ];

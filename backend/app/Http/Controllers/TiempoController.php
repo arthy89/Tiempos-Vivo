@@ -43,7 +43,13 @@ class TiempoController extends Controller
      */
     public function store(StoreTiempoRequest $request)
     {
-        // return $request;
+        // ESTADOS = [
+        //     {key: "PARTIO", label: "Partió"},
+        //     {key: "LLEGO", label: "Llegó"},
+        //     {key: "NO_LLEGO", label: "No Llegó"},
+        //     {key: "ABANDONO", label: "Abandono"},
+        // ];
+    
         // Validar si la tripulación ya está registrada para este especial
         $existing = Tiempo::where('especial_id', $request->especial_id)
                             ->where('tripulacion_id', $request->tripulacion_id)
@@ -56,6 +62,7 @@ class TiempoController extends Controller
         // * Crear Tiempo cuando se ingresa directamente el Resultado
         if ($request->hora_marcado) {
             $time_R = $request->except(['hora_salida', 'hora_llegada']);
+            $time_R['estado'] = 'LLEGO';
 
             $tiempo = Tiempo::create($time_R);
 
@@ -135,6 +142,7 @@ class TiempoController extends Controller
         // * Crear Tiempo cuando se ingresa directamente el Resultado
         if ($request->hora_marcado) {
             $time_R = $request->except(['hora_salida', 'hora_llegada']);
+            $time_R['estado'] = 'LLEGO';
 
             $tiempo->update($time_R);
 
@@ -185,6 +193,10 @@ class TiempoController extends Controller
         // Asignar el resultado en formato H:i:s.u
         $tiempo_resultado = sprintf('%02d:%02d:%02d.%03d', $horas, $minutos, $segundos, $milisegundos);
         $time_R['hora_marcado'] = $tiempo_resultado;
+
+        if ($request->estado !== 'ABANDONO' && $request->estado !== 'NO_LLEGO') {
+            $time_R['estado'] = 'LLEGO';
+        }
 
         $tiempo->update($time_R);
 

@@ -379,7 +379,7 @@ function OrdenPartida({ idEvent, eventName, modo }) {
               <div className="flex items-end justify-between gap-3">
                 <div className="flex gap-2">
                   {/* Botones */}
-                  <Tooltip color='primary' content="Por Inscripciones">
+                  <Tooltip color='primary' content="Por Inscripciones" placement="bottom">
                     <Button
                       type='submit'
                       color="primary"
@@ -391,7 +391,7 @@ function OrdenPartida({ idEvent, eventName, modo }) {
                     </Button>
                   </Tooltip>
 
-                  <Tooltip color='warning' content="Por Shakedown">
+                  <Tooltip color='warning' content="Por Shakedown" placement="bottom">
                     <Button
                       type='submit'
                       color="warning"
@@ -403,7 +403,7 @@ function OrdenPartida({ idEvent, eventName, modo }) {
                     </Button>
                   </Tooltip>
                   
-                  <Tooltip color='danger' content="Por Tiempos Acumulado">
+                  <Tooltip color='danger' content="Por Tiempos Acumulado" placement="bottom">
                     <Button
                       type='submit'
                       color="danger"
@@ -415,7 +415,7 @@ function OrdenPartida({ idEvent, eventName, modo }) {
                     </Button>
                   </Tooltip>
 
-                  <Tooltip color='danger' content="Eliminar Lista">
+                  <Tooltip color='danger' content="Eliminar Lista" placement="bottom">
                     <Button
                       type='submit'
                       color="danger"

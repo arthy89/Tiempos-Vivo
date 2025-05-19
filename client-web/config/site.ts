@@ -1,8 +1,14 @@
-export type SiteConfig = typeof siteConfig;
+export type SiteConfig = {
+  name: string;
+  description: string;
+  keywords: string[];
+  navItems: (user?: { id?: number }) => { label: string; href: string }[];
+  links: Record<string, string>;
+};
 
-export const siteConfig = {
+export const siteConfig: SiteConfig = {
   name: "Rally Cronos Perú",
-  description: "Tiempos en Vivo de competencias de Rally del Perú.",
+  description: "Tiempos en Vivo de competencias de Rally del Perú. | Rallycronos, rallycronos.",
   keywords: [
     "rally",
     "rally en vivo",
@@ -13,74 +19,29 @@ export const siteConfig = {
     "Rally Cronos Perú",
     "rallycronos",
   ],
-  navItems: [
-    {
-      label: "Inicio",
-      href: "/",
-    },
-    // {
-    //   label: "Admin",
-    //   href: "/admin",
-    // },
-    // {
-    //   label: "Eventos Admin",
-    //   href: "/admin/eventos",
-    // },
-    // {
-    //   label: "Pricing",
-    //   href: "/pricing",
-    // },
-    // {
-    //   label: "Blog",
-    //   href: "/blog",
-    // },
-    // {
-    //   label: "About",
-    //   href: "/about",
-    // },
-  ],
-  navMenuItems: [
-    {
-      label: "Profile",
-      href: "/profile",
-    },
-    {
-      label: "Admin",
-      href: "/admin",
-    },
-    {
-      label: "Eventos Admin",
-      href: "/admin/eventos",
-    },
-    // {
-    //   label: "Dashboard",
-    //   href: "/dashboard",
-    // },
-    // {
-    //   label: "Projects",
-    //   href: "/projects",
-    // },
-    // {
-    //   label: "Team",
-    //   href: "/team",
-    // },
-    // {
-    //   label: "Calendar",
-    //   href: "/calendar",
-    // },
-    // {
-    //   label: "Settings",
-    //   href: "/settings",
-    // },
-    // {
-    //   label: "Help & Feedback",
-    //   href: "/help-feedback",
-    // },
-    {
-      label: "Logout",
-      href: "/logout",
-    },
-  ],
+  navItems: (user) => {
+    const baseItems = [
+      {
+        label: "Inicio",
+        href: "/",
+      },
+    ];
+
+    const adminItems = user
+      ? [
+          {
+            label: "Admin",
+            href: "/admin",
+          },
+          {
+            label: "Eventos",
+            href: "/admin/eventos",
+          },
+        ]
+      : [];
+
+    return [...baseItems, ...adminItems];
+  },
   links: {
     github: "https://github.com/nextui-org/nextui",
     twitter: "https://twitter.com/getnextui",

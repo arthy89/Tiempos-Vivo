@@ -7,7 +7,8 @@ export const formData = {
   // cod_dist: '',
   // nombre: '',
 
-  org_id: 1,
+  org_id: "",
+  nf: false,
   name: "",
   descripcion: "",
   tipo: "",

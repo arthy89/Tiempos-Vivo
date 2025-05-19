@@ -48,8 +48,8 @@ RUN apk update && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     # xmlrpc \
     xsl \
     zip \
-    # pdo_pgsql \
-    # pgsql \
+    pdo_pgsql \
+    pgsql \
     #sql server
     && cd ~ \
     # Install composer

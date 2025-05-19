@@ -22,9 +22,11 @@ class Event extends Model
         'hora',
         'foto_url',
         'ruta_url',
+        'nf',
     ];
 
     // Relaciones principales
+    // protected $with = ['org', 'ubigeo', 'categorias', 'tripulaciones', 'especiales'];
     protected $with = ['org', 'ubigeo', 'categorias', 'tripulaciones', 'especiales'];
     // protected $appends = ['org', 'ubigeo', 'categorias'];
 

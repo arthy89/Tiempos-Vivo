@@ -14,6 +14,7 @@ import {
   Image,
   Select,
   SelectItem,
+  Chip,
 } from "@nextui-org/react";
 import toast, { Toaster } from "react-hot-toast";
 import { IoCarSportOutline } from "react-icons/io5";
@@ -121,8 +122,14 @@ function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
         // Ordenar los tiempos con una sola operación sort que combine ambas condiciones
         nuevosTiempos.sort((a, b) => {
           // Primero, verificar si tienen hora_llegada inválida (estos van al final)
-          const esHoraLlegadaInvalidaA = a.hora_llegada === null || a.hora_llegada === '00:00:00.0';
-          const esHoraLlegadaInvalidaB = b.hora_llegada === null || b.hora_llegada === '00:00:00.0';
+          const esHoraLlegadaInvalidaA =
+            a.hora_llegada === null ||
+            a.hora_llegada === '00:00:00' ||
+            a.hora_llegada === '00:00:00.0';
+          const esHoraLlegadaInvalidaB =
+            b.hora_llegada === null ||
+            b.hora_llegada === '00:00:00' ||
+            b.hora_llegada === '00:00:00.0';
 
           if (esHoraLlegadaInvalidaA && !esHoraLlegadaInvalidaB) return 1;
           if (!esHoraLlegadaInvalidaA && esHoraLlegadaInvalidaB) return -1;
@@ -191,16 +198,60 @@ function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
   };
 
   const calculateTimeDifference = (startTime, endTime) => {
-    const diff =
-      new Date(`1970-01-01T${endTime}`) - new Date(`1970-01-01T${startTime}`);
-    
-    const hours = Math.floor(diff / (1000 * 60 * 60)); // Calculate hours
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / 60000); // Calculate minutes
-    const seconds = Math.floor((diff % 60000) / 1000); // Calculate seconds
-    const milliseconds = Math.floor((diff % 1000) / 100); // Get first digit of milliseconds
-  
-    // Return format: HH:MM:SS.m or MM:SS.m when no hours involved
-    return `+ ${hours > 0 ? hours + ":" : ""}${minutes < 10 && hours > 0 ? "0" + minutes : minutes}:${seconds < 10 ? "0" : ""}${seconds}.${milliseconds}`;
+    // Función para parsear el tiempo en formato HH:MM:SS.m a horas, minutos, segundos y milisegundos
+    const parseTime = (timeString) => {
+        const [timePart, millisPart] = timeString.split('.'); // Separar la parte de milisegundos
+        const [hours, minutes, seconds] = timePart.split(':').map(Number); // Separar horas, minutos y segundos
+        const milliseconds = millisPart ? parseInt(millisPart.padEnd(3, '0')) : 0; // Completar con ceros si es necesario
+        return { hours, minutes, seconds, milliseconds };
+    };
+
+    // Si alguno es nulo o '00:00:00', retorna vacío
+    if (
+      !startTime ||
+      !endTime ||
+      startTime === "00:00:00" ||
+      endTime === "00:00:00"
+    ) {
+      return "";
+    }
+
+    // Si son iguales, es el primer puesto, retorna vacío
+    if (startTime === endTime) {
+      return "";
+    }
+
+    const start = parseTime(startTime);
+    const end = parseTime(endTime);
+
+    // Convertir todo a milisegundos para hacer la resta
+    const startInMillis = 
+        (start.hours * 3600000) + 
+        (start.minutes * 60000) + 
+        (start.seconds * 1000) + 
+        start.milliseconds;
+
+    const endInMillis = 
+        (end.hours * 3600000) + 
+        (end.minutes * 60000) + 
+        (end.seconds * 1000) + 
+        end.milliseconds;
+
+    // Si el tiempo final es menor que el inicial, retornar vacío
+    if (endInMillis < startInMillis) {
+        return '';
+    }
+
+    const diffInMillis = endInMillis - startInMillis;
+
+    // Convertir la diferencia a horas, minutos, segundos y milisegundos
+    const hoursDiff = Math.floor(diffInMillis / (3600000));
+    const minutesDiff = Math.floor((diffInMillis % (3600000)) / 60000);
+    const secondsDiff = Math.floor((diffInMillis % 60000) / 1000);
+    const millisDiff = Math.floor((diffInMillis % 1000) / 100); // Obtener solo el primer dígito de los milisegundos
+
+    // Formatear el tiempo en formato HH:MM:SS.m
+    return `+ ${hoursDiff > 0 ? hoursDiff + ':' : ''}${minutesDiff < 10 && hoursDiff > 0 ? '0' + minutesDiff : minutesDiff}:${secondsDiff < 10 ? '0' : ''}${secondsDiff}.${millisDiff}`;
   };
 
 
@@ -239,30 +290,39 @@ function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
   
       const columns = [
         "Nº",
-        "COCHE",
-        "PILOTO",
-        "CAT",
-        "H. SALIDA",
-        "H. LLEGADA",
-        "PENA",
+        "COCHE/CAT",
+        "PILOTO/NAVEGANTE",
+        "SALIDA",
+        "LLEGADA",
         "TIEMPO",
+        "ESTADO",
       ];
   
       const tableData = tiempos.map((tiempo, index) => [
         index + 1,
-        tiempo.tripulacion.auto_num,
-        `${tiempo.tripulacion.piloto.nombre} ${tiempo.tripulacion.piloto.apellidos}`,
-        tiempo.tripulacion.categoria,
+        `${tiempo.tripulacion.auto_num} | ${tiempo.tripulacion.categoria}`,
+        `${tiempo.tripulacion.piloto.nombre} ${tiempo.tripulacion.piloto.apellidos}\n${tiempo.tripulacion.navegante.nombre} ${tiempo.tripulacion.navegante.apellidos}`,
         tiempo.hora_salida,
         tiempo.hora_llegada,
-        tiempo.penalizacion,
-        tiempo.hora_marcado,
+        tiempo.penalizacion !== null && tiempo.penalizacion !== '00:00:00'
+          ? `${tiempo.hora_marcado}\n${tiempo.penalizacion}` // Evalua si existe una Penalizacion, sino solo muestra el tiempo acumulado
+          : `${tiempo.hora_marcado}`,
+        tiempo.estado === 'LLEGO'
+          ? 'Llegó'
+          : tiempo.estado === 'NO_LLEGO'
+          ? "No llegó"
+          : tiempo.estado === 'ABANDONO'
+          ? 'Abandonó'
+          : 'Partió',
       ]);
   
       doc.autoTable({
         head: [columns],
         body: tableData,
         startY: 25,
+        styles: {
+          valign: 'middle',
+        },
       });
 
       if (catRef.current == 'todas') {
@@ -392,7 +452,7 @@ function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
         return (
           <>
             <p>{row.hora_marcado}</p>
-            <p className="text-red-500">{row.penalizacion}</p>
+            <p className="text-red-500">{row.penalizacion != '00:00:00' ? row.penalizacion : ''}</p>
           </>
         );
 
@@ -422,15 +482,31 @@ function TiemposTable({ idEvent, especiales, categorias, modo, eventName }) {
         const diffWithPrev = prevTime
           ? calculateTimeDifference(prevTime, row.hora_marcado)
           : null;
+          
+        if (row.estado === 'PARTIO') {
+          return (<Chip variant="flat" size="sm" color="success">Partió</Chip>);
+        }
+        
+        if (row.estado === 'NO_LLEGO') {
+          return (<Chip variant="flat" size="sm" color="default">No llegó</Chip>);
+        }
 
-        return (
-          <>
-            <div className="text-blue-500 ">{diffWithFirst}</div>
-            {diffWithPrev && (
-              <div className="text-purple-500">{diffWithPrev}</div>
-            )}
-          </>
-        );
+        if (row.estado === 'ABANDONO') {
+          return (<Chip variant="flat" size="sm" color="danger">Abandonó</Chip>);
+        }
+        
+
+        if (row.estado === 'LLEGO')
+        {
+          return (
+            <>
+              <div className="text-blue-500 ">{diffWithFirst}</div>
+              {diffWithPrev && (
+                <div className="text-purple-500">{diffWithPrev}</div>
+              )}
+            </>
+          );
+        }
 
       // * Foto
       case "foto":

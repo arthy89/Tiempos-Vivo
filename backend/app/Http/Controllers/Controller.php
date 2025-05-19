@@ -47,10 +47,19 @@ class Controller extends BaseController
                 }
             }
         }
+        // Búsqueda
         if ($request->filled('search')) {
-            $querySet->where(function ($q) use ($searchBy, $request, $tableBaseName) {
+            $querySet->where(function ($q) use ($searchBy, $request) {
                 foreach ($searchBy as $searchByCol) {
-                    $q->orwhere(addOrSkipBaseTable($searchByCol, $tableBaseName), 'like', '%' . $request->input('search') . '%');
+                    // Si es un campo relacionado, utiliza whereHas
+                    if (strpos($searchByCol, '.') !== false) {
+                        $relation = explode('.', $searchByCol);
+                        $q->orWhereHas($relation[0], function ($query) use ($relation, $request) {
+                            $query->where($relation[1], 'ilike', '%' . $request->input('search') . '%');
+                        });
+                    } else {
+                        $q->orWhere($searchByCol, 'ilike', '%' . $request->input('search') . '%');
+                    }
                 }
                 return $q;
             });
@@ -100,10 +109,10 @@ class Controller extends BaseController
                     if (strpos($searchByCol, '.') !== false) {
                         $relation = explode('.', $searchByCol);
                         $q->orWhereHas($relation[0], function ($query) use ($relation, $request) {
-                            $query->where($relation[1], 'like', '%' . $request->input('search') . '%');
+                            $query->where($relation[1], 'ilike', '%' . $request->input('search') . '%');
                         });
                     } else {
-                        $q->orwhere($searchByCol, 'like', '%' . $request->input('search') . '%');
+                        $q->orWhere($searchByCol, 'ilike', '%' . $request->input('search') . '%');
                     }
                 }
                 return $q;
@@ -147,10 +156,10 @@ class Controller extends BaseController
                         $relationPath = implode('.', $relations); // Une las relaciones
 
                         $q->orWhereHas($relationPath, function ($query) use ($column, $searchTerm) {
-                            $query->where($column, 'like', '%' . $searchTerm . '%');
+                            $query->where($column, 'ilike', '%' . $searchTerm . '%');
                         });
                     } else {
-                        $q->orWhere($searchByCol, 'like', '%' . $searchTerm . '%');
+                        $q->orWhere($searchByCol, 'ilike', '%' . $searchTerm . '%');
                     }
                 }
             });

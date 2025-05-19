@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class EventController extends Controller
 {
@@ -22,11 +23,37 @@ class EventController extends Controller
         return $this->generateViewSetList(
             $request,
             Event::query(),
-            [],
+            ['org_id'],
             ['id', 'name'],
             ['id', 'name']
-            // ['id', 'nombre'],
-            // ['id', 'nombre', 'codigo']
+        );
+    }
+
+    public function index_less(Request $request)
+    {
+        $query = Event::without(['org', 'ubigeo', 'categorias', 'tripulaciones', 'especiales']);
+        // $query = $query->where('nf', null); // Solo eventos sin clase
+
+        return $this->generateViewSetList(
+            $request,
+            $query,
+            ['org_id', 'nf'],
+            ['id', 'name'],
+            ['id', 'name']
+        );
+    }
+
+    public function index_less_nf(Request $request)
+    {
+        $query = Event::without(['org', 'ubigeo', 'categorias', 'tripulaciones', 'especiales']);
+        // $query = $query->where('nf', !null); // Solo eventos con clase
+
+        return $this->generateViewSetList(
+            $request,
+            $query,
+            ['org_id', 'nf'],
+            ['id', 'name'],
+            ['id', 'name']
         );
     }
 
@@ -50,7 +77,15 @@ class EventController extends Controller
             }
     
             // Convertir hora_marcado a Carbon (con milisegundos)
-            $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
+            $horaMarcado = null;
+
+            try {
+                // Intenta primero con milisegundos
+                $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
+            } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+                // Si falla, intenta sin milisegundos
+                $horaMarcado = Carbon::createFromFormat('H:i:s', $tiempo->hora_marcado);
+            }
     
             // Convertir penalización a Carbon (sin milisegundos, formato H:i:s)
             $penalizacionString = explode('.', $tiempo->penalizacion ?? '00:00:00')[0];
@@ -101,27 +136,37 @@ class EventController extends Controller
             }, 'especiales.tiempos' => function ($query) use ($categoria) {
                 $query->orderBy('hora_marcado', 'asc');
 
-                // Filtrar por categoría si se proporciona
                 if ($categoria && $categoria != 'todas') {
                     $query->whereHas('tripulacion', function ($q) use ($categoria) {
                         $q->where('categoria', $categoria);
                     });
                 }
-
-                // Filtrar tiempos inválidos (hora_llegada no nula y hora_marcado distinto de 00:00:00.0)
-                $query->whereNotNull('hora_llegada')
-                    ->where('hora_marcado', '!=', '00:00:00.0');
             }]);
 
-        // Obtener los datos del evento
         $eventData = $query->get();
 
-        // Acumular los tiempos de las tripulaciones
-        $tiemposAcumulados = $this->calcularTiemposAcumulados($eventData->pluck('especiales.*.tiempos')->flatten());
+        // Acumular los tiempos
+        $tiemposAcumuladosArray = $this->calcularTiemposAcumulados(
+            $eventData->pluck('especiales.*.tiempos')->flatten()
+        );
+
+        // Convertir a colección para poder usar sortBy
+        $tiemposAcumulados = collect($tiemposAcumuladosArray);
+
+        // Ordenar los tiempos según estado de la tripulación
+        $tiemposAcumuladosOrdenados = $tiemposAcumulados->sortBy(function ($tiempo) {
+            $estado = $tiempo['tripulacion']['estado'] ?? 'EN_CARRERA';
+            return match ($estado) {
+                'EN_CARRERA' => 0,
+                'ABANDONO' => 1,
+                'DESCALIFICADO' => 2,
+                default => 3,
+            };
+        })->values(); // Reindexa la colección
 
         return response()->json([
             'event' => $eventData,
-            'tiempos_acumulados' => $tiemposAcumulados,
+            'tiempos_acumulados' => $tiemposAcumuladosOrdenados,
         ]);
     }
 
@@ -143,8 +188,15 @@ class EventController extends Controller
                 ];
             }
 
-            // Convertir hora_marcado y penalización
-            $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
+            $horaMarcado = null;
+
+            try {
+                // Intenta primero con milisegundos
+                $horaMarcado = Carbon::createFromFormat('H:i:s.u', $tiempo->hora_marcado);
+            } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+                // Si falla, intenta sin milisegundos
+                $horaMarcado = Carbon::createFromFormat('H:i:s', $tiempo->hora_marcado);
+            }
 
             $penalizacionString = explode('.', $tiempo->penalizacion ?? '00:00:00')[0];
             $penalizacion = Carbon::createFromFormat('H:i:s', $penalizacionString);
@@ -195,30 +247,38 @@ class EventController extends Controller
     {
         $eventId = $request->input('event_id');
 
-        // Consulta para traer el evento con especiales y tiempos
         $query = Event::where('id', $eventId)
             ->without(['org', 'ubigeo', 'tripulaciones'])  // Excluir relaciones no necesarias
             ->with(['especiales' => function ($query) {
-                // Filtrar solo los especiales donde estado es true
                 $query->where('estado', true);
             }, 'especiales.tiempos' => function ($query) {
-                // Ordenar por hora marcada
                 $query->orderBy('hora_marcado', 'asc');
-
-                // Filtrar tiempos inválidos (hora_llegada no nula y hora_marcado distinto de 00:00:00.0)
-                $query->whereNotNull('hora_llegada')
-                    ->where('hora_marcado', '!=', '00:00:00.0');
             }]);
 
-        // Obtener los datos del evento
         $eventData = $query->get();
 
-        // Acumular los tiempos de las tripulaciones
-        $tiemposConsolidados = $this->tiemposConsolidados($eventData->pluck('especiales.*.tiempos')->flatten());
+        // Acumular los tiempos
+        $tiemposConsolidadosArray = $this->tiemposConsolidados(
+            $eventData->pluck('especiales.*.tiempos')->flatten()
+        );
+
+        // Convertir a colección para poder ordenar
+        $tiemposConsolidados = collect($tiemposConsolidadosArray);
+
+        // Ordenar por estado de la tripulación
+        $tiemposConsolidadosOrdenados = $tiemposConsolidados->sortBy(function ($tiempo) {
+            $estado = $tiempo['tripulacion']['estado'] ?? 'EN_CARRERA';
+            return match ($estado) {
+                'EN_CARRERA' => 0,
+                'ABANDONO' => 1,
+                'DESCALIFICADO' => 2,
+                default => 3,
+            };
+        })->values();
 
         return response()->json([
             'evento' => $eventData,
-            'tiempos_consolidado' => $tiemposConsolidados,
+            'tiempos_consolidado' => $tiemposConsolidadosOrdenados,
         ]);
     }
 

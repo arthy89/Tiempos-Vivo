@@ -35,6 +35,7 @@ use App\Http\Controllers\UbigeoController;
 // });
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     $roles = $request->user()->roles;
+    $org = $request->user()->org;
     $permisos = [];
     foreach ($roles as $rol) {
 
@@ -50,6 +51,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
         // 'rolesSelected' => $request->user()->roles,
         'permisos' => $permisos,
         'roles' => $request->user()->roles->pluck('name'),
+        'org' => $org,
     ]);
 });
 
@@ -66,6 +68,8 @@ Route::apiResource('/permisos', PermisoController::class)->middleware([HandlePre
 Route::apiResource('/orgs', OrgController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/events', EventController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::get('/events_lite', [EventController::class, 'index_lite'])->middleware([HandlePrecognitiveRequests::class]);
+Route::get('/events_less', [EventController::class, 'index_less'])->middleware([HandlePrecognitiveRequests::class]);
+Route::get('/events_less_nf', [EventController::class, 'index_less_nf'])->middleware([HandlePrecognitiveRequests::class]);
 Route::get('/events_consolidado', [EventController::class, 'index_consolidado'])->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/categorias', CategoriaController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/especials', EspecialController::class)->middleware([HandlePrecognitiveRequests::class]);
@@ -76,6 +80,7 @@ Route::apiResource('/shakedowns', ShakedownController::class)->middleware([Handl
 
 Route::apiResource('/drivers', DriverController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::apiResource('/tripulacions', TripulacionController::class)->middleware([HandlePrecognitiveRequests::class]);
+Route::get('/tripulaciones_buscador', [TripulacionController::class, 'index_buscador'])->middleware([HandlePrecognitiveRequests::class]);
 // Route::apiResource('/parametros', ParametrosController::class)->middleware([HandlePrecognitiveRequests::class]);
 Route::get('/parametro_event', [ParametrosController::class, 'parametro_event'])->middleware([HandlePrecognitiveRequests::class]);
 Route::put('/update_params/{parametro}', [ParametrosController::class, 'update_params'])->middleware([HandlePrecognitiveRequests::class]);

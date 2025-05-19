@@ -38,10 +38,11 @@ export default function Home() {
     setSearch(value);
   };
 
-  const { data, mutate, isLoading } = EventoService.getData({
+  const { data, mutate, isLoading } = EventoService.getDataLess({
     page,
     rowsPerPage: rowPerPage,
     order_by: "-id",
+    nf: false,
     search,
   });
   // console.log(data?.last_page);

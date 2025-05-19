@@ -1,16 +1,30 @@
 version: '3.8'
 services:
-  mysql:
-    image: mysql
-    container_name: mysql
+  # mysql:
+  #   image: mysql
+  #   container_name: mysql
+  #   restart: always
+  #   ports:
+  #     - 3308:3306
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root
+  #     MYSQL_DATABASE: tiempos_en_vivo
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #   networks:
+  #     - app-network
+  postgres:
+    image: postgres:15
+    container_name: postgres
     restart: always
     ports:
-      - 3308:3306
+      - "5432:5432"
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: tiempos_en_vivo
+      POSTGRES_DB: tiempos_en_vivo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
 
@@ -31,7 +45,7 @@ services:
     ports:
       - "6001:6001"
     depends_on:
-      - mysql
+      - postgres
     networks:
       - app-network
 
@@ -134,7 +148,7 @@ services:
 
 # Definir volúmenes persistentes
 volumes:
-  mysql_data:
+  postgres_data:
     driver: local
   frontend_app:
     driver: local

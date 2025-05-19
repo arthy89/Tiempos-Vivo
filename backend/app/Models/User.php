@@ -23,9 +23,13 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'org_id',
         'password',
+        'estado',
     ];
     protected $guard_name = 'api';
+
+    // protected $with = ['org'];
 
     // public function validateForPassportPasswordGrant($password)
     // {
@@ -50,4 +54,20 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function org()
+    {
+        return $this->belongsTo(Org::class, 'org_id');
+    }
 }
+
+// TODO para asignar Roles a Usuarios desde Tinker
+// php artisan tinker
+
+// use App\Models\User;
+
+// $admin = User::where('email', 'aca_admin@gmail.com')->first();
+// $oficial = User::where('email', 'aca_ofi@gmail.com')->first();
+
+// $admin->assignRole('Administrador');
+// $oficial->assignRole('Oficial');

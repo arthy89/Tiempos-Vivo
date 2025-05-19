@@ -15,10 +15,34 @@ class TripulacionController extends Controller
      */
     public function index(Request $request)
     {
+        $query = Tripulacion::where('estado', 'EN_CARRERA');
+
         // Funcion que acepta tambien columnas anidadas
         return $this->newGenerateViewSetList(
             $request,
             Tripulacion::query(),
+            ['event_id'],
+            [
+            // 'id',
+            'piloto.nombre',
+            'piloto.apellidos',
+            'navegante.nombre',
+            'navegante.apellidos',
+            'auto_num'
+            ],
+            ['id', 'piloto', 'navegante', 'categoria'],
+        );
+    }
+
+    // Buscador
+    public function index_buscador(Request $request)
+    {
+        $query = Tripulacion::where('estado', 'EN_CARRERA');
+
+        // Funcion que acepta tambien columnas anidadas
+        return $this->newGenerateViewSetList(
+            $request,
+            $query,
             ['event_id'],
             [
             // 'id',

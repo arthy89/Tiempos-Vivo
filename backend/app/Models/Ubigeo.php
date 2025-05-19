@@ -11,6 +11,8 @@ class Ubigeo extends Model
     use HasFactory;
 
     protected $primaryKey = 'codigo';
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
         'codigo',

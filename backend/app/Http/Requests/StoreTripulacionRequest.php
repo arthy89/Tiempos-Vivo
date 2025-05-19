@@ -29,6 +29,7 @@ class StoreTripulacionRequest extends FormRequest
             'auto' => 'required',
             'auto_num' => 'required',
             'foto_url' => 'nullable',
+            'estado' => 'nullable',
         ];
     }
 }

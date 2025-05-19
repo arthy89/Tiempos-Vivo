@@ -8,4 +8,5 @@ export const formData = {
   hora_marcado: "",
   penalizacion: "",
   registrador: "",
+  estado: "PARTIO",
 };
