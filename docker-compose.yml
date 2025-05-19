@@ -23,6 +23,7 @@ services:
     restart: always
     volumes:
       - backend_app:/var/www/apitev/
+      - backend-archivos:/var/www/apitev/public/storage/
       # - ./nginx/php/php.ini:/usr/local/etc/php/conf.d/php.ini
     expose:
       - "9000"  # Exponemos PHP-FPM en el puerto 9000
@@ -121,6 +122,7 @@ services:
     container_name: nginx-laravel
     volumes:
       - backend_app:/var/www/apitev
+      - backend-archivos:/var/www/apitev/public/storage/
       - ./nginx/conf.d/:/etc/nginx/conf.d/
     restart: always
     ports:
@@ -137,6 +139,8 @@ volumes:
   frontend_app:
     driver: local
   backend_app:
+    driver: local
+  backend-archivos:
     driver: local
 
 
